@@ -23,6 +23,15 @@ class ScalaDoc {
     var reporter: ConsoleReporter = null
     val docSettings = new doc.Settings(msg => reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
     docSettings.debug.value = true
+
+    def jarPathOfClass(className: String) =
+      Class.forName(className).getProtectionDomain.getCodeSource.getLocation.getFile
+
+    val paths = List(
+      jarPathOfClass("scala.tools.nsc.Interpreter"),
+      jarPathOfClass("scala.ScalaObject"))
+    docSettings.bootclasspath.value = (docSettings.bootclasspath.value :: paths).mkString(":")
+
     reporter = new ConsoleReporter(docSettings) {
       // need to do this so that the Global instance doesn't trash all the
       // symbols just because there was an error
@@ -31,22 +40,7 @@ class ScalaDoc {
     val command = new ScalaDoc.Command(args.toList, docSettings)
     def hasFiles = command.files.nonEmpty || docSettings.uncompilableFiles.nonEmpty
 
-    if (docSettings.version.value)
-      reporter.info(null, versionMsg, true)
-    else if (docSettings.Xhelp.value)
-      reporter.info(null, command.xusageMsg, true)
-    else if (docSettings.Yhelp.value)
-      reporter.info(null, command.yusageMsg, true)
-    else if (docSettings.showPlugins.value)
-      reporter.warning(null, "Plugins are not available when using Scaladoc")
-    else if (docSettings.showPhases.value)
-      reporter.warning(null, "Phases are restricted when using Scaladoc")
-    else if (docSettings.help.value || !hasFiles)
-      reporter.info(null, command.usageMsg, true)
-    else try {
-      if (docSettings.target.value == "msil")
-        msilLibPath foreach (x => docSettings.assemrefs.value += (pathSeparator + x))
-
+    try {
       new OphirDocFactory(reporter, docSettings) document command.files
     }
     catch {
