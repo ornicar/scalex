@@ -4,6 +4,7 @@
 /lib
 /ophir
 *.html
+*.js
 
 # sbt specific
 dist/*
