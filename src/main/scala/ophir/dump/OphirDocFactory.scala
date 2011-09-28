@@ -4,6 +4,7 @@ package ophir.dump
 
 import scala.tools.nsc._
 import scala.tools.nsc.doc._
+import scala.tools.nsc.doc.model._
 import scala.util.control.ControlThrowable
 import scala.tools.nsc.reporters.Reporter
 import scala.tools.nsc.util.NoPosition
@@ -46,7 +47,6 @@ class OphirDocFactory(val reporter: Reporter, val settings: doc.Settings) { proc
     * previous calls to the same processor.
     * @param files The list of paths (relative to the compiler's source path, or absolute) of files to document. */
   def makeUniverse(files: List[String]): Option[Universe] = {
-    assert(settings.docformat.value == "html")
     new compiler.Run() compile files
     if (reporter.hasErrors)
       return None
@@ -60,7 +60,6 @@ class OphirDocFactory(val reporter: Reporter, val settings: doc.Settings) { proc
         } with Uncompilable { }
 
         compiler.docComments ++= uncompilable.comments
-        docdbg("" + uncompilable)
 
         uncompilable.templates
       }
@@ -98,31 +97,6 @@ class OphirDocFactory(val reporter: Reporter, val settings: doc.Settings) { proc
 
   /** Generate document(s) for all `files` containing scaladoc documenataion.
     * @param files The list of paths (relative to the compiler's source path, or absolute) of files to document. */
-  def document(files: List[String]): Unit = {
-    def generate() = {
-      import doclet._
-      val docletClass    = Class.forName(settings.docgenerator.value) // default is html.Doclet
-      val docletInstance = docletClass.newInstance().asInstanceOf[Generator]
-
-      docletInstance match {
-        case universer: Universer =>
-          val universe = makeUniverse(files) getOrElse { throw NoCompilerRunException }
-          universer setUniverse universe
-
-          docletInstance match {
-            case indexer: Indexer => indexer setIndex model.IndexModelFactory.makeIndex(universe)
-            case _                => ()
-          }
-        case _ => ()
-      }
-      docletInstance.generate
-    }
-
-    try generate()
-    catch documentError
-  }
-  private def docdbg(msg: String) {
-    if (settings.Ydocdebug.value)
-      println(msg)
-  }
+  def universe(files: List[String]): Universe =
+    makeUniverse(files) getOrElse { throw NoCompilerRunException }
 }

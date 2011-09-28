@@ -19,7 +19,7 @@ import Properties.msilLibPath
 class ScalaDoc {
   val versionMsg = "Scaladoc %s -- %s".format(Properties.versionString, Properties.copyrightString)
 
-  def process(args: Array[String]): Boolean = {
+  def process(args: Array[String]): Unit = {
     var reporter: ConsoleReporter = null
     val docSettings = new doc.Settings(msg => reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
     docSettings.debug.value = true
@@ -38,21 +38,12 @@ class ScalaDoc {
       override def hasErrors = false
     }
     val command = new ScalaDoc.Command(args.toList, docSettings)
-    def hasFiles = command.files.nonEmpty || docSettings.uncompilableFiles.nonEmpty
 
-    try {
-      new OphirDocFactory(reporter, docSettings) document command.files
-    }
-    catch {
-      case ex @ FatalError(msg) =>
-        if (docSettings.debug.value) ex.printStackTrace()
-        reporter.error(null, "fatal error: " + msg)
-    }
-    finally reporter.printSummary()
+    val universe = new OphirDocFactory(reporter, docSettings) universe command.files
+    val model = new ModelFactory makeModel universe
 
-    // not much point in returning !reporter.hasErrors when it has
-    // been overridden with constant false.
-    true
+    println("Got models: " + model.size)
+    println(model map (_.describe))
   }
 }
 
@@ -67,6 +58,7 @@ object ScalaDoc extends ScalaDoc {
   }
 
   def main(args: Array[String]): Unit = sys exit {
-    if (process(args)) 0 else 1
+    process(args)
+    0
   }
 }
