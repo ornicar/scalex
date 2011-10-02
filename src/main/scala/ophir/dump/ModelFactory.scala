@@ -13,37 +13,20 @@ class ModelFactory {
       def addMember(d: MemberEntity): Unit = {
         d match {
           case d: Def if (!(this contains d.qualifiedName)) => update(d.qualifiedName, makeDef(d))
-          case d => println(d)
+          case d =>
         }
       }
     }
 
     val done = mutable.HashSet.empty[String]
 
-    //def _gather(owner: DocTemplateEntity): Unit = {
-      //for(m <- owner.members) m match {
-        //case tpl: DocTemplateEntity  =>
-          //if (!(done contains tpl.qualifiedName)) {
-            //done += tpl.qualifiedName
-            //for (method <- tpl.methods if isValid(method)) {
-              //models += makeDef(method)
-            //}
-            ////for (method <- tpl.methods if !isValid(method)) {
-              ////println(List(
-                ////method, method.visibility.isPublic, method.isImplicit, method.isAbstract, method.inTemplate.isInstanceOf[Object]
-              ////).mkString(" "))
-            ////}
-            //gather(tpl)
-          //}
-        //case _ =>
-      //}
-    //}
-
     def gather(owner: DocTemplateEntity): Unit =
-      for(m <- owner.members if m.inDefinitionTemplates.isEmpty || m.inDefinitionTemplates.head == owner)
+      for(m <- owner.members if m.inDefinitionTemplates.isEmpty || m.inDefinitionTemplates.head == owner) {
+        println(m)
         m match {
           case tpl: DocTemplateEntity =>
             result.addMember(tpl)
+            println(m.methods)
             gather(tpl)
           case alias: AliasType =>
             result.addMember(alias)
@@ -53,6 +36,7 @@ class ModelFactory {
             result.addMember(non)
           case x @ _ =>
         }
+      }
 
     gather(universe.rootPackage)
 
