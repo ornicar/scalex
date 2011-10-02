@@ -28,7 +28,7 @@ import DocParser.Parsed
   * @param settings The settings to be used by the documenter and compiler for generating documentation.
   *
   * @author Gilles Dubochet */
-class OphirDocFactory(val reporter: Reporter, val settings: doc.Settings) { processor =>
+class Compiler(val reporter: Reporter, val settings: doc.Settings) { processor =>
   /** The unique compiler instance used by this processor and constructed from its `settings`. */
   object compiler extends Global(settings, reporter) with interactive.RangePositions {
     override protected def computeInternalPhases() {
@@ -75,15 +75,7 @@ class OphirDocFactory(val reporter: Reporter, val settings: doc.Settings) { proc
         }
     )
 
-    modelFactory.makeModel match {
-      case Some(madeModel) =>
-        println("model contains " + modelFactory.templatesCount + " documentable templates")
-        Some(madeModel)
-      case None =>
-        println("no documentable class found in compilation units")
-        None
-    }
-
+    modelFactory.makeModel
   }
 
   object NoCompilerRunException extends ControlThrowable { }

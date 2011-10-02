@@ -5,9 +5,9 @@
  */
 
 package ophir.dump
+import ophir.{model, db}
 
 import scala.tools.nsc._
-//import ophir.dump.OphirDocFactory
 import java.io.File.pathSeparator
 import scala.tools.nsc.reporters.ConsoleReporter
 import scala.tools.nsc.util.FakePos
@@ -16,10 +16,10 @@ import Properties.msilLibPath
 /** The main class for scaladoc, a front-end for the Scala compiler
  *  that generates documentation from source files.
  */
-class ScalaDoc {
+class Dumper {
   val versionMsg = "Scaladoc %s -- %s".format(Properties.versionString, Properties.copyrightString)
 
-  def process(args: Array[String]): Unit = {
+  def process(files: List[String]): Unit = {
     var reporter: ConsoleReporter = null
     val docSettings = new doc.Settings(msg => reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
     docSettings.debug.value = true
@@ -37,28 +37,16 @@ class ScalaDoc {
       // symbols just because there was an error
       override def hasErrors = false
     }
-    val command = new ScalaDoc.Command(args.toList, docSettings)
 
-    val universe = new OphirDocFactory(reporter, docSettings) universe command.files
-    val model = new ModelFactory makeModel universe
-
-    println("Got models: " + model.size)
-    println(model map (_.describe))
-  }
-}
-
-object ScalaDoc extends ScalaDoc {
-  class Command(arguments: List[String], settings: doc.Settings) extends CompilerCommand(arguments, settings) {
-    override def cmdName = "scaladoc"
-    override def usageMsg = (
-      createUsageMsg("where possible scaladoc", false, x => x.isStandard && settings.isScaladocSpecific(x.name)) +
-      "\n\nStandard scalac options also available:" +
-      createUsageMsg(x => x.isStandard && !settings.isScaladocSpecific(x.name))
-    )
-  }
-
-  def main(args: Array[String]): Unit = sys exit {
-    process(args)
-    0
+    val universe = new Compiler(reporter, docSettings) universe files
+    println("Extracting functions from the model...")
+    val models = new ModelFactory makeModel universe
+    println("Saving %d functions..." format models.size)
+    //models foreach { m => println(m) }
+    db.DefRepo.drop
+    db.DefRepo.index
+    models foreach { _ match {
+      case fun: model.Def => db.DefRepo.save(fun)
+    }}
   }
 }
