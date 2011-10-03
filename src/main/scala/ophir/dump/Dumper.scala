@@ -40,13 +40,10 @@ class Dumper {
 
     val universe = new Compiler(reporter, docSettings) universe files
     println("Extracting functions from the model...")
-    val models = new ModelFactory makeModel universe
-    println("Saving %d functions..." format models.size)
-    //models foreach { m => println(m) }
+    val functions = new ModelFactory makeModel universe
+    println("Saving %d functions..." format functions.size)
     db.DefRepo.drop
+    functions.sliding(5000, 5000).toList map db.DefRepo.save
     db.DefRepo.index
-    models foreach { _ match {
-      case fun: model.Def => db.DefRepo.save(fun)
-    }}
   }
 }

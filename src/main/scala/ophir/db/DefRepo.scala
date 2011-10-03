@@ -17,7 +17,6 @@ object DefRepo extends Repo[Def] {
   }
 
   override def index() {
-    collection.ensureIndex(MongoDBObject("qualifiedName" -> 1), "unicity", true)
     collection.ensureIndex(MongoDBObject("tokens" -> 1))
   }
 }

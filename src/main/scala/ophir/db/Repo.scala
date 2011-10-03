@@ -12,9 +12,14 @@ abstract class Repo[M <: CaseClass] {
 
   def index() = {}
 
-  def drop() { collection remove MongoDBObject.empty }
+  def drop() {
+    collection remove MongoDBObject.empty
+    collection.dropIndexes
+  }
 
   def save(obj: M) { collection insert serialize(obj) }
+
+  def save(objs: List[M]) { collection insert (objs map serialize) }
 
   def remove(obj: M) { collection remove serialize(obj) }
 
