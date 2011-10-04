@@ -13,7 +13,7 @@ case class Def(
 
   /** For members representing values: the type of the value returned by this member; for members
     * representing types: the type itself. */
-  , val resultType: TypeEntity
+  , val resultType: TypeEntityInterface
 
   /** The comment attached to this function, if any. */
   , val comment: String

@@ -7,7 +7,7 @@ case class ValueParam(
   val name: String
 
   /** The type of this value parameter. */
-  , val resultType: TypeEntity
+  , val resultType: TypeEntityInterface
 
   /** The devault value of this value parameter, if it has been defined. */
   , val defaultValue: Option[String]

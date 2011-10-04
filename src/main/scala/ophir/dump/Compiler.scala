@@ -67,9 +67,9 @@ class Compiler(val reporter: Reporter, val settings: doc.Settings) { processor =
 
     val modelFactory = (
       new { override val global: compiler.type = compiler }
-        with model.ModelFactory(compiler, settings)
-        with model.comment.CommentFactory
-        with model.TreeFactory {
+        with ModelFactory(compiler, settings)
+        with comment.CommentFactory
+        with TreeFactory {
           override def templateShouldDocument(sym: compiler.Symbol) =
             extraTemplatesToDocument(sym) || super.templateShouldDocument(sym)
         }

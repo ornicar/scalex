@@ -13,10 +13,10 @@ case class TypeParam(
   , val variance: String
 
   /** The lower bound for this type parameter, if it has been defined. */
-  , val lo: Option[TypeEntity]
+  , val lo: Option[TypeEntityInterface]
 
   /** The upper bound for this type parameter, if it has been defined. */
-  , val hi: Option[TypeEntity]
+  , val hi: Option[TypeEntityInterface]
 
   /** The type parameters of this entity. */
   , val typeParams: List[TypeParam]

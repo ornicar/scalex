@@ -5,7 +5,8 @@
  */
 
 package ophir.dump
-import ophir.{model, db}
+
+import ophir.db
 
 import scala.tools.nsc._
 import java.io.File.pathSeparator
@@ -13,9 +14,6 @@ import scala.tools.nsc.reporters.ConsoleReporter
 import scala.tools.nsc.util.FakePos
 import Properties.msilLibPath
 
-/** The main class for scaladoc, a front-end for the Scala compiler
- *  that generates documentation from source files.
- */
 class Dumper {
 
   def process(files: List[String]): Unit = {
