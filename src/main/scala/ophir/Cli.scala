@@ -1,8 +1,8 @@
 package ophir
 
-import ophir.dump.Dumper
-import ophir.dump.Locator
+import ophir.dump.{Dumper, Locator}
 import ophir.db.DefRepo
+import ophir.signature.Signature
 import ophir.search.Search
 import java.io.File
 
@@ -25,7 +25,10 @@ object Cli {
   }
 
   def list: String =
-    (DefRepo.findAll map (_.toString)) mkString "\n"
+    (DefRepo.findAll map {
+      //f => f.toString + " | " + Signature(f).toString
+      f => f.toString
+    }) mkString "\n"
 
   def search(query: String): String = {
     val results = (searchEngine find query map (_.toString)).toList

@@ -17,33 +17,41 @@ import Properties.msilLibPath
  *  that generates documentation from source files.
  */
 class Dumper {
-  val versionMsg = "Scaladoc %s -- %s".format(Properties.versionString, Properties.copyrightString)
 
   def process(files: List[String]): Unit = {
     var reporter: ConsoleReporter = null
     val docSettings = new doc.Settings(msg => reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
-    docSettings.debug.value = true
+    docSettings.debug.value = false
+    docSettings.bootclasspath.value = (docSettings.bootclasspath.value :: jarPaths).mkString(":")
+    reporter = new ConsoleReporter(docSettings) { override def hasErrors = false }
+
+    log("Creating universe...")
+    val universe = new Compiler(reporter, docSettings) universe files
+
+    log("Extracting functions from the model...")
+    val functions = new Extractor makeFunctions universe
+
+    log("Dropping previous DB...")
+    db.DefRepo.drop
+
+    log("Saving %d functions..." format functions.size)
+    functions.sliding(5000, 5000).toList map db.DefRepo.save
+
+    log("Indexing DB...")
+    db.DefRepo.index
+  }
+
+  private[this] def log(message: String) {
+    println("* " + message)
+  }
+
+  private[this] def jarPaths: List[String] = {
 
     def jarPathOfClass(className: String) =
       Class.forName(className).getProtectionDomain.getCodeSource.getLocation.getFile
 
-    val paths = List(
+    List(
       jarPathOfClass("scala.tools.nsc.Interpreter"),
       jarPathOfClass("scala.ScalaObject"))
-    docSettings.bootclasspath.value = (docSettings.bootclasspath.value :: paths).mkString(":")
-
-    reporter = new ConsoleReporter(docSettings) {
-      // need to do this so that the Global instance doesn't trash all the
-      // symbols just because there was an error
-      override def hasErrors = false
-    }
-
-    val universe = new Compiler(reporter, docSettings) universe files
-    println("Extracting functions from the model...")
-    val functions = new ModelFactory makeModel universe
-    println("Saving %d functions..." format functions.size)
-    db.DefRepo.drop
-    functions.sliding(5000, 5000).toList map db.DefRepo.save
-    db.DefRepo.index
   }
 }

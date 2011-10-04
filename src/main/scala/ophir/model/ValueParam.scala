@@ -18,7 +18,7 @@ case class ValueParam(
 ) {
 
   /** The human-readable representation of this param. */
-  override def toString = resultType.toString + (defaultValue match {
+  override def toString = name + ": " + resultType.toString + (defaultValue match {
     case Some(dv) => " = " + dv
     case None => ""
   })

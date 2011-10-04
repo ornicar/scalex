@@ -13,7 +13,7 @@ case class Parent(
 
   , val isObject: Boolean
 
-) extends Entity with HigherKinded {
+) extends HigherKinded {
 
   override def toString = name + showTypeParams
 }

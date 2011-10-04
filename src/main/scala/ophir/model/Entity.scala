@@ -1,6 +1,6 @@
 package ophir.model
 
-trait Entity extends Model {
+trait Entity {
   /** The name of the entity. It does not qualify this entity uniquely; use its `qualifiedName` instead. */
   val name: String
 

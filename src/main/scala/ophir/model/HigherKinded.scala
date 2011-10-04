@@ -6,7 +6,7 @@ trait HigherKinded extends Entity {
   /** The type parameters of this entity. */
   def typeParams: List[TypeParam]
 
-  def showTypeParams =
+  def showTypeParams: String =
     if (typeParams.isEmpty) ""
     else typeParams map (_.toString) mkString ("[", ", ", "]")
 }

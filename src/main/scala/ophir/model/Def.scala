@@ -39,7 +39,11 @@ case class Def(
   /** Signature of the function parameters, not including the host class */
   def paramSignature: String = valueParams map (_.toString) mkString ""
 
-  override def toString = qualifiedName + " " + signature
+  /** All value params flattened, ignoring curried methods separations */
+  def flattenedValueParams: List[ValueParam] =
+    valueParams.foldLeft(List[ValueParam]())((a, b) => a ::: b.params)
+
+  override def toString = qualifiedName + showTypeParams + ": " + signature
 }
 
 object Def {

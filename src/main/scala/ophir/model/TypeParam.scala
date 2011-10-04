@@ -21,7 +21,7 @@ case class TypeParam(
   /** The type parameters of this entity. */
   , val typeParams: List[TypeParam]
 
-) extends HigherKinded {
+) extends Entity with HigherKinded {
 
   override def toString =
     variance + name + (
@@ -29,4 +29,11 @@ case class TypeParam(
     ) + (
       if (hi.isDefined) ">" + lo else ""
     ) + showTypeParams
+}
+
+object TypeParam {
+
+  def apply(name: String, typeParams: List[TypeParam] = Nil): TypeParam =
+    TypeParam(name, "", "", None, None, typeParams)
+
 }

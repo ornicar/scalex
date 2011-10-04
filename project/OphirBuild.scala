@@ -11,7 +11,10 @@ object OphirBuild extends Build
       "org.scala-lang" % "scala-compiler" % "2.9.0-1",
       "com.mongodb.casbah" %% "casbah" % "2.1.5.0",
       "org.slf4j" % "slf4j-simple" % "1.6.1" % "runtime",
-      "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT"
+      "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT",
+      "org.scala-tools.testing" %% "scalacheck" % "1.9",
+      "org.scala-tools.testing" % "test-interface" % "0.5",
+      "org.scalatest" % "scalatest_2.9.0" % "1.6.1"
     ),
     resolvers ++= Seq(
         "repo.novus rels" at "http://repo.novus.com/releases/",

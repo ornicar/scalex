@@ -5,9 +5,9 @@ import scala.tools.nsc.doc.Universe
 import scala.collection.mutable
 import scala.tools.nsc.doc.model._
 
-class ModelFactory {
+class Extractor {
 
-  def makeModel(universe: Universe): List[model.Def] = {
+  def makeFunctions(universe: Universe): List[model.Def] = {
 
     val functions = mutable.ListBuffer[model.Def]()
     val done = mutable.HashSet.empty[DocTemplateEntity]
@@ -103,14 +103,13 @@ class ModelFactory {
   }
 
   private[this] def makeValueParams(params: List[List[ValueParam]]) =
-    params.map(vs =>
-      model.ValueParams(vs.map(v =>
-        model.ValueParam(
-            v.name
-          , makeTypeEntity(v.resultType)
-          , v.defaultValue map (_.expression)
-          , v.isImplicit
-        )
-      ))
-  )
+    params.map(vs => model.ValueParams(vs map makeValueParam))
+
+  private[this] def makeValueParam(param: ValueParam): model.ValueParam =
+      model.ValueParam(
+          param.name
+        , makeTypeEntity(param.resultType)
+        , param.defaultValue map (_.expression)
+        , param.isImplicit
+      )
 }
