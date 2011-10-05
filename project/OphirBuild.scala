@@ -6,10 +6,10 @@ object OphirBuild extends Build
   lazy val root = Project("root", file(".")) settings(
     name := "Ophir",
     version := "0.1",
-    scalaVersion := "2.9.0-1",
+    scalaVersion := "2.9.1",
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-compiler" % "2.9.0-1",
-      "com.mongodb.casbah" %% "casbah" % "2.1.5.0",
+      "org.scala-lang" % "scala-compiler" % "2.9.1",
+      "com.mongodb.casbah" %% "casbah" % "2.1.5-1",
       "org.slf4j" % "slf4j-simple" % "1.6.1" % "runtime",
       "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT",
       "org.scala-tools.testing" %% "scalacheck" % "1.9",
