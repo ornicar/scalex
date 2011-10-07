@@ -34,4 +34,6 @@ abstract class Repo[M <: CaseClass] {
   def unserialize(dbo: DBObject): M = mapper asObject dbo
 
   def serialize(obj: M): DBObject = mapper asDBObject obj
+
+  def count: Long = collection.count
 }

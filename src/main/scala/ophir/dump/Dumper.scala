@@ -6,7 +6,7 @@
 
 package ophir.dump
 
-import ophir.db
+import ophir.db.DefRepo
 
 import scala.tools.nsc._
 import java.io.File.pathSeparator
@@ -27,13 +27,15 @@ class Dumper {
     val universe = new Compiler(reporter, docSettings) universe files
 
     log("Dropping previous DB...")
-    db.DefRepo.drop
+    DefRepo.drop
 
     log("Extracting functions from the model...")
-    (new Extractor).passFunctions(universe, db.DefRepo.save)
+    (new Extractor).passFunctions(universe, DefRepo.save)
 
     log("Indexing DB...")
-    db.DefRepo.index
+    DefRepo.index
+
+    log("Saved %d functions!" format DefRepo.count)
   }
 
   private[this] def log(message: String) {
