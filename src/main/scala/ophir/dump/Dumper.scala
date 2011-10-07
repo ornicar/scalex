@@ -26,14 +26,11 @@ class Dumper {
     log("Creating universe...")
     val universe = new Compiler(reporter, docSettings) universe files
 
-    log("Extracting functions from the model...")
-    val functions = new Extractor makeFunctions universe
-
     log("Dropping previous DB...")
     db.DefRepo.drop
 
-    log("Saving %d functions..." format functions.size)
-    functions.sliding(5000, 5000).toList map db.DefRepo.save
+    log("Extracting functions from the model...")
+    (new Extractor).passFunctions(universe, db.DefRepo.save)
 
     log("Indexing DB...")
     db.DefRepo.index

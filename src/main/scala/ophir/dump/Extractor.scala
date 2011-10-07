@@ -7,9 +7,8 @@ import ophir.dump.model._
 
 class Extractor {
 
-  def makeFunctions(universe: Universe): List[ophir.model.Def] = {
+  def passFunctions(universe: Universe, callback: List[ophir.model.Def] => Unit) {
 
-    val functions = mutable.ListBuffer[ophir.model.Def]()
     val done = mutable.HashSet.empty[DocTemplateEntity]
 
     def gather(tpl: DocTemplateEntity): Unit = {
@@ -18,29 +17,16 @@ class Extractor {
 
         val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract)
 
-        //members foreach println
-
         println("%s => %d functions" format (tpl, members.size))
 
-        members map { m => functions += makeDef(m) }
+        callback(members map makeDef)
 
-        tpl.templates map gather
+        tpl.templates foreach gather
       }
     }
 
     gather(universe.rootPackage)
-
-    functions.toList
   }
-
-  private[this] def isValid(fun: Def) =
-    fun.visibility.isPublic &&
-    !fun.isImplicit &&
-    !fun.isAbstract &&
-    (
-      fun.inTemplate.isInstanceOf[Trait]
-      || fun.inTemplate.isInstanceOf[Object]
-    )
 
   private[this] def makeDef(fun: NonTemplateMemberEntity) = fun match {
     case fun: Def => ophir.model.Def(
