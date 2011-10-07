@@ -2,7 +2,6 @@ package ophir.dump.model
 
 import scala.tools.nsc.doc.model.{TypeEntity => NscTypeEntity, TemplateEntity}
 import scala.collection._
-import ophir.model.TypeEntityInterface
 
 
 /** A type. Note that types and templates contain the same information only for the simplest types. For example, a type
@@ -18,7 +17,7 @@ abstract class TypeEntity extends NscTypeEntity {
     * character. The referenced character ranges do not to overlap or nest. The map is sorted by position. */
   def refEntity: SortedMap[Int, (TemplateEntity, Int)]
 
-  def fullType: TypeEntityInterface
+  def fullType: ophir.model.TypeEntity
 
   /** The human-readable representation of this type. */
   override def toString = name
@@ -27,7 +26,7 @@ abstract class TypeEntity extends NscTypeEntity {
 
 object TypeEntity {
 
-  def apply(te: NscTypeEntity, ft: TypeEntityInterface): TypeEntity = new TypeEntity {
+  def apply(te: NscTypeEntity, ft: ophir.model.TypeEntity): TypeEntity = new TypeEntity {
     val name = te.name
     val refEntity = te.refEntity
     val fullType = ft

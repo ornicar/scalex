@@ -3,19 +3,21 @@ package ophir.model
 case class Parent(
 
   /** See Entity */
-  val name: String
+  name: String
 
   /** See Entity */
-  , val qualifiedName: String
+  , qualifiedName: String
 
   /** The type parameters of this entity. */
-  , val typeParams: List[TypeParam]
+  , typeParams: List[TypeParam]
 
-  , val isObject: Boolean
+  , isObject: Boolean
 
 ) extends HigherKinded {
 
   override def toString = name + showTypeParams
+
+  def toTypeEntity: TypeEntity = Class(name, true, typeParams map (_.toTypeEntity))
 }
 
 object Parent {

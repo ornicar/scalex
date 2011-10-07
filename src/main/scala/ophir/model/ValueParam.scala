@@ -4,28 +4,30 @@ package ophir.model
 case class ValueParam(
 
   /** Variable name */
-  val name: String
+  name: String
 
   /** The type of this value parameter. */
-  , val resultType: TypeEntityInterface
+  , resultType: TypeEntity
 
   /** The devault value of this value parameter, if it has been defined. */
-  , val defaultValue: Option[String]
+  , defaultValue: Option[String]
 
   /** Whether this value parameter is implicit. */
-  , val isImplicit: Boolean
+  , isImplicit: Boolean
 
 ) {
 
   /** The human-readable representation of this param. */
-  override def toString = name + ": " + resultType.toString + (defaultValue match {
+  override def toString = (
+    if (isImplicit) "implicit " else ""
+  ) + name + ": " + resultType.toString + (defaultValue match {
     case Some(dv) => " = " + dv
     case None => ""
   })
 }
 
 case class ValueParams(
-  val params: List[ValueParam]
+  params: List[ValueParam]
 ) {
   override def toString = params map (_.toString) mkString ("(", ", ", ")")
 }

@@ -18,7 +18,9 @@ class Extractor {
 
         val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract)
 
-        //println("%s => %d functions" format (tpl, members.size))
+        //members foreach println
+
+        println("%s => %d functions" format (tpl, members.size))
 
         members map { m => functions += makeDef(m) }
 
@@ -94,7 +96,7 @@ class Extractor {
       )
   }
 
-  private[this] def makeTypeEntity(t: NscTypeEntity): ophir.model.TypeEntityInterface = {
+  private[this] def makeTypeEntity(t: NscTypeEntity): ophir.model.TypeEntity = {
     // convert to ophir TypeEntity, which is richer
     val te = t.asInstanceOf[TypeEntity]
     te.fullType

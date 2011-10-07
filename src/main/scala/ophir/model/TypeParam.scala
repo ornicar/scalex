@@ -4,22 +4,22 @@ package ophir.model
 case class TypeParam(
 
   /** See Entity */
-  val name: String
+  name: String
 
   /** See Entity */
-  , val qualifiedName: String
+  , qualifiedName: String
 
   /** The variance of this type type parameter. Valid values are "+", "-", and the empty string. */
-  , val variance: String
+  , variance: String
 
   /** The lower bound for this type parameter, if it has been defined. */
-  , val lo: Option[TypeEntityInterface]
+  , lo: Option[TypeEntity]
 
   /** The upper bound for this type parameter, if it has been defined. */
-  , val hi: Option[TypeEntityInterface]
+  , hi: Option[TypeEntity]
 
   /** The type parameters of this entity. */
-  , val typeParams: List[TypeParam]
+  , typeParams: List[TypeParam]
 
 ) extends Entity with HigherKinded {
 
@@ -29,6 +29,8 @@ case class TypeParam(
     ) + (
       if (hi.isDefined) ">" + lo else ""
     ) + showTypeParams
+
+  def toTypeEntity: TypeEntity = Class(name, name != qualifiedName, typeParams map (_.toTypeEntity))
 }
 
 object TypeParam {

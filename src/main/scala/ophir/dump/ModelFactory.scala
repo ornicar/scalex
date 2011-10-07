@@ -3,7 +3,7 @@ package ophir.dump
 import scala.tools.nsc
 import scala.collection._
 
-import ophir.model._
+import ophir.model.{ TypeEntity => OphirTypeEntity, _ }
 import ophir.dump.model.TypeEntity
 
 /** This trait extracts all required information for documentation from compilation units */
@@ -18,7 +18,7 @@ class ModelFactory(g: nsc.Global, s: nsc.doc.Settings)
   /** Override to keep more informations about the types */
   override def makeType(aType: Type, inTpl: => TemplateImpl): TypeEntity = {
 
-    def appendTypes1(types: List[Type]): List[TypeEntityInterface] = types match {
+    def appendTypes1(types: List[Type]): List[OphirTypeEntity] = types match {
       case Nil => Nil
       case tp :: tps => appendType1(tp) :: appendTypes1(tps)
     }
@@ -27,15 +27,20 @@ class ModelFactory(g: nsc.Global, s: nsc.doc.Settings)
       (args.length > 0) && (args.length - 1 <= definitions.MaxFunctionArity) &&
       (sym == definitions.FunctionClass(args.length - 1))
     }
-    def appendType1(tpe: Type): TypeEntityInterface = tpe match {
+    def appendType1(tpe: Type): OphirTypeEntity = tpe match {
       case tp: TypeRef if checkFunctionType(tp) => Fun(appendTypes1(tp.args))
       case tp: TypeRef if definitions.isScalaRepeatedParamType(tp) => Repeated(appendType1(tp.args.head))
       case tp: TypeRef if definitions.isByNameParamType(tp) => ByName(appendType1(tp.args.head))
       case tp: TypeRef if definitions.isTupleTypeOrSubtype(tp) => Tuple(appendTypes1(tp.args))
       case TypeRef(pre, aSym, targs) =>
         val bSym = normalizeTemplate(aSym)
-        val name = if (bSym.isNonClassType) bSym.name else makeTemplate(bSym).name
-        Class(name.toString, appendTypes1(targs))
+        val (name, isReal) =
+          if (bSym.isNonClassType) (bSym.name, false)
+          else (makeTemplate(bSym).name, true)
+        if (targs.isEmpty)
+          SimpleClass(name.toString, isReal)
+        else
+          ParameterizedClass(name.toString, isReal, appendTypes1(targs))
       /* Refined types */
       case RefinedType(parents, defs) =>
         val ps = appendTypes1((if (parents.length > 1) parents filterNot (_ == ObjectClass.tpe) else parents))

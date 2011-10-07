@@ -1,36 +1,83 @@
 package ophir.model
 
-trait TypeEntityInterface
+import com.novus.salat.annotations._
 
 /** A type. Note that types and templates contain the same information only for the simplest types. For example, a type
   * defines how a template's type parameters are instantiated (as in `List[Cow]`), what the template's prefix is
   * (as in `johnsFarm.Cow`), and supports compound or structural types. */
-case class TypeEntity (
+@Salat
+trait TypeEntity {
 
-  /** The human-readable representation of this type. */
-  val name: String
-
-  /** The types composing this type */
-
-) extends TypeEntityInterface {
-  /** The human-readable representation of this type. */
-  override def toString = name
+  def toIndex = toString
 }
 
-case class Class(val name: String, tparams: List[TypeEntityInterface]) extends TypeEntityInterface
+trait Class extends TypeEntity {
 
-case class Fun(val args: List[TypeEntityInterface]) extends TypeEntityInterface
+  val wildcard = "ø"
 
-case class Repeated(val arg: TypeEntityInterface) extends TypeEntityInterface
+  val name: String
+}
 
-case class ByName(val arg: TypeEntityInterface) extends TypeEntityInterface
+object Class {
 
-case class Tuple(val args: List[TypeEntityInterface]) extends TypeEntityInterface
+  def apply(name: String, isReal: Boolean, tparams: List[TypeEntity]): Class =
+    if (tparams.isEmpty)
+      SimpleClass(name, isReal)
+    else
+      ParameterizedClass(name, isReal, tparams)
+}
 
-case class Refined(val parents: List[TypeEntityInterface], val refinements: List[String]) extends TypeEntityInterface
+case class SimpleClass(name: String, isReal: Boolean) extends Class {
 
-case class NullaryMethod(val result: TypeEntityInterface) extends TypeEntityInterface
+  override def toString = name
 
-case class Polymorphic(val tparams: String, val result: TypeEntityInterface) extends TypeEntityInterface
+  override def toIndex = if (isReal) name else wildcard
+}
 
-case class Other(val text: String) extends TypeEntityInterface
+case class ParameterizedClass(name: String, isReal: Boolean, tparams: List[TypeEntity]) extends Class {
+
+  assume(!tparams.isEmpty, "Use a Class if params are empty")
+
+  private[this] def wrap(list: List[_]): String = list mkString ("[", ", ", "]")
+
+  override def toString = name + wrap(tparams)
+
+  override def toIndex = (if (isReal) name else wildcard) + wrap(tparams)
+}
+
+case class Fun(args: List[TypeEntity]) extends TypeEntity {
+
+  assume(!args.isEmpty, "Any function needs args")
+
+  private[this] def wrap(list: List[_]): String = list mkString ("(", " => ", ")")
+
+  override def toString = wrap(args)
+
+  override def toIndex = wrap(args map (_.toIndex))
+}
+
+case class Repeated(arg: TypeEntity) extends TypeEntity {
+
+  override def toString = arg + "*"
+}
+
+case class ByName(arg: TypeEntity) extends TypeEntity {
+
+  override def toString = "⇒ " + arg
+}
+
+case class Tuple(args: List[TypeEntity]) extends TypeEntity {
+
+  override def toString = args mkString ("(", ", ", ")")
+}
+
+case class Refined(parents: List[TypeEntity], refinements: List[String]) extends TypeEntity
+
+case class NullaryMethod(result: TypeEntity) extends TypeEntity
+
+case class Polymorphic(tparams: String, result: TypeEntity) extends TypeEntity
+
+case class Other(text: String) extends TypeEntity {
+
+  override def toString = text
+}
