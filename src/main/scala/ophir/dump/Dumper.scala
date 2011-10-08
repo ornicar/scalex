@@ -30,12 +30,12 @@ class Dumper {
     DefRepo.drop
 
     log("Extracting functions from the model...")
-    (new Extractor).passFunctions(universe, DefRepo.save)
+    (new Extractor).passFunctions(universe, DefRepo.batchInsert)
 
     log("Indexing DB...")
     DefRepo.index
 
-    log("Saved %d functions!" format DefRepo.count)
+    log("Saved %d functions!" format DefRepo.count())
   }
 
   private[this] def log(message: String) {

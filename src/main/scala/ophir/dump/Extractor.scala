@@ -7,7 +7,7 @@ import ophir.dump.model._
 
 class Extractor {
 
-  def passFunctions(universe: Universe, callback: List[ophir.model.Def] => Unit) {
+  def passFunctions(universe: Universe, callback: List[ophir.model.Def] => Any) {
 
     val done = mutable.HashSet.empty[DocTemplateEntity]
 
