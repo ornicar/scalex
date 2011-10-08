@@ -9,11 +9,12 @@ class Extractor {
 
   def passFunctions(universe: Universe, callback: List[ophir.model.Def] => Any) {
 
-    val done = mutable.HashSet.empty[DocTemplateEntity]
+    val done = mutable.HashSet.empty[Int]
 
     def gather(tpl: DocTemplateEntity): Unit = {
-      if (!(done contains tpl)) {
-        done += tpl
+      val tplHashCode = tpl.hashCode
+      if (!(done contains tplHashCode)) {
+        done += tplHashCode
 
         val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract)
 
