@@ -52,10 +52,9 @@ case class Def(
   def flatNonImplicitValueParams: List[ValueParam] =
     flatValueParams filter (!_.isImplicit)
 
-
   override def toString = (
     qualifiedName + showTypeParams + ": " + signature
-  ) + "\n" + typeSig + "\n" + normalizedTypeSig
+  )
 
   def typeSig = RawTypeSig(parent.toTypeEntity :: (flatNonImplicitValueParams map (_.resultType)) ::: List(resultType))
 

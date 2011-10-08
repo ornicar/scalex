@@ -2,6 +2,7 @@ package ophir.search
 
 import ophir.model.Def
 import ophir.db.DefRepo
+import ophir.parser.SigParser
 
 trait Engine {
 
@@ -22,8 +23,8 @@ class TextEngine extends Engine {
 class TypeEngine extends Engine {
 
   def find(query: Query): Iterator[Result] = {
-    val tokens = Def nameToTokens query.string
-    DefRepo findByTokens tokens map makeResult
+    val normalizedQuery = SigParser(query.string).normalize.toString
+    DefRepo findBySig normalizedQuery map makeResult
   }
 }
 
@@ -33,7 +34,7 @@ object Engine {
   val typeRegex = """^=>$""".r
 
   def find(query: Query): Iterator[Result] = query.string match {
-    case typeRegex(text) => (new TypeEngine) find query
     case textRegex(text) => (new TextEngine) find query
+    case _ => (new TypeEngine) find query
   }
 }

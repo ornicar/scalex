@@ -16,6 +16,9 @@ object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("o
     find(MongoDBObject("$and" -> equalities))
   }
 
+  def findBySig(sig: String): Iterator[Def] =
+    find(MongoDBObject("normalizedTypeSig" -> sig))
+
   def findAll: Iterator[Def] = find(MongoDBObject())
 
   def index() {
