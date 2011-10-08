@@ -18,5 +18,6 @@ object DefRepo extends Repo[Def] {
 
   override def index() {
     collection.ensureIndex(MongoDBObject("tokens" -> 1))
+    collection.ensureIndex(MongoDBObject("normalizedTypeSig" -> 1))
   }
 }

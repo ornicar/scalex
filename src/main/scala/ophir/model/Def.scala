@@ -1,5 +1,7 @@
 package ophir.model
 
+import com.novus.salat.annotations._
+
 case class Def(
 
   /** See Entity */
@@ -53,11 +55,12 @@ case class Def(
 
   override def toString = (
     qualifiedName + showTypeParams + ": " + signature
-  ) + "\n" + typeSig + "\n" + typeSigIndex
+  ) + "\n" + typeSig + "\n" + normalizedTypeSig
 
-  def typeSig = TypeSig(parent.toTypeEntity :: (flatNonImplicitValueParams map (_.resultType)) ::: List(resultType))
+  def typeSig = RawTypeSig(parent.toTypeEntity :: (flatNonImplicitValueParams map (_.resultType)) ::: List(resultType))
 
-  val typeSigIndex: String = typeSig.toIndex
+  @Persist
+  val normalizedTypeSig: String = typeSig.normalize.toString
 }
 
 object Def {
