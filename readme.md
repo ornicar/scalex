@@ -9,6 +9,8 @@
 
 Searches can be either textual (a list of words), or by type (a type signature) or both. A type search may optionally start with a `:` symbol. A search is considered a text search unless it contains a combination of text and symbols, or if it starts with `:`. To search for both a type and a name, place a `:` between them, for example "size : List[A] => Int"
 
+Ophir uses mongodb to store informations about scala library functions.
+
 ## Usage
 
 Run it with sbt.
