@@ -29,7 +29,7 @@ object OphirBuild extends Build
     libraryDependencies ++= Seq(
       "org.scalatra" %% "scalatra" % "2.0.1",
       "javax.servlet" % "servlet-api" % "2.5" % "provided",
-      "org.mortbay.jetty" % "jetty" % "6.1.22" % "jetty"
+      "org.eclipse.jetty" % "jetty-webapp" % "7.4.5.v20110725" % "jetty"
     )
   )
 
