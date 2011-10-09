@@ -30,7 +30,7 @@ class Dumper {
     DefRepo.drop
 
     log("Extracting functions from the model...")
-    (new Extractor).passFunctions(universe, DefRepo.batchInsert)
+    (new Extractor(println)).passFunctions(universe, DefRepo.batchInsert)
 
     log("Indexing DB...")
     DefRepo.index

@@ -5,7 +5,7 @@ import scala.collection.mutable
 import scala.tools.nsc.doc.model.{ TypeEntity => NscTypeEntity, _ }
 import ophir.dump.model._
 
-class Extractor {
+class Extractor(logger: String => Unit) {
 
   def passFunctions(universe: Universe, callback: List[ophir.model.Def] => Any) {
 
@@ -29,27 +29,37 @@ class Extractor {
     gather(universe.rootPackage)
   }
 
-  private[this] def makeDef(fun: NonTemplateMemberEntity) = fun match {
-    case fun: Def => ophir.model.Def(
-        fun.name
-      , makeQualifiedName(fun.qualifiedName)
-      , makeParent(fun.inTemplate)
-      , makeTypeEntity(fun.resultType)
-      , HtmlWriter.commentToHtml(fun.comment).toString
-      , makeValueParams(fun.valueParams)
-      , makeTypeParams(fun.typeParams)
-      , makeTokens(makeQualifiedName(fun.qualifiedName))
-    )
-    case fun: Val => ophir.model.Def(
-        fun.name
-      , makeQualifiedName(fun.qualifiedName)
-      , makeParent(fun.inTemplate)
-      , makeTypeEntity(fun.resultType)
-      , HtmlWriter.commentToHtml(fun.comment).toString
-      , makeValueParams(Nil)
-      , makeTypeParams(Nil)
-      , makeTokens(makeQualifiedName(fun.qualifiedName))
-    )
+  private[this] def makeDef(fun: NonTemplateMemberEntity) = {
+
+    val commentHtml = TextUtil.removeTrailingNewline(HtmlWriter.commentToHtml(fun.comment).toString)
+    val commentText =
+      try { TextUtil.htmlToText(commentHtml) }
+      catch { case e: scala.xml.parsing.FatalError => logger("--" + e.toString); "" }
+
+    fun match {
+      case fun: Def => ophir.model.Def(
+          fun.name
+        , makeQualifiedName(fun.qualifiedName)
+        , makeParent(fun.inTemplate)
+        , makeTypeEntity(fun.resultType)
+        , commentHtml
+        , commentText
+        , makeValueParams(fun.valueParams)
+        , makeTypeParams(fun.typeParams)
+        , makeTokens(makeQualifiedName(fun.qualifiedName))
+      )
+      case fun: Val => ophir.model.Def(
+          fun.name
+        , makeQualifiedName(fun.qualifiedName)
+        , makeParent(fun.inTemplate)
+        , makeTypeEntity(fun.resultType)
+        , commentHtml
+        , commentText
+        , makeValueParams(Nil)
+        , makeTypeParams(Nil)
+        , makeTokens(makeQualifiedName(fun.qualifiedName))
+      )
+    }
   }
 
   private[this] def makeQualifiedName(name: String): String =
@@ -99,4 +109,15 @@ class Extractor {
         , param.defaultValue map (_.expression)
         , param.isImplicit
       )
+
+  private object TextUtil {
+
+    def htmlToText(html: String): String =
+      scala.xml.parsing.XhtmlParser(
+        scala.io.Source.fromString("<span>"+html.trim+"</span>")
+      ).text.lines map (_.trim) mkString
+
+    def removeTrailingNewline(text: String): String =
+      text.replaceAll("""(^\n|\n$)""", "")
+  }
 }

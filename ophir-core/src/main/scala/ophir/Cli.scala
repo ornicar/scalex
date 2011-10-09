@@ -33,26 +33,12 @@ object Cli {
 
   private def render(d: Def): String =
     d.name + "\n  " + d.toString + (
-      if (d.comment != "") "\n  " + renderComment(d.comment)
+      if (d.commentText != "") "\n  " + d.commentText
       else ""
     )
 
   private def render(ds: List[Def]): String =
     ds map render map ("* "+) mkString "\n\n"
-
-  private def renderComment(c: String): String =
-    TextUtil.removeTrailingNewline(TextUtil.htmlToText(c))
-
-  private object TextUtil {
-
-    def htmlToText(html: String): String =
-      scala.xml.parsing.XhtmlParser(
-        scala.io.Source.fromString("<span>"+html.trim+"</span>")
-      ).text.lines map (_.trim) mkString
-
-    def removeTrailingNewline(text: String): String =
-      text.replaceAll("""\n$""", "")
-  }
 
   def dump(fs: List[String]): String = {
     val files = fs map (f => new File(f))

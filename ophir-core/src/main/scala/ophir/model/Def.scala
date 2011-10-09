@@ -18,7 +18,10 @@ case class Def(
   , resultType: TypeEntity
 
   /** The comment attached to this function, if any. */
-  , comment: String
+  , commentHtml: String
+
+  /** The comment attached to this function, if any, translated to raw text. */
+  , commentText: String
 
   /** The value parameters of this method. Each parameter block of a curried method is an element of the list.
     * Each parameter block is a list of value parameters. */
