@@ -3,8 +3,8 @@ import Keys._
 
 object OphirBuild extends Build
 {
-  lazy val root = Project("root", file(".")) settings(
-    name := "Ophir",
+  lazy val core = Project("core", file("ophir-core")) settings(
+    name := "Ophir Core",
     version := "0.1",
     scalaVersion := "2.9.1",
     libraryDependencies ++= Seq(
@@ -19,6 +19,17 @@ object OphirBuild extends Build
     resolvers ++= Seq(
         "repo.novus rels" at "http://repo.novus.com/releases/",
         "repo.novus snaps" at "http://repo.novus.com/snapshots/"
+    )
+  )
+
+  lazy val http = Project("http", file("ophir-http")) dependsOn(core) settings(
+    name := "Ophir HTTP",
+    version := "0.1",
+    scalaVersion := "2.9.1",
+    libraryDependencies ++= Seq(
+      "org.scalatra" %% "scalatra" % "2.0.1",
+      "javax.servlet" % "servlet-api" % "2.5" % "provided",
+      "org.mortbay.jetty" % "jetty" % "6.1.22" % "jetty"
     )
   )
 
