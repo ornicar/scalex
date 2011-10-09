@@ -4,37 +4,43 @@ import ophir.model.Def
 import ophir.db.DefRepo
 import ophir.parser.SigParser
 
-trait Engine {
-
-  protected def makeResult(d: Def): Result = Result(d)
-
-  def find(query: Query): Iterator[Result]
-}
-
-class TextEngine extends Engine {
-
-  def find(query: Query): Iterator[Result] = {
-    val tokens = Def nameToTokens query.string
-    DefRepo findByTokens tokens map makeResult
-  }
-}
-
-// List[String] => Int => List[Int]
-class TypeEngine extends Engine {
-
-  def find(query: Query): Iterator[Result] = {
-    val normalizedQuery = SigParser(query.string).normalize.toString
-    DefRepo findBySig normalizedQuery map makeResult
-  }
-}
+import Search.Result
 
 object Engine {
 
-  val textRegex = """^([\w\s-:]+)$""".r
-  val typeRegex = """^=>$""".r
+  private val mixedRegex = """^([^\:]+)\:(.+)$""".r
 
-  def find(query: Query): Iterator[Result] = query.string match {
-    case textRegex(text) => (new TextEngine) find query
-    case _ => (new TypeEngine) find query
+  def find(query: Query): Result = query.string match {
+    case mixedRegex(text, tpe) => MixedEngine find (text, tpe)
+    case tpe if tpe contains "=>" => TypeEngine find tpe
+    case text => TextEngine find text
+  }
+
+  object TextEngine {
+
+    def find(text: String): Result =
+      tokenize(text).right map DefRepo.findByTokens
+
+    def tokenize(text: String): Either[String, List[String]] = Def nameToTokens text match {
+      case Nil => Left("Empty text")
+      case tokens => Right(tokens)
+    }
+  }
+
+  object TypeEngine {
+
+    def find(tpe: String): Result =
+      normalize(tpe).right map DefRepo.findBySig
+
+    def normalize(tpe: String): Either[String, String] =
+      SigParser(tpe).right map (_.normalize.toString)
+  }
+
+  object MixedEngine {
+
+    def find(text: String, tpe: String): Result = for {
+      tokens <- (TextEngine tokenize text).right
+      normalized <- (TypeEngine normalize tpe).right
+    } yield DefRepo.findByTokensAndSig(tokens, normalized)
   }
 }

@@ -5,8 +5,12 @@ import scala.util.parsing.combinator._
 
 object SigParser extends RegexParsers {
 
-  def apply(pattern: String): RawTypeSig =
-    RawTypeSig(parseAll(typeEntities, pattern).get)
+  class SyntaxException(msg: String) extends Exception(msg)
+
+  def apply(pattern: String): Either[String, RawTypeSig] = parseAll(typeEntities, pattern) match {
+    case f: Failure => Left(f.toString)
+    case Success(result, _) => Right(RawTypeSig(result))
+  }
 
   private def typeEntities: Parser[List[TypeEntity]] = repsep(typeEntity, "=>")
 

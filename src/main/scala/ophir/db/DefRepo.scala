@@ -11,13 +11,17 @@ object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("o
 
   def batchInsert(objs: List[Def]) { collection insert (objs map _grater.asDBObject) }
 
-  def findByTokens(tokens: List[String]): Iterator[Def] = {
-    val equalities = tokens map (token => MongoDBObject("tokens" -> token.toLowerCase))
-    find(MongoDBObject("$and" -> equalities))
-  }
+  def findByTokens(tokens: List[String]): Iterator[Def] =
+    find(MongoDBObject("$and" -> tokensToEqualities(tokens)))
 
   def findBySig(sig: String): Iterator[Def] =
     find(MongoDBObject("normalizedTypeSig" -> sig))
+
+  def findByTokensAndSig(tokens: List[String], sig: String): Iterator[Def] =
+    find(MongoDBObject("$and" -> tokensToEqualities(tokens), "normalizedTypeSig" -> sig))
+
+  private def tokensToEqualities(tokens: List[String]) =
+    tokens map (token => MongoDBObject("tokens" -> token.toLowerCase))
 
   def findAll: Iterator[Def] = find(MongoDBObject())
 

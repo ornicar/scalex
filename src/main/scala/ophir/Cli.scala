@@ -12,7 +12,7 @@ object Cli {
 
   def locator = new Locator
 
-  def searchEngine = new Search
+  def searchEngine = Search
 
   def main(args: Array[String]): Unit = sys exit {
     println(args.head match {
@@ -30,9 +30,10 @@ object Cli {
       f => f.toString
     }) mkString "\n"
 
-  def search(query: String): String = {
-    val results = (searchEngine find query map (_.toString)).toList
-    (results mkString "\n") + "\nFound %d results" format results.size
+  def search(query: String): String = (Search find query) match {
+    case Left(msg) => msg
+    case Right(results) =>
+      (results mkString "\n") + "\nFound %d results" format results.size
   }
 
   def dump(fs: List[String]): String = {

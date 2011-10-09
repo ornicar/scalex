@@ -65,8 +65,5 @@ case class Def(
 object Def {
 
   def nameToTokens(name: String): List[String] =
-    name.split(Array('#', '.', ' ')).toList.distinct map (_.toLowerCase)
-
-  def typeToTokens(name: String): List[String] =
-    name.split(Array('#', '.', ' ')).toList.distinct map (_.toLowerCase)
+    name.split(Array('#', '.', ' ')).toList.distinct map (_.toLowerCase.trim)
 }

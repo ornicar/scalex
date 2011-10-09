@@ -1,8 +1,12 @@
 package ophir.search
 
-class Search {
+import ophir.model.Def
 
-  def find(queryString: String): Iterator[Result] = {
+object Search {
+
+  type Result = Either[String, Iterator[Def]]
+
+  def find(queryString: String): Result = {
     val query = Query(queryString)
     val results = Engine.find(query)
 
