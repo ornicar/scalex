@@ -21,18 +21,16 @@ Run it with sbt.
 
     > run search List[A] => (A => B) => List[B]
 
-    3 results for List[A] => (A => B) => List[B]
+    * mapConserve
+      collection.immutable.List#mapConserve[B<Some(A)>Some(A)]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
+      Builds a new list by applying a function to all elements of this list.Like xs map f, but returns xs unchanged if functionf maps all elements to themselves (wrt eq).
 
-    * collection.immutable.List#mapConserve[B<Some(A)>Some(A)]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
-      Builds a new list by applying a function to all elements of this list.
-    Like xs map f, but returns xs unchanged if function
-    f maps all elements to themselves (wrt eq).
+    * reverseMap
+      collection.immutable.List#reverseMap[B]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
+      Builds a new collection by applying a function to all elements of this list andcollecting the results in reversed order.
 
-    * collection.immutable.List#reverseMap[B]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
-      Builds a new collection by applying a function to all elements of this list and
-    collecting the results in reversed order.
-
-    * collection.immutable.List#map[B]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
+    * map
+      collection.immutable.List#map[B]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
       Builds a new collection by applying a function to all elements of this list.
 
 ## HTTP

@@ -32,7 +32,7 @@ object Cli {
   }
 
   private def render(d: Def): String =
-    d.toString + (
+    d.name + "\n  " + d.toString + (
       if (d.comment != "") "\n  " + renderComment(d.comment)
       else ""
     )
@@ -48,7 +48,7 @@ object Cli {
     def htmlToText(html: String): String =
       scala.xml.parsing.XhtmlParser(
         scala.io.Source.fromString("<span>"+html.trim+"</span>")
-      ).text
+      ).text.lines map (_.trim) mkString
 
     def removeTrailingNewline(text: String): String =
       text.replaceAll("""\n$""", "")
