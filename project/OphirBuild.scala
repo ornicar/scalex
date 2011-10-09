@@ -29,7 +29,8 @@ object OphirBuild extends Build
     libraryDependencies ++= Seq(
       "org.scalatra" %% "scalatra" % "2.0.1",
       "javax.servlet" % "servlet-api" % "2.5" % "provided",
-      "org.eclipse.jetty" % "jetty-webapp" % "7.4.5.v20110725" % "jetty"
+      "org.eclipse.jetty" % "jetty-webapp" % "7.4.5.v20110725" % "jetty",
+      "net.liftweb" % "lift-json_2.9.1" % "2.4-SNAPSHOT" from "http://scala-tools.org/repo-snapshots/net/liftweb/lift-json_2.9.1/2.4-SNAPSHOT/lift-json_2.9.1-2.4-SNAPSHOT.jar"
     )
   )
 
