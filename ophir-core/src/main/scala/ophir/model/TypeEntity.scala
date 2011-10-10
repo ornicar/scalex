@@ -79,7 +79,7 @@ case class Repeated(arg: TypeEntity) extends TypeEntity {
 
 case class ByName(arg: TypeEntity) extends TypeEntity {
 
-  override def toString = "⇒ " + arg
+  override def toString = "=> " + arg
 
   override def children = List(arg)
 

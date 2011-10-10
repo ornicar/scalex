@@ -25,7 +25,7 @@ object Cli {
 
   def list: String = render(DefRepo.findAll.toList)
 
-  def search(query: String): String = (Search find query).right map (_.toList) match {
+  def search(query: String): String = (Search find query).right map (_.take(10).toList) match {
     case Left(msg) => msg
     case Right(results) =>
       "%d results for %s\n\n%s" format (results.length, query, render(results))
