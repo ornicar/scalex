@@ -5,6 +5,7 @@
 /ophir
 *.html
 *.js
+*.war
 
 # sbt specific
 dist/*
