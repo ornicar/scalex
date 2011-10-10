@@ -39,7 +39,7 @@ case class Def(
 ) extends Entity with HigherKinded {
 
   /** Complete signature of the function including host class and return value */
-  def signature: String = List(classSignature, paramSignature, resultType) filter (_ != "") mkString " ⇒ "
+  def signature: String = List(classSignature, paramSignature, resultType) filter (_ != "") mkString " => "
 
   /** Signature of the host class */
   def classSignature: String = parent.toString
