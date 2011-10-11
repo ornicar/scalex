@@ -31,7 +31,7 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
 
   private[this] def makeDef(fun: NonTemplateMemberEntity) = {
 
-    val commentHtml = TextUtil.removeTrailingNewline(HtmlWriter.commentToHtml(fun.comment).toString)
+    val commentHtml = TextUtil.removeTrailingNewline(HtmlWriter.commentToHtml(fun.comment))
     val commentText =
       try { TextUtil.htmlToText(commentHtml) }
       catch { case e: scala.xml.parsing.FatalError => logger("--" + e.toString); "" }

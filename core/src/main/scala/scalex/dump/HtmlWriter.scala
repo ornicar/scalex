@@ -7,17 +7,20 @@ import scala.xml.NodeSeq
 object HtmlWriter {
   /** Transforms an optional comment into an styled HTML tree representing its body if it is defined, or into an empty
     * node sequence if it is not. */
-  def commentToHtml(comment: Option[Comment]): NodeSeq =
-    (comment map (commentToHtml(_))) getOrElse NodeSeq.Empty
+  def commentToHtml(comment: Option[Comment]): String =
+    nl2br(((comment map (commentToHtml(_))) getOrElse NodeSeq.Empty).toString)
 
   /** Transforms a comment into an styled HTML tree representing its body. */
   def commentToHtml(comment: Comment): NodeSeq =
     bodyToHtml(comment.body)
 
-  def bodyToHtml(body: Body): NodeSeq =
+  private def bodyToHtml(body: Body): NodeSeq =
     body.blocks flatMap (blockToHtml(_))
 
-  def blockToHtml(block: Block): NodeSeq = block match {
+  private def nl2br(html: String): String =
+    html.replace("\n", "<br />")
+
+  private def blockToHtml(block: Block): NodeSeq = block match {
     case Title(in, 1) => <h3>{ inlineToHtml(in) }</h3>
     case Title(in, 2) => <h4>{ inlineToHtml(in) }</h4>
     case Title(in, 3) => <h5>{ inlineToHtml(in) }</h5>
