@@ -15,13 +15,16 @@ object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("s
     find(MongoDBObject("$and" -> tokensToRegexes(tokens)))
 
   def findBySig(sig: String): Iterator[Def] =
-    find(MongoDBObject("sigTokens" -> sig.toLowerCase))
+    find(MongoDBObject("sigTokens" -> sigToRegex(sig)))
 
   def findByTokensAndSig(tokens: List[String], sig: String): Iterator[Def] =
-    find(MongoDBObject("$and" -> tokensToRegexes(tokens), "sigTokens" -> sig))
+    find(MongoDBObject("$and" -> tokensToRegexes(tokens), "sigTokens" -> sigToRegex(sig)))
 
   private def tokensToRegexes(tokens: List[String]) =
     tokens map (token => MongoDBObject("tokens" -> ("^%s" format token.toLowerCase).r))
+
+  private def sigToRegex(sig: String) =
+    ("^" + "(){}+*.[]-^$".toList.foldLeft(sig.toLowerCase)((a, b) => a.replace(b.toString, "\\" + b))).r
 
   def findAll: Iterator[Def] = find(MongoDBObject())
 
