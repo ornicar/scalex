@@ -32,9 +32,8 @@ object Cli {
   }
 
   private def render(d: Def): String =
-    d.name + "\n  " + d.toString + (
-      if (d.commentText != "") "\n  " + d.commentText
-      else ""
+    d.name + "\n  " + d.toString + "\n" + (
+      d.comment map (_.short) getOrElse "no comment"
     )
 
   private def render(ds: List[Def]): String =
