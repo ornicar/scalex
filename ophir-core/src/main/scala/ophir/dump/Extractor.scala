@@ -5,7 +5,7 @@ import scala.collection.mutable
 import scala.tools.nsc.doc.model.{ TypeEntity => NscTypeEntity, _ }
 import ophir.dump.model._
 
-class Extractor(logger: String => Unit) {
+class Extractor(logger: String => Unit, config: Dumper.Config) {
 
   def passFunctions(universe: Universe, callback: List[ophir.model.Def] => Any) {
 
@@ -35,29 +35,43 @@ class Extractor(logger: String => Unit) {
     val commentText =
       try { TextUtil.htmlToText(commentHtml) }
       catch { case e: scala.xml.parsing.FatalError => logger("--" + e.toString); "" }
+    val qualifiedName = makeQualifiedName(fun.qualifiedName)
+    val parent = makeParent(fun.inTemplate)
+    val resultType = makeTypeEntity(fun.resultType)
+    val valueParams = fun match {
+      case fun: Def => makeValueParams(fun.valueParams)
+      case fun: Val => makeValueParams(Nil)
+    }
+    val flatValueParams = valueParams.foldLeft(List[ophir.model.ValueParam]())((a, b) => a ::: b.params)
+    val typeSig = ophir.model.RawTypeSig(
+      parent.toTypeEntity :: (flatValueParams filter (!_.isImplicit) map (_.resultType)) ::: List(resultType))
+    val normSig = typeSig.normalize.toString
+    val sigTokens = makeSigTokens(List(normSig), config.aliases.toList) map (_.toLowerCase)
 
     fun match {
       case fun: Def => ophir.model.Def(
           fun.name
-        , makeQualifiedName(fun.qualifiedName)
-        , makeParent(fun.inTemplate)
-        , makeTypeEntity(fun.resultType)
+        , qualifiedName
+        , parent
+        , resultType
         , commentHtml
         , commentText
-        , makeValueParams(fun.valueParams)
+        , valueParams
         , makeTypeParams(fun.typeParams)
-        , makeTokens(makeQualifiedName(fun.qualifiedName))
+        , makeTokens(qualifiedName)
+        , sigTokens
       )
       case fun: Val => ophir.model.Def(
           fun.name
-        , makeQualifiedName(fun.qualifiedName)
-        , makeParent(fun.inTemplate)
-        , makeTypeEntity(fun.resultType)
+        , qualifiedName
+        , parent
+        , resultType
         , commentHtml
         , commentText
-        , makeValueParams(Nil)
+        , valueParams
         , makeTypeParams(Nil)
-        , makeTokens(makeQualifiedName(fun.qualifiedName))
+        , makeTokens(qualifiedName)
+        , sigTokens
       )
     }
   }
@@ -66,7 +80,21 @@ class Extractor(logger: String => Unit) {
     name.replace("scala.", "")
 
   private[this] def makeTokens(name: String): List[String] =
-    ophir.model.Def.nameToTokens(name)
+    addAliases(ophir.model.Def.nameToTokens(name), config.aliases.toList)
+
+  private[this] def addAliases(tokens: List[String], aliases: List[(String, String)]): List[String] = aliases match {
+    case Nil => tokens
+    case (a, b) :: rest => if (tokens contains a.toLowerCase) addAliases(b.toLowerCase :: tokens, rest) else addAliases(tokens, rest)
+  }
+
+  private[this] def makeSigTokens(sigs: List[String], aliases: List[(String, String)]): List[String] = aliases match {
+    case Nil => sigs
+    case (a, b) :: rest =>
+      if (sigs.head contains a)
+        addAliases(sigs.head.replace(a, b) :: sigs, rest)
+      else
+        addAliases(sigs, rest)
+  }
 
   private[this] def makeTypeParams(tps: List[TypeParam]): List[ophir.model.TypeParam] = tps map { tp =>
     ophir.model.TypeParam(

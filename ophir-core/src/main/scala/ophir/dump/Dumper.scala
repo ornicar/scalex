@@ -16,6 +16,10 @@ import Properties.msilLibPath
 
 class Dumper {
 
+  val config = Dumper.Config(Map(
+    "StringOps" -> "String"
+  ))
+
   def process(files: List[String]): Unit = {
     var reporter: ConsoleReporter = null
     val docSettings = new doc.Settings(msg => reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
@@ -30,7 +34,7 @@ class Dumper {
     DefRepo.drop
 
     log("Extracting functions from the model...")
-    (new Extractor(println)).passFunctions(universe, DefRepo.batchInsert)
+    (new Extractor(println, config)).passFunctions(universe, DefRepo.batchInsert)
 
     log("Indexing DB...")
     DefRepo.index
@@ -51,4 +55,9 @@ class Dumper {
       jarPathOfClass("scala.tools.nsc.Interpreter"),
       jarPathOfClass("scala.ScalaObject"))
   }
+}
+
+object Dumper {
+
+  case class Config(aliases: Map[String, String])
 }

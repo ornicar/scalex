@@ -15,10 +15,10 @@ object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("o
     find(MongoDBObject("$and" -> tokensToRegexes(tokens)))
 
   def findBySig(sig: String): Iterator[Def] =
-    find(MongoDBObject("normalizedTypeSig" -> sig))
+    find(MongoDBObject("sigTokens" -> sig))
 
   def findByTokensAndSig(tokens: List[String], sig: String): Iterator[Def] =
-    find(MongoDBObject("$and" -> tokensToRegexes(tokens), "normalizedTypeSig" -> sig))
+    find(MongoDBObject("$and" -> tokensToRegexes(tokens), "sigTokens" -> sig))
 
   private def tokensToRegexes(tokens: List[String]) =
     tokens map (token => MongoDBObject("tokens" -> ("^%s" format token.toLowerCase).r))
@@ -27,7 +27,7 @@ object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("o
 
   def index() {
     collection.ensureIndex(MongoDBObject("tokens" -> 1))
-    collection.ensureIndex(MongoDBObject("normalizedTypeSig" -> 1))
+    collection.ensureIndex(MongoDBObject("sigTokens" -> 1))
   }
 
   def drop() {

@@ -33,8 +33,8 @@ case class Def(
   /** The search text tokens */
   , tokens: List[String]
 
-  /** The search type tokens */
-  //, typeTokens: List[String]
+  /** The search signature tokens */
+  , sigTokens: List[String]
 
 ) extends Entity with HigherKinded {
 
@@ -47,22 +47,10 @@ case class Def(
   /** Signature of the function parameters, not including the host class */
   def paramSignature: String = valueParams map (_.toString) mkString ""
 
-  /** All value params flattened, ignoring curried methods separations */
-  def flatValueParams: List[ValueParam] =
-    valueParams.foldLeft(List[ValueParam]())((a, b) => a ::: b.params)
-
-  /** Non implicit value params */
-  def flatNonImplicitValueParams: List[ValueParam] =
-    flatValueParams filter (!_.isImplicit)
-
   override def toString = (
     qualifiedName + showTypeParams + ": " + signature
   )
 
-  def typeSig = RawTypeSig(parent.toTypeEntity :: (flatNonImplicitValueParams map (_.resultType)) ::: List(resultType))
-
-  @Persist
-  val normalizedTypeSig: String = typeSig.normalize.toString.toLowerCase
 }
 
 object Def {
