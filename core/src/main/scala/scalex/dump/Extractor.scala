@@ -43,9 +43,9 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
       case fun: Val => makeValueParams(Nil)
     }
     val flatValueParams = valueParams.foldLeft(List[scalex.model.ValueParam]())((a, b) => a ::: b.params)
-    val typeSig = scalex.model.RawTypeSig(
-      parent.toTypeEntity :: (flatValueParams filter (!_.isImplicit) map (_.resultType)) ::: List(resultType))
-    val normSig = typeSig.normalize.toString
+    val typeSigEnd = (flatValueParams filter (!_.isImplicit) map (_.resultType)) ::: List(resultType)
+    val typeSig = if (!parent.isObject) parent.toTypeEntity :: typeSigEnd else typeSigEnd
+    val normSig = scalex.model.RawTypeSig(typeSig).normalize.toString
     val sigTokens = makeSigTokens(List(normSig), config.aliases.toList) map (_.toLowerCase)
 
     fun match {
