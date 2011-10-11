@@ -3,18 +3,21 @@ package http
 
 import org.scalatra._
 import scalex.search.Search
-import scalex.model.Def
+import scalex.model.{Def, Block}
+import collection.mutable.WeakHashMap
 
 class MainServlet extends ScalatraServlet {
 
   val limit = 20
+
+  val cache = WeakHashMap[String, String]()
 
   get("/") {
     contentType = "application/json"
 
     val response = request.getParameter("q") match {
       case null | "" => "Empty query!"
-      case query => search(query, page)
+      case query => cache.getOrElseUpdate(query, search(query, page))
     }
 
     // handle jsonp
@@ -44,23 +47,44 @@ class MainServlet extends ScalatraServlet {
     "page" -> page
   ))
 
-  def funToJsonObject(fun: Def): JsonObject = JsonObject(Map(
-    "name" -> fun.name,
-    "qualifiedName" -> fun.qualifiedName,
-    "parent" -> JsonObject(Map(
-      "name" -> fun.parent.name,
-      "qualifiedName" -> fun.parent.qualifiedName,
-      "typeParams" -> fun.parent.showTypeParams
-    )),
-    "comment" -> JsonObject(Map(
-      "html" -> fun.commentHtml,
-      "text" -> fun.commentText
-    )),
-    "typeParams" -> fun.showTypeParams,
-    "resultType" -> fun.resultType,
-    "valueParams" -> fun.paramSignature,
-    "signature" -> fun.signature
-  ))
+  def funToJsonObject(fun: Def): JsonObject = {
+
+    def optionBlock(b: Option[Block]): JsonObject =
+      JsonObject("html" -> (b map (_.html)), "txt" -> (b map (_.txt)))
+
+    def block(b: Block): JsonObject =
+      JsonObject("html" -> b.html, "txt" -> b.txt)
+
+    JsonObject(
+      "name" -> fun.name,
+      "qualifiedName" -> fun.qualifiedName,
+      "parent" -> JsonObject(
+        "name" -> fun.parent.name,
+        "qualifiedName" -> fun.parent.qualifiedName,
+        "typeParams" -> fun.parent.showTypeParams
+      ),
+      "comment" -> (fun.comment map { com =>
+        JsonObject(
+          "short" -> block(com.short),
+          "body" -> block(com.body),
+          "authors" -> (com.authors map block),
+          "see" -> (com.see map block),
+          "result" -> optionBlock(com.result),
+          "version" -> optionBlock(com.version),
+          "since" -> optionBlock(com.since),
+          "todo" -> (com.todo map block),
+          "note" -> (com.note map block),
+          "example" -> (com.example map block),
+          "constructor" -> optionBlock(com.constructor),
+          "source" -> com.source
+        )
+      }),
+      "typeParams" -> fun.showTypeParams,
+      "resultType" -> fun.resultType,
+      "valueParams" -> fun.paramSignature,
+      "signature" -> fun.signature
+    ) removeNones
+  }
 
   case class JsonObject(pairs: Map[String, Any]) {
 
@@ -75,6 +99,20 @@ class MainServlet extends ScalatraServlet {
       case v: List[_] => v mkString ("[", ", ", "]")
       case v => quote(v.toString)
     }
+
+    def removeNones: JsonObject = JsonObject(
+      pairs map {
+        case (k, Some(o: JsonObject)) => (k, o.removeNones)
+        case (k, o: JsonObject) => (k, o.removeNones)
+        case (k, Some(v)) => (k, v)
+        case x => x
+      } filter {
+        case (k, None) => false
+        case (k, Nil) => false
+        case (k, o: JsonObject) if o.pairs.isEmpty => false
+        case x => true
+      }
+    )
 
     /**
     * Quote a string according to "JSON rules".
@@ -103,5 +141,10 @@ class MainServlet extends ScalatraServlet {
         case c => c.toChar
       }
     }
+  }
+
+  object JsonObject {
+
+    def apply(pairs: (String, Any)*): JsonObject = JsonObject(pairs.toMap)
   }
 }
