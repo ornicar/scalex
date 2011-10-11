@@ -44,6 +44,5 @@ object Cli {
     val sources = locator locate files map (_.getPath)
     dumper.process(sources)
     "Dump complete"
-    //list
   }
 }

@@ -20,15 +20,15 @@ case class Comment(
   , result: Option[Block] = None
 
   /** A map of exceptions that the entity can throw when accessed, and a description of what they mean. */
-  , throws: List[(String, Block)]
+  , throws: Map[String, Block]
 
   /** A map of value parameters, and a description of what they are. Typically, this provides additional information on
     * the domain of the parameters, contractual pre-conditions, etc. */
-  , valueParams: List[(String, Block)]
+  , valueParams: Map[String, Block]
 
   /** A map of type parameters, and a description of what they are. Typically, this provides additional information on
     * the domain of the parameters. */
-  , typeParams: List[(String, Block)]
+  , typeParams: Map[String, Block]
 
   /** The version number of the entity. There is no formatting or further meaning attached to this value. */
   , version: Option[Block]

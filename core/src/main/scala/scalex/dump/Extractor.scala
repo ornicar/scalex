@@ -79,9 +79,9 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
     , com.authors map makeBlock
     , com.see map makeBlock
     , com.result map makeBlock
-    , Nil //com.throws.toList map { case (a, b) => (a, makeBlock(b)) }
-    , Nil //com.valueParams.toList map { case (a, b) => (a, makeBlock(b)) }
-    , Nil //com.typeParams.toList map { case (a, b) => (a, makeBlock(b)) }
+    , com.throws.toMap map { case (a, b) => (a.replace(".", "_"), makeBlock(b)) }
+    , com.valueParams.toMap map { case (a, b) => (a.replace(".", "_"), makeBlock(b)) }
+    , com.typeParams.toMap map { case (a, b) => (a.replace(".", "_"), makeBlock(b)) }
     , com.version map makeBlock
     , com.since map makeBlock
     , com.todo map makeBlock
