@@ -6,7 +6,7 @@
 
     <servlet>
         <servlet-name>Api</servlet-name>
-        <servlet-class>ophir.http.MainServlet</servlet-class>
+        <servlet-class>scalex.http.MainServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

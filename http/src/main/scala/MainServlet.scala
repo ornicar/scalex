@@ -53,7 +53,7 @@ class MainServlet extends ScalatraServlet {
       "typeParams" -> fun.parent.showTypeParams
     )),
     "comment" -> JsonObject(Map(
-      //"html" -> fun.commentHtml,
+      "html" -> fun.commentHtml,
       "text" -> fun.commentText
     )),
     "typeParams" -> fun.showTypeParams,

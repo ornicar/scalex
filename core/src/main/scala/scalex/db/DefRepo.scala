@@ -15,7 +15,7 @@ object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("s
     find(MongoDBObject("$and" -> tokensToRegexes(tokens)))
 
   def findBySig(sig: String): Iterator[Def] =
-    find(MongoDBObject("sigTokens" -> sig))
+    find(MongoDBObject("sigTokens" -> sig.toLowerCase))
 
   def findByTokensAndSig(tokens: List[String], sig: String): Iterator[Def] =
     find(MongoDBObject("$and" -> tokensToRegexes(tokens), "sigTokens" -> sig))
