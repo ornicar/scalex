@@ -59,8 +59,7 @@ class MainServlet extends ScalatraServlet {
     "typeParams" -> fun.showTypeParams,
     "resultType" -> fun.resultType,
     "valueParams" -> fun.paramSignature,
-    "signature" -> fun.signature,
-    "normalizedSignature" -> fun.normalizedTypeSig
+    "signature" -> fun.signature
   ))
 
   case class JsonObject(pairs: Map[String, Any]) {

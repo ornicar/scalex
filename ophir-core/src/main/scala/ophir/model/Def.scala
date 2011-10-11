@@ -62,7 +62,7 @@ case class Def(
   def typeSig = RawTypeSig(parent.toTypeEntity :: (flatNonImplicitValueParams map (_.resultType)) ::: List(resultType))
 
   @Persist
-  val normalizedTypeSig: String = typeSig.normalize.toString
+  val normalizedTypeSig: String = typeSig.normalize.toString.toLowerCase
 }
 
 object Def {
