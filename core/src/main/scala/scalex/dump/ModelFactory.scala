@@ -35,7 +35,7 @@ class ModelFactory(g: nsc.Global, s: nsc.doc.Settings)
       case TypeRef(pre, aSym, targs) =>
         val bSym = normalizeTemplate(aSym)
         val (name, isReal) =
-          if (bSym.isNonClassType) (bSym.name, false)
+          if (bSym.isNonClassType) (bSym.name, !bSym.isDeferred)
           else (makeTemplate(bSym).name, true)
         if (targs.isEmpty)
           SimpleClass(name.toString, isReal)
