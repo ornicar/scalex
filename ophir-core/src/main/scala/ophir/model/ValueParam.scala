@@ -29,5 +29,10 @@ case class ValueParam(
 case class ValueParams(
   params: List[ValueParam]
 ) {
-  override def toString = params map (_.toString) mkString ("(", ", ", ")")
+
+  def isEmpty = params.isEmpty
+
+  override def toString =
+    if (params.size > 0) params map (_.toString) mkString ("(", ", ", ")")
+    else ""
 }
