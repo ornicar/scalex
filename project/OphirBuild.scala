@@ -1,10 +1,10 @@
 import sbt._
 import Keys._
 
-object OphirBuild extends Build
+object ScalexBuild extends Build
 {
-  lazy val core = Project("core", file("ophir-core")) settings(
-    name := "Ophir Core",
+  lazy val core = Project("core", file("core")) settings(
+    name := "Scalex Core",
     version := "0.1",
     scalaVersion := "2.9.1",
     libraryDependencies ++= Seq(
@@ -22,8 +22,8 @@ object OphirBuild extends Build
     )
   )
 
-  lazy val http = Project("http", file("ophir-http")) dependsOn(core) settings(
-    name := "Ophir HTTP",
+  lazy val http = Project("http", file("http")) dependsOn(core) settings(
+    name := "Scalex HTTP",
     version := "0.1",
     scalaVersion := "2.9.1",
     libraryDependencies ++= Seq(
