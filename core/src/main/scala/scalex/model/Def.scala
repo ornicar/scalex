@@ -18,10 +18,7 @@ case class Def(
   , resultType: TypeEntity
 
   /** The comment attached to this function, if any. */
-  , commentHtml: String
-
-  /** The comment attached to this function, if any, translated to raw text. */
-  , commentText: String
+  , comment: Option[Comment]
 
   /** The value parameters of this method. Each parameter block of a curried method is an element of the list.
     * Each parameter block is a list of value parameters. */
@@ -50,7 +47,6 @@ case class Def(
   override def toString = (
     qualifiedName + showTypeParams + ": " + signature
   )
-
 }
 
 object Def {

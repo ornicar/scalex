@@ -3,6 +3,7 @@ package scalex.dump
 import scala.tools.nsc.doc.Universe
 import scala.collection.mutable
 import scala.tools.nsc.doc.model.{ TypeEntity => NscTypeEntity, _ }
+import scala.tools.nsc.doc.model.comment._
 import scalex.dump.model._
 
 class Extractor(logger: String => Unit, config: Dumper.Config) {
@@ -31,10 +32,7 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
 
   private[this] def makeDef(fun: NonTemplateMemberEntity) = {
 
-    val commentHtml = TextUtil.removeTrailingNewline(HtmlWriter.commentToHtml(fun.comment))
-    val commentText =
-      try { TextUtil.htmlToText(commentHtml) }
-      catch { case e: scala.xml.parsing.FatalError => logger("--" + e.toString); "" }
+    val comment = makeComment(fun.comment)
     val qualifiedName = makeQualifiedName(fun.qualifiedName)
     val parent = makeParent(fun.inTemplate)
     val resultType = makeTypeEntity(fun.resultType)
@@ -54,8 +52,7 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
         , qualifiedName
         , parent
         , resultType
-        , commentHtml
-        , commentText
+        , comment
         , valueParams
         , makeTypeParams(fun.typeParams)
         , makeTokens(qualifiedName)
@@ -66,8 +63,7 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
         , qualifiedName
         , parent
         , resultType
-        , commentHtml
-        , commentText
+        , comment
         , valueParams
         , makeTypeParams(Nil)
         , makeTokens(qualifiedName)
@@ -75,6 +71,35 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
       )
     }
   }
+
+  private[this] def makeComment(comment: Option[Comment]) = comment map { com =>
+    scalex.model.Comment(
+      makeBlock(com.body)
+    , makeBlock(com.short)
+    , com.authors map makeBlock
+    , com.see map makeBlock
+    , com.result map makeBlock
+    , Nil //com.throws.toList map { case (a, b) => (a, makeBlock(b)) }
+    , Nil //com.valueParams.toList map { case (a, b) => (a, makeBlock(b)) }
+    , Nil //com.typeParams.toList map { case (a, b) => (a, makeBlock(b)) }
+    , com.version map makeBlock
+    , com.since map makeBlock
+    , com.todo map makeBlock
+    , com.note map makeBlock
+    , com.example map makeBlock
+    , com.source
+    , com.constructor map makeBlock
+    )
+  }
+
+  private[this] def makeBlock(body: Body): scalex.model.Block =
+    makeBlock(HtmlWriter.toHtml(body))
+
+  private[this] def makeBlock(inline: Inline): scalex.model.Block =
+    makeBlock(HtmlWriter.toHtml(inline))
+
+  private[this] def makeBlock(html: String): scalex.model.Block =
+    scalex.model.Block(html, HtmlWriter.htmlToText(html))
 
   private[this] def makeQualifiedName(name: String): String =
     name.replace("scala.", "")
@@ -131,21 +156,10 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
     params.map(vs => scalex.model.ValueParams(vs map makeValueParam))
 
   private[this] def makeValueParam(param: ValueParam): scalex.model.ValueParam =
-      scalex.model.ValueParam(
-          param.name
-        , makeTypeEntity(param.resultType)
-        , param.defaultValue map (_.expression)
-        , param.isImplicit
-      )
-
-  private object TextUtil {
-
-    def htmlToText(html: String): String =
-      scala.xml.parsing.XhtmlParser(
-        scala.io.Source.fromString("<span>"+html.trim+"</span>")
-      ).text.lines map (_.trim) mkString
-
-    def removeTrailingNewline(text: String): String =
-      text.replaceAll("""(^\n|\n$)""", "")
-  }
+    scalex.model.ValueParam(
+        param.name
+      , makeTypeEntity(param.resultType)
+      , param.defaultValue map (_.expression)
+      , param.isImplicit
+    )
 }
