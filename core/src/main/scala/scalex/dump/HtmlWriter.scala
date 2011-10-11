@@ -5,20 +5,24 @@ import scala.tools.nsc.doc.model.comment._
 import scala.xml.NodeSeq
 
 object HtmlWriter {
+
   /** Transforms an optional comment into an styled HTML tree representing its body if it is defined, or into an empty
     * node sequence if it is not. */
-  def commentToHtml(comment: Option[Comment]): String =
-    nl2br(((comment map (commentToHtml(_))) getOrElse NodeSeq.Empty).toString)
+  def toHtml(body: Body): String =
+    cleanup((body.blocks flatMap blockToHtml).mkString)
 
-  /** Transforms a comment into an styled HTML tree representing its body. */
-  def commentToHtml(comment: Comment): NodeSeq =
-    bodyToHtml(comment.body)
+  def toHtml(inline: Inline): String =
+    cleanup(inlineToHtml(inline).mkString)
 
-  private def bodyToHtml(body: Body): NodeSeq =
-    body.blocks flatMap (blockToHtml(_))
+  private def cleanup(html: String): String =
+    html.replace("\n", "").replaceAll("\\s{2,}", " ").lines map (_.trim) mkString
 
-  private def nl2br(html: String): String =
-    html.replace("\n", "<br />")
+  def htmlToText(html: String): String =
+    try {
+      scala.xml.parsing.XhtmlParser(scala.io.Source.fromString("<span>"+html+"</span>")).text
+    } catch {
+      case e: scala.xml.parsing.FatalError => html
+    }
 
   private def blockToHtml(block: Block): NodeSeq = block match {
     case Title(in, 1) => <h3>{ inlineToHtml(in) }</h3>
