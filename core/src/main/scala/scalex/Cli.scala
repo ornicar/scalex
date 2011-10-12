@@ -32,7 +32,7 @@ object Cli {
   }
 
   private def render(d: Def): String =
-    d.name + "\n  " + d.toString + "\n" + (
+    "[" + d.pack + "] " + d.name + "\n  " + d.toString + "\n" + (
       d.comment map (_.short) getOrElse "no comment"
     )
 
@@ -40,9 +40,10 @@ object Cli {
     ds map render map ("* "+) mkString "\n\n"
 
   def dump(fs: List[String]): String = {
-    val files = fs map (f => new File(f))
+    val pack = fs.head
+    val files = fs.tail map (f => new File(f))
     val sources = locator locate files map (_.getPath)
-    dumper.process(sources)
+    dumper.process(pack, sources)
     "Dump complete"
   }
 }

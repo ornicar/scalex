@@ -33,6 +33,9 @@ case class Def(
   /** The search signature tokens */
   , sigTokens: List[String]
 
+  /** The package containing the def */
+  , pack: String
+
 ) extends Entity with HigherKinded {
 
   /** Complete signature of the function including host class and return value */

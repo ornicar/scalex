@@ -20,7 +20,7 @@ class Dumper {
     "StringOps" -> "String"
   ))
 
-  def process(files: List[String]): Unit = {
+  def process(pack: String, files: List[String]): Unit = {
     var reporter: ConsoleReporter = null
     val docSettings = new doc.Settings(msg => reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
     docSettings.debug.value = false
@@ -30,11 +30,11 @@ class Dumper {
     log("Creating universe...")
     val universe = new Compiler(reporter, docSettings) universe files
 
-    log("Dropping previous DB...")
-    DefRepo.drop
+    log("Dropping previous pack...")
+    DefRepo.removePack(pack)
 
     log("Extracting functions from the model...")
-    (new Extractor(println, config)).passFunctions(universe, DefRepo.batchInsert)
+    (new Extractor(println, pack, config)).passFunctions(universe, DefRepo.batchInsert)
 
     log("Indexing DB...")
     DefRepo.index

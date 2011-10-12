@@ -28,10 +28,10 @@ object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("s
   def index() {
     collection.ensureIndex(MongoDBObject("tokens" -> 1))
     collection.ensureIndex(MongoDBObject("sigTokens" -> 1))
+    collection.ensureIndex(MongoDBObject("pack" -> 1))
   }
 
-  def drop() {
-    collection remove MongoDBObject()
-    collection.dropIndexes
+  def removePack(pack: String) {
+    collection remove MongoDBObject("pack" -> pack)
   }
 }

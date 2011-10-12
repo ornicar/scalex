@@ -85,7 +85,8 @@ class MainServlet extends ScalatraServlet {
       "typeParams" -> fun.showTypeParams,
       "resultType" -> fun.resultType,
       "valueParams" -> fun.paramSignature,
-      "signature" -> fun.signature
+      "signature" -> fun.signature,
+      "pack" -> fun.pack
     ) removeNones
   }
 

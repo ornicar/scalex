@@ -6,7 +6,7 @@ import scala.tools.nsc.doc.model.{ TypeEntity => NscTypeEntity, _ }
 import scala.tools.nsc.doc.model.comment._
 import scalex.dump.model._
 
-class Extractor(logger: String => Unit, config: Dumper.Config) {
+class Extractor(logger: String => Unit, pack: String, config: Dumper.Config) {
 
   def passFunctions(universe: Universe, callback: List[scalex.model.Def] => Any) {
 
@@ -57,6 +57,7 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
         , makeTypeParams(fun.typeParams)
         , makeTokens(qualifiedName)
         , sigTokens
+        , pack
       )
       case fun: Val => scalex.model.Def(
           fun.name
@@ -68,6 +69,7 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
         , makeTypeParams(Nil)
         , makeTokens(qualifiedName)
         , sigTokens
+        , pack
       )
     }
   }
@@ -101,8 +103,7 @@ class Extractor(logger: String => Unit, config: Dumper.Config) {
   private[this] def makeBlock(html: String): scalex.model.Block =
     scalex.model.Block(html, HtmlWriter.htmlToText(html))
 
-  private[this] def makeQualifiedName(name: String): String =
-    name.replace("scala.", "")
+  private[this] def makeQualifiedName(name: String): String = name
 
   private[this] def makeTokens(name: String): List[String] =
     addAliases(scalex.model.Def.nameToTokens(name), config.aliases.toList)
