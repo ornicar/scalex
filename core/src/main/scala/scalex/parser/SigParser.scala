@@ -14,6 +14,8 @@ object SigParser extends RegexParsers {
 
   private def typeEntities: Parser[List[TypeEntity]] = repsep(typeEntity, "=>")
 
+  private def typeEntityList: Parser[List[TypeEntity]] = repsep(typeEntity, ",")
+
   private def typeEntity: Parser[TypeEntity] =
     function | parameterizedClass | unrealParameterizedClass | simpleClass | unrealClass
 
@@ -24,12 +26,12 @@ object SigParser extends RegexParsers {
     """\w{2,}""".r ^^ { name => SimpleClass(name, true) }
 
   private def unrealParameterizedClass: Parser[ParameterizedClass] =
-    """\w""".r ~ "[" ~ typeEntities ~ "]" ^^ {
+    """\w""".r ~ "[" ~ typeEntityList ~ "]" ^^ {
       case name ~ "[" ~ tpes ~ "]" => ParameterizedClass(name, false, tpes)
     }
 
   private def parameterizedClass: Parser[ParameterizedClass] =
-    """\w{2,}""".r ~ "[" ~ typeEntities ~ "]" ^^ {
+    """\w{2,}""".r ~ "[" ~ typeEntityList ~ "]" ^^ {
       case name ~ "[" ~ tpes ~ "]" => ParameterizedClass(name, true, tpes)
     }
 
