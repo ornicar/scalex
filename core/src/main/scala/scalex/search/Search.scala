@@ -8,7 +8,7 @@ object Search {
 
   type Result = Either[String, Iterator[Def]]
 
-  private val mixedRegex = """^([^\:]*)\:(.+)$""".r
+  private val mixedRegex = """^([^\:]*)\:\s(.+)$""".r
 
   def find(query: String): Result = query match {
     case mixedRegex("", tpe) => TypeEngine find tpe
