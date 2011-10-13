@@ -13,7 +13,7 @@ object Search {
   def find(query: String): Result = query match {
     case mixedRegex("", tpe) => TypeEngine find tpe
     case mixedRegex(text, tpe) => MixedEngine find (text, tpe)
-    case tpe if tpe contains "=>" => TypeEngine find tpe
+    case tpe if tpe contains " => " => TypeEngine find tpe
     case text => TextEngine find text
   }
 
