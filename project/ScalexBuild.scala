@@ -14,11 +14,13 @@ object ScalexBuild extends Build
       "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT",
       "org.scala-tools.testing" %% "scalacheck" % "1.9",
       "org.scala-tools.testing" % "test-interface" % "0.5",
-      "org.scalatest" % "scalatest_2.9.0" % "1.6.1"
+      "org.scalatest" % "scalatest_2.9.0" % "1.6.1",
+      "com.github.ornicar" % "paginator-core_2.9.1" % "1.0",
+      "com.github.ornicar" % "paginator-salat-adapter_2.9.1" % "1.0"
     ),
     resolvers ++= Seq(
-        "repo.novus rels" at "http://repo.novus.com/releases/",
-        "repo.novus snaps" at "http://repo.novus.com/snapshots/"
+      "repo.novus rels" at "http://repo.novus.com/releases/",
+      "repo.novus snaps" at "http://repo.novus.com/snapshots/"
     )
   )
 
@@ -29,8 +31,7 @@ object ScalexBuild extends Build
     libraryDependencies ++= Seq(
       "org.scalatra" %% "scalatra" % "2.0.1",
       "javax.servlet" % "servlet-api" % "2.5" % "provided",
-      "org.eclipse.jetty" % "jetty-webapp" % "7.4.5.v20110725" % "jetty",
-      "net.liftweb" % "lift-json_2.9.1" % "2.4-SNAPSHOT" from "http://scala-tools.org/repo-snapshots/net/liftweb/lift-json_2.9.1/2.4-SNAPSHOT/lift-json_2.9.1-2.4-SNAPSHOT.jar"
+      "org.eclipse.jetty" % "jetty-webapp" % "7.4.5.v20110725" % "jetty"
     )
   )
 

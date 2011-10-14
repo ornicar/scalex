@@ -6,19 +6,22 @@ import com.novus.salat.global._
 import com.novus.salat.annotations._
 import com.novus.salat.dao._
 import com.mongodb.casbah.Imports._
+import com.github.ornicar.paginator.adapter.SalatAdapter
 
 object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("scalex")("def")) {
 
+  def paginatorAdapter(query: MongoDBObject) = new SalatAdapter[Def, ObjectId](this, query)
+
   def batchInsert(objs: List[Def]) { collection insert (objs map _grater.asDBObject) }
 
-  def findByTokens(tokens: List[String]): Iterator[Def] =
-    find(MongoDBObject("$and" -> tokensToRegexes(tokens)))
+  def queryByTokens(tokens: List[String]): MongoDBObject =
+    MongoDBObject("$and" -> tokensToRegexes(tokens))
 
-  def findBySig(sig: String): Iterator[Def] =
-    find(MongoDBObject("sigTokens" -> sig.toLowerCase))
+  def queryBySig(sig: String): MongoDBObject =
+    MongoDBObject("sigTokens" -> sig.toLowerCase)
 
-  def findByTokensAndSig(tokens: List[String], sig: String): Iterator[Def] =
-    find(MongoDBObject("$and" -> tokensToRegexes(tokens), "sigTokens" -> sig.toLowerCase))
+  def queryByTokensAndSig(tokens: List[String], sig: String): MongoDBObject =
+    MongoDBObject("$and" -> tokensToRegexes(tokens), "sigTokens" -> sig.toLowerCase)
 
   private def tokensToRegexes(tokens: List[String]) =
     tokens map (token => MongoDBObject("tokens" -> ("^%s" format token.toLowerCase).r))

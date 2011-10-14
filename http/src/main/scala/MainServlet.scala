@@ -2,22 +2,35 @@ package scalex
 package http
 
 import org.scalatra._
-import scalex.search.Search
+import scalex.search.{Search, Query}
 import scalex.model.{Def, Block}
 import collection.mutable.WeakHashMap
+import com.github.ornicar.paginator._
+import javax.servlet.http._
+
+class SalatAdapter[A <: CaseClass](dao: DAO[A, ObjectId], query: MongoDBObject) extends Adapter[A] {
+
+  def nbResults = dao.count(query).toInt
+
+  def slice(offset: Int, length: Int): Seq[A] =
+    dao.find(query).skip(offset).limit(length).toSeq
+}
 
 class MainServlet extends ScalatraServlet {
 
-  val limit = 20
+  val limit = 3
 
-  val cache = WeakHashMap[String, String]()
+  val cache = WeakHashMap[Query, String]()
 
   get("/") {
     contentType = "application/json"
 
     val response = request.getParameter("q") match {
-      case null | "" => "Empty query!"
-      case query => cache.getOrElseUpdate(query, search(query, page))
+      case null | "" => error("Empty query!")
+      case q => {
+        val query = Query(q, request.getParameter("page").toInt, limit)
+        cache.getOrElseUpdate(query, search(query))
+      }
     }
 
     // handle jsonp
@@ -36,12 +49,14 @@ class MainServlet extends ScalatraServlet {
     case spage => spage.toInt
   }
 
-  def search(query: String, page: Int): String = Search find query match {
-    case Left(msg) => JsonObject(Map("error" -> msg)).toString
-    case Right(results) => makeResult(results.take(limit).toList, page).toString
+  def error(msg: String): String = JsonObject(Map("error" -> msg)).toString
+
+  def search(query: Query, page: Int): String = Search find query match {
+    case Left(msg) => error(msg)
+    case Right(results) => makeResult(results, page).toString
   }
 
-  def makeResult(funs: List[Def], page: Int): JsonObject = JsonObject(Map(
+  def makeResult(funs: Seq[Def], page: Int): JsonObject = JsonObject(Map(
     "results" -> (funs map funToJsonObject),
     "nb" -> funs.size,
     "page" -> page
