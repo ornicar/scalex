@@ -10,7 +10,7 @@ import com.github.ornicar.paginator.Paginator
 
 class MainServlet extends ScalatraServlet {
 
-  val limit = 10
+  val limit = 15
 
   val cache = WeakHashMap[Query, String]()
 
