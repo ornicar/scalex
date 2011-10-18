@@ -15,8 +15,8 @@ object ScalexBuild extends Build
       "org.scala-tools.testing" %% "scalacheck" % "1.9",
       "org.scala-tools.testing" % "test-interface" % "0.5",
       "org.scalatest" % "scalatest_2.9.0" % "1.6.1",
-      "com.github.ornicar" % "paginator-core_2.9.1" % "1.0",
-      "com.github.ornicar" % "paginator-salat-adapter_2.9.1" % "1.0"
+      "com.github.ornicar" % "paginator-core_2.9.1" % "1.1",
+      "com.github.ornicar" % "paginator-salat-adapter_2.9.1" % "1.1"
     ),
     resolvers ++= Seq(
       "repo.novus rels" at "http://repo.novus.com/releases/",
@@ -32,6 +32,10 @@ object ScalexBuild extends Build
       "org.scalatra" %% "scalatra" % "2.0.1",
       "javax.servlet" % "servlet-api" % "2.5" % "provided",
       "org.eclipse.jetty" % "jetty-webapp" % "7.4.5.v20110725" % "jetty"
+    ),
+    resolvers ++= Seq(
+      "repo.novus rels" at "http://repo.novus.com/releases/",
+      "repo.novus snaps" at "http://repo.novus.com/snapshots/"
     )
   )
 
