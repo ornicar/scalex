@@ -24,21 +24,13 @@ class MainServlet extends ScalatraServlet {
       }
     }
 
-    contentType = getSome("callback") match {
-      case None => "application/json"
-      case Some(_) => "application/javascript"
-    }
-
-    // handle jsonp
     getSome("callback") match {
-      case None => response
-      case Some(callback) => "%s(%s)" format (callback, response)
+      case None => contentType = "application/json"; response
+      case Some(c) => contentType = "application/javascript"; "%s(%s)" format (c, response)
     }
   }
 
-  notFound {
-    <h1>Not found. Bummer.</h1>
-  }
+  notFound { <h1>Not found. Bummer.</h1> }
 
   def getSome(name: String): Option[String] = request.getParameter(name) match {
     case null | "" => None
@@ -51,15 +43,7 @@ class MainServlet extends ScalatraServlet {
 
   def search(query: Query): String = Search find query match {
     case Left(msg) => error(msg)
-    case Right(paginator) => makeResult(query, paginator).toString
+    case Right(paginator) => Formatter(query.string, paginator).toString
   }
-
-  def makeResult(query: Query, paginator: Paginator[Def]): JsonObject = JsonObject(Map(
-    "query" -> query.string,
-    "results" -> (paginator.currentPageResults.toList map (JsonObject(_))),
-    "nbResults" -> paginator.nbResults,
-    "page" -> page,
-    "nbPages" -> paginator.nbPages
-  ))
 
 }
