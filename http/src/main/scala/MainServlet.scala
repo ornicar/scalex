@@ -7,6 +7,10 @@ import scalex.model.{Def, Block}
 import collection.mutable.WeakHashMap
 import javax.servlet.http._
 import com.github.ornicar.paginator.Paginator
+import net.liftweb.json.JsonAST._
+import net.liftweb.json.Extraction._
+import net.liftweb.json.Printer._
+
 
 class MainServlet extends ScalatraServlet {
 
@@ -47,19 +51,13 @@ class MainServlet extends ScalatraServlet {
 
   def page: Int = getSome("page") map (_.toInt) getOrElse(1)
 
-  def error(msg: String): String = JsonObject(Map("error" -> msg)).toString
+  def error(msg: String): String = """{"error": "%s"}""" format msg.replace('"', "\"")
 
   def search(query: Query): String = Search find query match {
     case Left(msg) => error(msg)
-    case Right(paginator) => makeResult(query, paginator).toString
+    case Right(paginator) => toJson(Builder(query.string, paginator))
   }
 
-  def makeResult(query: Query, paginator: Paginator[Def]): JsonObject = JsonObject(Map(
-    "query" -> query.string,
-    "results" -> (paginator.currentPageResults.toList map (JsonObject(_))),
-    "nbResults" -> paginator.nbResults,
-    "page" -> page,
-    "nbPages" -> paginator.nbPages
-  ))
-
+  def toJson(result: Product): String =
+    pretty(render(decompose(result, net.liftweb.json.DefaultFormats)))
 }
