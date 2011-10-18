@@ -13,17 +13,20 @@ class Extractor(logger: String => Unit, pack: String, config: Dumper.Config) {
     val done = mutable.HashSet.empty[Int]
 
     def gather(tpl: DocTemplateEntity): Unit = {
+
+      def isDeprecated(me: MemberEntity) = me.deprecation.isDefined
+
       val tplHashCode = tpl.hashCode
       if (!(done contains tplHashCode)) {
         done += tplHashCode
 
-        val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract)
+        val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract) filterNot isDeprecated
 
         println("%s => %d functions" format (tpl, members.size))
 
         callback(members map makeDef)
 
-        tpl.templates foreach gather
+        tpl.templates filterNot isDeprecated foreach gather
       }
     }
 
