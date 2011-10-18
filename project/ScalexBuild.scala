@@ -31,8 +31,7 @@ object ScalexBuild extends Build
     libraryDependencies ++= Seq(
       "org.scalatra" %% "scalatra" % "2.0.1",
       "javax.servlet" % "servlet-api" % "2.5" % "provided",
-      "org.eclipse.jetty" % "jetty-webapp" % "7.4.5.v20110725" % "jetty",
-      "net.liftweb" %% "lift-json" % "2.4-M4"
+      "org.eclipse.jetty" % "jetty-webapp" % "7.4.5.v20110725" % "jetty"
     ),
     resolvers ++= Seq(
       "repo.novus rels" at "http://repo.novus.com/releases/",
