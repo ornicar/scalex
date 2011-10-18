@@ -23,8 +23,11 @@ object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("s
   def queryByTokensAndSig(tokens: List[String], sig: String): MongoDBObject =
     MongoDBObject("$and" -> tokensToRegexes(tokens), "sigTokens" -> sig.toLowerCase)
 
-  private def tokensToRegexes(tokens: List[String]) =
-    tokens map (token => MongoDBObject("tokens" -> ("^%s" format token.toLowerCase).r))
+  private def tokensToRegexes(tokens: List[String]): List[DBObject] = {
+    val quoteRegex = """()[]{}\+-?^$.~""".toList.map("""\""" + _).mkString("(", "|", ")").r
+    def escapeToken(token: String) = quoteRegex.replaceAllIn(token, m => """\\""" + m.group(0))
+    tokens map (token => MongoDBObject("tokens" -> ("^%s" format escapeToken(token.toLowerCase)).r))
+  }
 
   def findAll: Iterator[Def] = find(MongoDBObject())
 

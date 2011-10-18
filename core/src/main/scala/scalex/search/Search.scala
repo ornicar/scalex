@@ -37,7 +37,7 @@ object Search {
       tokenize(text).right map DefRepo.queryByTokens
 
     def tokenize(text: String): Either[String, List[String]] = Def nameToTokens text match {
-      case Nil => Left("Empty text")
+      case Nil => Left("Empty query")
       case tokens => Right(tokens)
     }
   }
