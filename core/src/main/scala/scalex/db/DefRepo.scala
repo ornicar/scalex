@@ -6,11 +6,11 @@ import com.novus.salat.global._
 import com.novus.salat.annotations._
 import com.novus.salat.dao._
 import com.mongodb.casbah.Imports._
-import com.github.ornicar.paginator.adapter.SalatAdapter
+import com.github.ornicar.paginator.SalatAdapter
 
 object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("scalex")("def")) {
 
-  def paginatorAdapter(query: MongoDBObject) = new SalatAdapter[Def, ObjectId](this, query)
+  def paginatorAdapter(query: MongoDBObject) = SalatAdapter[Def, ObjectId](this, query)
 
   def batchInsert(objs: List[Def]) { collection insert (objs map _grater.asDBObject) }
 

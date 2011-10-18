@@ -3,8 +3,7 @@ package scalex.search
 import scalex.model.Def
 import scalex.db.DefRepo
 import scalex.parser.SigParser
-import com.github.ornicar.paginator.Paginator
-import com.github.ornicar.paginator.adapter.SalatAdapter
+import com.github.ornicar.paginator._
 
 import com.novus.salat._
 import com.novus.salat.global._
