@@ -15,7 +15,7 @@ object HtmlWriter {
     cleanup(inlineToHtml(inline).mkString)
 
   private def cleanup(html: String): String =
-    html.replace("\n", "").replaceAll("\\s{2,}", " ").lines map (_.trim) mkString
+    html.replace("\n", " ").replaceAll("\\s{2,}", " ").lines map (_.trim) mkString
 
   def htmlToText(html: String): String =
     try {
