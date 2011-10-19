@@ -32,9 +32,9 @@ object Formatter {
             "authors" -> (com.authors map block),
             "see" -> (com.see map block),
             "result" -> optionBlock(com.result),
-            "throws" -> JsonObject(com.throws map { case (k, v) => (k.replace("_", ".") -> block(v)) }),
-            "typeParams" -> JsonObject(com.typeParams map { case (k, v) => (k.replace("_", ".") -> block(v)) }),
-            "valueParams" -> JsonObject(com.valueParams map { case (k, v) => (k.replace("_", ".") -> block(v)) }),
+            "throws" -> JsonObject(com.throws map fixKey),
+            "typeParams" -> JsonObject(com.typeParams map fixKey),
+            "valueParams" -> JsonObject(com.valueParams map fixKey),
             "version" -> optionBlock(com.version),
             "since" -> optionBlock(com.since),
             "todo" -> (com.todo map block),
@@ -47,6 +47,10 @@ object Formatter {
       ) removeNones
     })
   )
+
+  private val fixKey: PartialFunction[(String, Block), (String, JsonObject)] = {
+    case (k, v) => (k.replace("_", ".") -> block(v))
+  }
 
   private def optionBlock(b: Option[Block]): JsonObject =
     JsonObject("html" -> (b map (_.html)), "txt" -> (b map (_.txt)))
