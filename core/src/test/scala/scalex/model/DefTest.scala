@@ -6,20 +6,13 @@ import scalex.model._
 
 class DefTest extends FunSuite {
 
-  test("Get flattened value params without curried method") {
-    val expected = List(
-      ValueParam("a", TypeEntity("A"), None, false),
-      ValueParam("b", TypeEntity("B"), None, false)
-    )
-    assert(Fixture.def1.flattenedValueParams === expected)
+  test("Get param signature without curried method") {
+    val expected = "(a: A, b: B)"
+    assert(Fixture.def1.paramSignature === expected)
   }
 
   test("Get flattened value params with curried method") {
-    val expected = List(
-      ValueParam("a", TypeEntity("A"), None, false),
-      ValueParam("b", TypeEntity("B"), None, false),
-      ValueParam("c", TypeEntity("C"), None, false)
-    )
-    assert(Fixture.def2.flattenedValueParams === expected)
+    val expected = "(a: A, b: B)(c: C)"
+    assert(Fixture.def2.paramSignature === expected)
   }
 }

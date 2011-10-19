@@ -8,26 +8,28 @@ object Fixture {
     "test",
     "",
     Parent("ptest", "", Nil, false),
-    TypeEntity("ttest"),
-    "test comment",
+    SimpleClass("ParentClass", true),
+    None,
     List(
       ValueParams(List(
-        ValueParam("a", TypeEntity("A"), None, false),
-        ValueParam("b", TypeEntity("B"), None, false)
+        ValueParam("a", SimpleClass("A", false), None, false),
+        ValueParam("b", SimpleClass("B", false), None, false)
       ))
     ),
     Nil,
-    Nil
+    Nil,
+    Nil,
+    "test"
   )
 
   val def2 = def1.copy(
     valueParams = List(
       ValueParams(List(
-        ValueParam("a", TypeEntity("A"), None, false),
-        ValueParam("b", TypeEntity("B"), None, false)
+        ValueParam("a", SimpleClass("A", false), None, false),
+        ValueParam("b", SimpleClass("B", false), None, false)
       )),
       ValueParams(List(
-        ValueParam("c", TypeEntity("C"), None, false)
+        ValueParam("c", SimpleClass("C", false), None, false)
       ))
     )
   )
