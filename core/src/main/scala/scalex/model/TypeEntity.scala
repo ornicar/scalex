@@ -6,7 +6,7 @@ import com.novus.salat.annotations._
   * defines how a template's type parameters are instantiated (as in `List[Cow]`), what the template's prefix is
   * (as in `johnsFarm.Cow`), and supports compound or structural types. */
 @Salat
-trait TypeEntity {
+sealed trait TypeEntity {
 
   type Dict = Map[String, String]
 
@@ -21,7 +21,7 @@ trait TypeEntity {
     types map (_.rename(dict))
 }
 
-trait Class extends TypeEntity {
+sealed trait Class extends TypeEntity {
 
   val name: String
 
