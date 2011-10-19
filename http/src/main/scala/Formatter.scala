@@ -20,6 +20,7 @@ object Formatter {
         "valueParams" -> fun.paramSignature,
         "signature" -> fun.signature,
         "package" -> fun.pack,
+        "deprecation" -> (fun.deprecation map block),
         "parent" -> JsonObject(
           "name" -> fun.parent.name,
           "qualifiedName" -> fun.parent.qualifiedName,
