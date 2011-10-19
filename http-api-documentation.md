@@ -37,6 +37,10 @@ The results are paginated by 15. Here is an output example for `http://api.scale
           valueParams: "f: (B => C)"  // Params the function accepts
           signature: "ListMap[A, +B] => (f: (B => C)) => Map[A, C]" // Normalized signature of the function
           package: "scala"            // Name of the package containing the function
+          deprecation: {              // Deprecation message if the function is deprecated, otherwise nothing
+            html:                     // HTML deprecation message
+            txt:                      // TXT deprecation message
+          }
           parent: {                   // class|trait|object containing the function
             name: "ListMap"           // Parent short name
             qualifiedName: "scala.collection.immutable.ListMap" // Parent full name
