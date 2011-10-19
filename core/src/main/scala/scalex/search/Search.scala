@@ -2,7 +2,6 @@ package scalex.search
 
 import scalex.model.Def
 import scalex.db.DefRepo
-import scalex.parser.SigParser
 import com.github.ornicar.paginator._
 
 import com.novus.salat._

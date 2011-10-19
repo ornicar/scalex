@@ -1,4 +1,4 @@
-package scalex.parser
+package scalex.search
 
 import scalex.model._
 import scala.util.parsing.combinator._
@@ -17,7 +17,7 @@ object SigParser extends RegexParsers {
   private def typeEntityList: Parser[List[TypeEntity]] = repsep(typeEntity, ",")
 
   private def typeEntity: Parser[TypeEntity] =
-    function | parameterizedClass | unrealParameterizedClass | simpleClass | unrealClass
+    tuple | function | parameterizedClass | unrealParameterizedClass | simpleClass | unrealClass
 
   private def unrealClass: Parser[SimpleClass] =
     """\w""".r ^^ { name => SimpleClass(name, false) }
@@ -38,6 +38,11 @@ object SigParser extends RegexParsers {
   private def function: Parser[Fun] =
     "(" ~ typeEntities ~ ")" ^^ {
       case  "(" ~ tpes ~ ")" => Fun(tpes)
+    }
+
+  private def tuple: Parser[Tuple] =
+    "(" ~ typeEntityList ~ ")" ^^ {
+      case  "(" ~ tpes ~ ")" => Tuple(tpes)
     }
 
   private def literal: Parser[TypeEntity] =
