@@ -36,6 +36,9 @@ case class Def(
   /** The package containing the def */
   , pack: String
 
+  /** Some deprecation message if this function is deprecated, or none otherwise. */
+  , deprecation: Option[Block]
+
 ) extends Entity with HigherKinded {
 
   /** Complete signature of the function including host class and return value */

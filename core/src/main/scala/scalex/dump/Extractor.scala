@@ -20,13 +20,13 @@ class Extractor(logger: String => Unit, pack: String, config: Dumper.Config) {
       if (!(done contains tplHashCode)) {
         done += tplHashCode
 
-        val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract) filterNot isDeprecated
+        val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract)
 
         println("%s => %d functions" format (tpl, members.size))
 
         callback(members map makeDef)
 
-        tpl.templates filterNot isDeprecated foreach gather
+        tpl.templates foreach gather
       }
     }
 
@@ -61,6 +61,7 @@ class Extractor(logger: String => Unit, pack: String, config: Dumper.Config) {
         , makeTokens(qualifiedName)
         , sigTokens
         , pack
+        , fun.deprecation map makeBlock
       )
       case fun: Val => scalex.model.Def(
           fun.name
@@ -73,6 +74,7 @@ class Extractor(logger: String => Unit, pack: String, config: Dumper.Config) {
         , makeTokens(qualifiedName)
         , sigTokens
         , pack
+        , fun.deprecation map makeBlock
       )
     }
   }
