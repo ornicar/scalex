@@ -1,9 +1,7 @@
 package scalex
 
 import scalex.dump.{Dumper, Locator}
-import scalex.db.DefRepo
 import scalex.model.Def
-import scalex.signature.Signature
 import scalex.search.{Search, Query}
 import java.io.File
 
