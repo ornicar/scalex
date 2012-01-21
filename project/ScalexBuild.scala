@@ -42,11 +42,11 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
       resolvers := Seq(typesafe, iliaz, novus),
       libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, paginatorSalat, scalaz)))
 
-  lazy val http = Project("http", file("http")) dependsOn(core) settings(
-    name := "scalex-http",
-    resolvers := Seq(novus),
-    libraryDependencies ++= Seq(scalatra, servlet, jetty, slf4j)
-  )
+  lazy val http = Project("http", file("http"),
+    settings = buildSettings ++ Seq(
+      name := "scalex-http",
+      resolvers := Seq(novus),
+      libraryDependencies ++= Seq(scalatra, servlet, jetty, slf4j))) dependsOn "core"
 }
 
 object ShellPrompt {
