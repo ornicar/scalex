@@ -16,8 +16,10 @@ object Search {
 
   private val mixedRegex = """^([^\:]*)\:\s(.+)$""".r
 
-  def find(query: Query): Result =
-    mongoQuery(query.string).right map { paginator(_, query.currentPage, query.maxPerPage) }
+  def find(query: Query): Result = for {
+    obj <- mongoQuery(query.string).right
+    paginator <- paginator(obj, query.currentPage, query.maxPerPage)
+  } yield paginator
 
   def mongoQuery(queryString: String): MongoQuery = queryString match {
     case mixedRegex("", tpe) => TypeEngine find tpe
@@ -27,7 +29,7 @@ object Search {
   }
 
   private[this] def paginator(query: MongoDBObject, currentPage: Int, maxPerPage: Int) =
-    new Paginator(DefRepo.paginatorAdapter(query), currentPage, maxPerPage)
+    Paginator(DefRepo.paginatorAdapter(query), currentPage, maxPerPage)
 
   object TextEngine {
 
