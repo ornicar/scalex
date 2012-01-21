@@ -40,12 +40,12 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
     settings = buildSettings ++ Seq(
       name := "scalex-core",
       resolvers := Seq(typesafe, iliaz, novus),
-      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, slf4j, paginator, paginatorSalat, scalaz)))
+      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, paginatorSalat, scalaz)))
 
   lazy val http = Project("http", file("http")) dependsOn(core) settings(
     name := "scalex-http",
     resolvers := Seq(novus),
-    libraryDependencies ++= Seq(scalatra, servlet, jetty)
+    libraryDependencies ++= Seq(scalatra, servlet, jetty, slf4j)
   )
 }
 
