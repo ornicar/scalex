@@ -1,9 +1,10 @@
 package object scalex
   extends scalaz.Identitys
-  with    scalaz.Equals
-  with    scalaz.MABs
-  with    scalaz.MAs
-  with    scalaz.Options {
+  with scalaz.Equals
+  with scalaz.MABs
+  with scalaz.MAs
+  with scalaz.Options
+  with scalaz.Booleans {
 
   /**
    * K combinator implementation

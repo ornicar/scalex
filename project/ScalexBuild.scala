@@ -21,9 +21,7 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val scalacheck = "org.scala-tools.testing" %% "scalacheck" % "1.9"
-  val test = "org.scala-tools.testing" % "test-interface" % "0.5"
-  val scalatest = "org.scalatest" %% "scalatest" % "1.6.1"
+  val specs2 = "org.specs2" %% "specs2" % "1.6.1"
   val casbah = "com.mongodb.casbah" %% "casbah" % "2.1.5-1"
   val salat = "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT"
   val compiler = "org.scala-lang" % "scala-compiler" % "2.9.1"
@@ -42,7 +40,7 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
     settings = buildSettings ++ Seq(
       name := "scalex-core",
       resolvers := Seq(typesafe, iliaz, novus),
-      libraryDependencies ++= Seq(scalacheck, test, scalatest, casbah, salat, compiler, slf4j, paginator, paginatorSalat, scalaz)))
+      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, slf4j, paginator, paginatorSalat, scalaz)))
 
   lazy val http = Project("http", file("http")) dependsOn(core) settings(
     name := "scalex-http",

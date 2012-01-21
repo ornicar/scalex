@@ -1,48 +1,50 @@
 package scalex.test.search
 
-import org.scalatest._
+import org.specs2.specification.Example
+import org.specs2.mutable._
 import scalex.search._
 import scalex.model.TypeParam
 
-class SigParserTest extends FunSuite {
+class SigParserTest extends Specification {
 
-  test("Parse identity") {
+  "Parse identity" in {
     =/=("a => a")
     =/=("A => a")
     =/=("a => A")
   }
 
-  test("Parse simple signature") {
+  "Parse simple signature" in {
     =/=("a => b")
     =/=("A => b")
     =/=("a => B")
   }
 
-  test("Parse list map") {
+  "Parse list map" in {
     =/=("list[a] => (a => b) => list[b]")
     =/=("List[e] => (e => z) => List[z]")
   }
 
-  test("Parse string toList") {
+  "Parse string toList" in {
     =/=("string => list[char]")
     =/=("String => List[Char]")
   }
 
-  test("Parse Either[A, B] => Boolean") {
+  "Parse Either[A, B] => Boolean" in {
     =/=("Either[A, B] => Boolean")
   }
 
-  test("Parse multi-argument type constructors") {
+  "Parse multi-argument type constructors" in {
     =/=("a => (a, b)")
   }
 
-  test("Parse list[either[a, b]] => (list[a], list[b])") {
+  "Parse list[either[a, b]] => (list[a], list[b])" in {
     =/=("list[either[a, b]] => (list[a], list[b])")
   }
 
-  private def =/=(sig: String): Unit = =/=(sig, sig)
+  private def =/=(sig: String): Example = =/=(sig, sig)
 
-  private def =/=(sig: String, expected: String): Unit = assert(parse(sig) === expected)
+  private def =/=(sig: String, expected: String): Example =
+    sig in { sig mustEqual expected }
 
   private def parse(str: String) = SigParser(str) match {
     case Right(typeSig) => typeSig.toString
