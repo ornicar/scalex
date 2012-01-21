@@ -12,13 +12,18 @@ object Cli {
   def locator = new Locator
 
   def main(args: Array[String]): Unit = sys exit {
-    println(args.head match {
-      case "dump" => dump(args.toList.tail)
-      case "search" => search(args.toList.tail mkString " ")
-      case "index" => index()
-      case command => "Unknown command " + command
+    println(args.toList match {
+      case Nil => "No command given."
+      case command :: args => process(command, args)
     })
     0
+  }
+
+  def process(command: String, args: List[String]) = command match {
+    case "dump" => dump(args)
+    case "search" => search(args mkString " ")
+    case "index" => index()
+    case command => "Unknown command " + command
   }
 
   def search(query: String): String = (Search find Query(query, 1, 5)) match {
