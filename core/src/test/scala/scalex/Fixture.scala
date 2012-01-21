@@ -19,7 +19,8 @@ object Fixture {
     Nil,
     Nil,
     Nil,
-    "test"
+    "test",
+    None
   )
 
   val def2 = def1.copy(
