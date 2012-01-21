@@ -1,59 +1,57 @@
 import sbt._
 import Keys._
 
-object Resolvers {
-  val twitter = "twitter.com" at "http://maven.twttr.com/"
-  val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
-  val iliaz = "iliaz.com" at "http://scala.iliaz.com/"
-  val novus = "novus" at "http://repo.novus.com/snapshots/"
+trait BuildSettings {
+  val buildOrganization = "com.github.ornicar"
+  val buildVersion = "0.2"
+  val buildScalaVersion = "2.9.1"
+
+  val buildSettings = Defaults.defaultSettings ++ Seq(
+    organization := buildOrganization,
+    version := buildVersion,
+    scalaVersion := buildScalaVersion,
+    shellPrompt := ShellPrompt.buildShellPrompt,
+    scalacOptions := Seq("-deprecation", "-unchecked"))
 }
 
-object ScalexBuild extends Build
-{
-  import Resolvers._
+trait Resolvers {
+  val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
+  val iliaz = "iliaz.com" at "http://scala.iliaz.com/"
+  val novus = "repo.novus snaps" at "http://repo.novus.com/snapshots/"
+}
 
-  lazy val core = Project("core", file("core")) settings(
-    name := "Scalex Core",
-    version := "0.1",
-    scalaVersion := "2.9.1",
-    scalacOptions += "-deprecation",
-    scalacOptions += "-unchecked",
-    shellPrompt := ShellPrompt.buildShellPrompt,
-    libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-compiler" % "2.9.1",
-      "com.mongodb.casbah" %% "casbah" % "2.1.5-1",
-      "org.slf4j" % "slf4j-simple" % "1.6.1" % "runtime",
-      "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT",
-      "org.scala-tools.testing" %% "scalacheck" % "1.9",
-      "org.scala-tools.testing" % "test-interface" % "0.5",
-      "org.scalatest" % "scalatest_2.9.0" % "1.6.1",
-      "com.github.ornicar" %% "paginator-core" % "1.2",
-      "com.github.ornicar" %% "paginator-salat-adapter" % "1.1",
-      "org.scalaz" %% "scalaz-core" % "6.0.3"
-    ),
-    resolvers ++= Seq(novus, iliaz)
-  )
+trait Dependencies {
+  val scalacheck = "org.scala-tools.testing" %% "scalacheck" % "1.9"
+  val test = "org.scala-tools.testing" % "test-interface" % "0.5"
+  val scalatest = "org.scalatest" %% "scalatest" % "1.6.1"
+  val casbah = "com.mongodb.casbah" %% "casbah" % "2.1.5-1"
+  val salat = "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT"
+  val compiler = "org.scala-lang" % "scala-compiler" % "2.9.1"
+  val slf4j = "org.slf4j" % "slf4j-simple" % "1.6.1" % "runtime"
+  val paginator = "com.github.ornicar" %% "paginator-core" % "1.2"
+  val paginatorSalat = "com.github.ornicar" %% "paginator-salat-adapter" % "1.1"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.3"
+  val scalatra = "org.scalatra" %% "scalatra" % "2.0.1"
+  val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
+  val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
+}
+
+object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies
+{
+  lazy val core = Project("core", file("core"),
+    settings = buildSettings ++ Seq(
+      name := "scalex-core",
+      resolvers := Seq(typesafe, iliaz, novus),
+      libraryDependencies ++= Seq(scalacheck, test, scalatest, casbah, salat, compiler, slf4j, paginator, paginatorSalat, scalaz)))
 
   lazy val http = Project("http", file("http")) dependsOn(core) settings(
-    name := "Scalex HTTP",
-    version := "0.1",
-    scalaVersion := "2.9.1",
-    libraryDependencies ++= Seq(
-      "org.scalatra" %% "scalatra" % "2.0.1",
-      "javax.servlet" % "servlet-api" % "2.5" % "provided",
-      "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
-    ),
-    resolvers ++= Seq(novus)
+    name := "scalex-http",
+    resolvers := Seq(novus),
+    libraryDependencies ++= Seq(scalatra, servlet, jetty)
   )
 }
 
 object ShellPrompt {
-
-  val buildShellPrompt = {
-    (state: State) =>
-      {
-        val currProject = Project.extract(state).currentProject.id
-        "hermes:%s> ".format(currProject)
-      }
-  }
+  val buildShellPrompt =
+    (state: State) => "scalex:%s> ".format(Project.extract(state).currentProject.id)
 }
