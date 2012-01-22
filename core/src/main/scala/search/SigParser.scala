@@ -1,7 +1,6 @@
 package scalex
 package search
 
-import scalaz._
 import scalex.model._
 import scala.util.parsing.combinator._
 
@@ -18,7 +17,7 @@ object SigParser extends RegexParsers {
 
   def typeEntityList: Parser[List[TypeEntity]] = repsep(typeEntity, ",")
 
-  def typeEntityNel: Parser[NonEmptyList[TypeEntity]] = repsep(typeEntity, ",") map (_.toNel.get)
+  def typeEntityNel: Parser[List[TypeEntity]] = repsep(typeEntity, ",")
 
   def typeEntity: Parser[TypeEntity] =
     tuple | function | parameterizedClass | unrealParameterizedClass | simpleClass | unrealClass
