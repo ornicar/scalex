@@ -29,22 +29,15 @@ trait Dependencies {
   val scalatra = "org.scalatra" %% "scalatra" % "2.0.1"
   val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
-  val elasticsearch = "org.elasticsearch" % "elasticsearch" % "0.18.7"
 }
 
 object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies
 {
-  //lazy val scalaElasticsearch = Project("elasticsearch", file("scala-elasticsearch"),
-    //settings = buildSettings ++ Seq(
-      //name := "scala-elasticsearch",
-      //resolvers := Seq(sonatype),
-      //libraryDependencies ++= Seq(specs2, elasticsearch)))
-
   lazy val core = Project("core", file("core"),
     settings = buildSettings ++ Seq(
       name := "scalex-core",
       resolvers := Seq(typesafe, iliaz, sonatype),
-      libraryDependencies ++= Seq(specs2, compiler, paginator, scalaz, elasticsearch)))
+      libraryDependencies ++= Seq(specs2, compiler, paginator, scalaz)))
 
   lazy val http = Project("http", file("http"),
     settings = buildSettings ++ Seq(

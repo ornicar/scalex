@@ -21,7 +21,6 @@ object Cli {
 
   def process(command: String, args: List[String]) = command match {
     case "dump" => dump(args)
-    case "drop" => drop()
     case "search" => search(args mkString " ")
     case command => "Unknown command " + command
   }
@@ -32,19 +31,11 @@ object Cli {
       "%d results for %s\n\n%s" format (paginator.nbResults, query, render(paginator.currentPageResults))
   }
 
-  def drop() = {
-    es.DefType { t => t.drop() }
-    "Drop complete"
-  }
-
   def dump(fs: List[String]): String = {
     val pack = fs.head
     val files = fs.tail map (f => new File(f))
     val sources = locator locate files map (_.getPath)
-    es.DefType { t =>
-      t.drop()
-      dumper.process(pack, sources, t)
-    }
+    dumper.process(pack, sources)
     "Dump complete"
   }
 
