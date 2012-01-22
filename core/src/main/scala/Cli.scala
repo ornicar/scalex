@@ -41,7 +41,9 @@ object Cli {
   }
 
   def index(): String = {
-    es.Elasticsearch populate db.DefRepo.findAll
+    es.DefType { typ =>
+      typ.populate(db.DefRepo.findAll, es.Mapper.defToJson, es.Mapper.defToId)
+    }
     "Indexing complete"
   }
 

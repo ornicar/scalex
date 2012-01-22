@@ -18,6 +18,8 @@ object Mapper {
     )})
   }
 
+  def defToId(d: Def) = d.id
+
   def obj[A](model: A)(fun: (A, XContentBuilder) => XContentBuilder) = {
     val o = jsonBuilder.startObject
     fun(model, o)
