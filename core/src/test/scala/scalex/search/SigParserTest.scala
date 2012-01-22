@@ -44,7 +44,7 @@ class SigParserTest extends Specification {
   private def =/=(sig: String): Example = =/=(sig, sig)
 
   private def =/=(sig: String, expected: String): Example =
-    sig in { sig mustEqual expected }
+    sig in { parse(sig) mustEqual expected }
 
   private def parse(str: String) = SigParser(str) match {
     case Right(typeSig) => typeSig.toString

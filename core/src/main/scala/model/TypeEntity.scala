@@ -1,11 +1,11 @@
-package scalex.model
+package scalex
+package model
 
-import com.novus.salat.annotations._
+import scalaz._
 
 /** A type. Note that types and templates contain the same information only for the simplest types. For example, a type
   * defines how a template's type parameters are instantiated (as in `List[Cow]`), what the template's prefix is
   * (as in `johnsFarm.Cow`), and supports compound or structural types. */
-@Salat
 sealed trait TypeEntity {
 
   type Dict = Map[String, String]
@@ -17,8 +17,8 @@ sealed trait TypeEntity {
   def substitute(dict: Dict, name: String) =
     if (dict contains name) dict(name) else name
 
-  def substitute(dict: Dict, types: List[TypeEntity]) =
-    types map (_.rename(dict))
+  def substitute[F[_]](dict: Dict, types: F[TypeEntity])(implicit f: Functor[F]) =
+    f.fmap(types, (t: TypeEntity) => t.rename(dict))
 }
 
 sealed trait Class extends TypeEntity {
@@ -31,8 +31,9 @@ sealed trait Class extends TypeEntity {
 object Class {
 
   def apply(name: String, isReal: Boolean, tparams: List[TypeEntity]): Class =
-    if (tparams.isEmpty) SimpleClass(name, isReal)
-    else ParameterizedClass(name, isReal, tparams)
+    tparams.toNel map { nel =>
+      ParameterizedClass(name, isReal, nel)
+    } getOrElse SimpleClass(name, isReal)
 }
 
 case class SimpleClass(name: String, isReal: Boolean) extends Class {
@@ -42,17 +43,22 @@ case class SimpleClass(name: String, isReal: Boolean) extends Class {
   def rename(dict: Dict): Class = copy(name = substitute(dict, name))
 }
 
-case class ParameterizedClass(name: String, isReal: Boolean, tparams: List[TypeEntity]) extends Class {
-
-  assume(!tparams.isEmpty, "Use a Class if params are empty")
+case class ParameterizedClass(
+  name: String,
+  isReal: Boolean,
+  tparams: NonEmptyList[TypeEntity]
+) extends Class {
 
   private[this] def wrap(list: List[_]): String = list mkString ("[", ", ", "]")
 
-  override def toString = name + wrap(tparams)
+  override def toString = name + wrap(children)
 
-  override def children = tparams
+  override def children = tparams.list
 
-  def rename(dict: Dict): ParameterizedClass = copy(name = substitute(dict, name), tparams = substitute(dict, tparams))
+  def rename(dict: Dict): ParameterizedClass = copy(
+    name = substitute(dict, name),
+    tparams = substitute(dict, tparams)
+  )
 }
 
 case class Fun(args: List[TypeEntity]) extends TypeEntity {

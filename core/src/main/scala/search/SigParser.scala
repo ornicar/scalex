@@ -1,5 +1,7 @@
-package scalex.search
+package scalex
+package search
 
+import scalaz._
 import scalex.model._
 import scala.util.parsing.combinator._
 
@@ -12,39 +14,41 @@ object SigParser extends RegexParsers {
     case Success(result, _) => Right(RawTypeSig(result))
   }
 
-  private def typeEntities: Parser[List[TypeEntity]] = repsep(typeEntity, "=>")
+  def typeEntities: Parser[List[TypeEntity]] = repsep(typeEntity, "=>")
 
-  private def typeEntityList: Parser[List[TypeEntity]] = repsep(typeEntity, ",")
+  def typeEntityList: Parser[List[TypeEntity]] = repsep(typeEntity, ",")
 
-  private def typeEntity: Parser[TypeEntity] =
+  def typeEntityNel: Parser[NonEmptyList[TypeEntity]] = repsep(typeEntity, ",") map (_.toNel.get)
+
+  def typeEntity: Parser[TypeEntity] =
     tuple | function | parameterizedClass | unrealParameterizedClass | simpleClass | unrealClass
 
-  private def unrealClass: Parser[SimpleClass] =
+  def unrealClass: Parser[SimpleClass] =
     """\w""".r ^^ { name => SimpleClass(name, false) }
 
-  private def simpleClass: Parser[SimpleClass] =
+  def simpleClass: Parser[SimpleClass] =
     """\w{2,}""".r ^^ { name => SimpleClass(name, true) }
 
-  private def unrealParameterizedClass: Parser[ParameterizedClass] =
-    """\w""".r ~ "[" ~ typeEntityList ~ "]" ^^ {
+  def unrealParameterizedClass: Parser[ParameterizedClass] =
+    """\w""".r ~ "[" ~ typeEntityNel ~ "]" ^^ {
       case name ~ "[" ~ tpes ~ "]" => ParameterizedClass(name, false, tpes)
     }
 
-  private def parameterizedClass: Parser[ParameterizedClass] =
-    """\w{2,}""".r ~ "[" ~ typeEntityList ~ "]" ^^ {
+  def parameterizedClass: Parser[ParameterizedClass] =
+    """\w{2,}""".r ~ "[" ~ typeEntityNel ~ "]" ^^ {
       case name ~ "[" ~ tpes ~ "]" => ParameterizedClass(name, true, tpes)
     }
 
-  private def function: Parser[Fun] =
+  def function: Parser[Fun] =
     "(" ~ typeEntities ~ ")" ^^ {
       case  "(" ~ tpes ~ ")" => Fun(tpes)
     }
 
-  private def tuple: Parser[Tuple] =
+  def tuple: Parser[Tuple] =
     "(" ~ typeEntityList ~ ")" ^^ {
       case  "(" ~ tpes ~ ")" => Tuple(tpes)
     }
 
-  private def literal: Parser[TypeEntity] =
+  def literal: Parser[TypeEntity] =
     """[\w\[\]\(\)]+""".r ^^ { str => Other(str) }
 }

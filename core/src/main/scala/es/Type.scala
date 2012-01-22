@@ -9,23 +9,25 @@ import org.elasticsearch.indices.IndexMissingException
 
 class Type(indexName: String, name: String, client: Client) {
 
-  def populate[A](objs: Iterator[A], map: A => XContentBuilder, id: A => String) = {
-    drop
+  def populate[A](objs: Iterable[A], map: A => XContentBuilder, id: A => String) = {
     val bulk = client.prepareBulk
     objs foreach { obj => bulk add store(map(obj), id(obj)) }
     bulk.execute.actionGet
-    flush
+    flush()
   }
 
   def store(obj: XContentBuilder, id: String) =
     client.prepareIndex(indexName, name, id) setSource obj
 
-  def drop = try {
-    client.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet
-  } catch {
-    case e: IndexMissingException =>
+  def drop() {
+    try {
+      client.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet
+    } catch {
+      case e: IndexMissingException =>
+    }
   }
 
-  def flush =
+  def flush() {
     client.admin().indices().flush(new FlushRequest(indexName).refresh(true)).actionGet
+  }
 }

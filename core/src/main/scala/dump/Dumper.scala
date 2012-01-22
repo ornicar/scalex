@@ -1,12 +1,5 @@
-/* scaladoc, a documentation generator for Scala
- * Copyright 2005-2011 LAMP/EPFL
- * @author  Martin Odersky
- * @author  Geoffrey Washburn
- */
-
-package scalex.dump
-
-import scalex.db.DefRepo
+package scalex
+package dump
 
 import scala.tools.nsc._
 import java.io.File.pathSeparator
@@ -30,16 +23,15 @@ class Dumper {
     log("Creating universe...")
     val universe = new Compiler(reporter, docSettings) universe files
 
-    log("Dropping previous pack...")
-    DefRepo.removePack(pack)
-
     log("Extracting functions from the model...")
-    (new Extractor(println, pack, config)).passFunctions(universe, DefRepo.batchInsert)
+    es.DefType { typ =>
+      typ.drop()
+      (new Extractor(println, pack, config)).passFunctions(universe, defs =>
+        typ.populate(defs, es.Mapper.defToJson, es.Mapper.defToId)
+      )
+    }
 
-    log("Indexing DB...")
-    DefRepo.index
-
-    log("Saved %d functions!" format DefRepo.count())
+    log("Indexed %s functions!" format "?")
   }
 
   private[this] def log(message: String) {

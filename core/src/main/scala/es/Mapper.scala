@@ -11,11 +11,12 @@ object Mapper {
 
   def defToJson(d: Def) = obj(d) { (d, o) => o
     .field("name", d.name)
-    .field("qualified", d.qualifiedName)
+    .field("qualifiedName", d.qualifiedName)
     .field("parent", map(d.parent) { p => Map(
       "name" -> p.name,
-      "qualified" -> p.qualifiedName
+      "qualifiedName" -> p.qualifiedName
     )})
+    .field("resultType", d.resultType.toString)
   }
 
   def defToId(d: Def) = d.id

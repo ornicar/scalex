@@ -1,7 +1,5 @@
 package scalex.model
 
-import com.novus.salat.annotations._
-
 case class Def(
 
   /** See Entity */

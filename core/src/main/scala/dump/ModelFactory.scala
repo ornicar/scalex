@@ -1,7 +1,9 @@
-package scalex.dump
+package scalex
+package dump
 
 import scala.tools.nsc
 import scala.collection._
+import scalaz._
 
 import scalex.model.{ TypeEntity => ScalexTypeEntity, _ }
 import scalex.dump.model.TypeEntity
@@ -18,10 +20,9 @@ class ModelFactory(g: nsc.Global, s: nsc.doc.Settings)
   /** Override to keep more informations about the types */
   override def makeType(aType: Type, inTpl: => TemplateImpl): TypeEntity = {
 
-    def appendTypes1(types: List[Type]): List[ScalexTypeEntity] = types match {
-      case Nil => Nil
-      case tp :: tps => appendType1(tp) :: appendTypes1(tps)
-    }
+    def appendTypes1[F[_]](types: F[Type])(implicit f: Functor[F]): F[ScalexTypeEntity] =
+      f.fmap(types, appendType1)
+
     def checkFunctionType(tpe: TypeRef): Boolean = {
       val TypeRef(_, sym, args) = tpe
       (args.length > 0) && (args.length - 1 <= definitions.MaxFunctionArity) &&
@@ -37,10 +38,9 @@ class ModelFactory(g: nsc.Global, s: nsc.doc.Settings)
         val (name, isReal) =
           if (bSym.isNonClassType) (bSym.name, !bSym.isDeferred)
           else (makeTemplate(bSym).name, true)
-        if (targs.isEmpty)
-          SimpleClass(name.toString, isReal)
-        else
-          ParameterizedClass(name.toString, isReal, appendTypes1(targs))
+          targs.toNel map { nel =>
+            ParameterizedClass(name.toString, isReal, appendTypes1(nel))
+          } getOrElse SimpleClass(name.toString, isReal)
       /* Refined types */
       case RefinedType(parents, defs) =>
         val ps = appendTypes1((if (parents.length > 1) parents filterNot (_ == ObjectClass.tpe) else parents))

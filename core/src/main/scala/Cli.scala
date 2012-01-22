@@ -22,7 +22,6 @@ object Cli {
   def process(command: String, args: List[String]) = command match {
     case "dump" => dump(args)
     case "search" => search(args mkString " ")
-    case "index" => index()
     case command => "Unknown command " + command
   }
 
@@ -38,13 +37,6 @@ object Cli {
     val sources = locator locate files map (_.getPath)
     dumper.process(pack, sources)
     "Dump complete"
-  }
-
-  def index(): String = {
-    es.DefType { typ =>
-      typ.populate(db.DefRepo.findAll, es.Mapper.defToJson, es.Mapper.defToId)
-    }
-    "Indexing complete"
   }
 
   private def render(d: Def): String =
