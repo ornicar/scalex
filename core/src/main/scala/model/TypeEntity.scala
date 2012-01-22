@@ -1,9 +1,11 @@
-package scalex
-package model
+package scalex.model
+
+import com.novus.salat.annotations._
 
 /** A type. Note that types and templates contain the same information only for the simplest types. For example, a type
   * defines how a template's type parameters are instantiated (as in `List[Cow]`), what the template's prefix is
   * (as in `johnsFarm.Cow`), and supports compound or structural types. */
+@Salat
 sealed trait TypeEntity {
 
   type Dict = Map[String, String]
@@ -15,10 +17,8 @@ sealed trait TypeEntity {
   def substitute(dict: Dict, name: String) =
     if (dict contains name) dict(name) else name
 
-  def substitute(dict: Dict, types: List[TypeEntity]) = types.map(_ rename dict)
-
-  def toMap = Map(
-    "name" -> toString)
+  def substitute(dict: Dict, types: List[TypeEntity]) =
+    types map (_.rename(dict))
 }
 
 sealed trait Class extends TypeEntity {
@@ -42,22 +42,17 @@ case class SimpleClass(name: String, isReal: Boolean) extends Class {
   def rename(dict: Dict): Class = copy(name = substitute(dict, name))
 }
 
-case class ParameterizedClass(
-  name: String,
-  isReal: Boolean,
-  tparams: List[TypeEntity]
-) extends Class {
+case class ParameterizedClass(name: String, isReal: Boolean, tparams: List[TypeEntity]) extends Class {
+
+  assume(!tparams.isEmpty, "Use a Class if params are empty")
 
   private[this] def wrap(list: List[_]): String = list mkString ("[", ", ", "]")
 
-  override def toString = name + wrap(children)
+  override def toString = name + wrap(tparams)
 
   override def children = tparams
 
-  def rename(dict: Dict): ParameterizedClass = copy(
-    name = substitute(dict, name),
-    tparams = substitute(dict, tparams)
-  )
+  def rename(dict: Dict): ParameterizedClass = copy(name = substitute(dict, name), tparams = substitute(dict, tparams))
 }
 
 case class Fun(args: List[TypeEntity]) extends TypeEntity {

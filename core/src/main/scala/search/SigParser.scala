@@ -1,5 +1,4 @@
-package scalex
-package search
+package scalex.search
 
 import scalex.model._
 import scala.util.parsing.combinator._
@@ -13,41 +12,39 @@ object SigParser extends RegexParsers {
     case Success(result, _) => Right(RawTypeSig(result))
   }
 
-  def typeEntities: Parser[List[TypeEntity]] = repsep(typeEntity, "=>")
+  private def typeEntities: Parser[List[TypeEntity]] = repsep(typeEntity, "=>")
 
-  def typeEntityList: Parser[List[TypeEntity]] = repsep(typeEntity, ",")
+  private def typeEntityList: Parser[List[TypeEntity]] = repsep(typeEntity, ",")
 
-  def typeEntityNel: Parser[List[TypeEntity]] = repsep(typeEntity, ",")
-
-  def typeEntity: Parser[TypeEntity] =
+  private def typeEntity: Parser[TypeEntity] =
     tuple | function | parameterizedClass | unrealParameterizedClass | simpleClass | unrealClass
 
-  def unrealClass: Parser[SimpleClass] =
+  private def unrealClass: Parser[SimpleClass] =
     """\w""".r ^^ { name => SimpleClass(name, false) }
 
-  def simpleClass: Parser[SimpleClass] =
+  private def simpleClass: Parser[SimpleClass] =
     """\w{2,}""".r ^^ { name => SimpleClass(name, true) }
 
-  def unrealParameterizedClass: Parser[ParameterizedClass] =
-    """\w""".r ~ "[" ~ typeEntityNel ~ "]" ^^ {
+  private def unrealParameterizedClass: Parser[ParameterizedClass] =
+    """\w""".r ~ "[" ~ typeEntityList ~ "]" ^^ {
       case name ~ "[" ~ tpes ~ "]" => ParameterizedClass(name, false, tpes)
     }
 
-  def parameterizedClass: Parser[ParameterizedClass] =
-    """\w{2,}""".r ~ "[" ~ typeEntityNel ~ "]" ^^ {
+  private def parameterizedClass: Parser[ParameterizedClass] =
+    """\w{2,}""".r ~ "[" ~ typeEntityList ~ "]" ^^ {
       case name ~ "[" ~ tpes ~ "]" => ParameterizedClass(name, true, tpes)
     }
 
-  def function: Parser[Fun] =
+  private def function: Parser[Fun] =
     "(" ~ typeEntities ~ ")" ^^ {
       case  "(" ~ tpes ~ ")" => Fun(tpes)
     }
 
-  def tuple: Parser[Tuple] =
+  private def tuple: Parser[Tuple] =
     "(" ~ typeEntityList ~ ")" ^^ {
       case  "(" ~ tpes ~ ")" => Tuple(tpes)
     }
 
-  def literal: Parser[TypeEntity] =
+  private def literal: Parser[TypeEntity] =
     """[\w\[\]\(\)]+""".r ^^ { str => Other(str) }
 }

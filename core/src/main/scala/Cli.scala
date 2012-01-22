@@ -1,6 +1,6 @@
 package scalex
 
-import scalex.dump.{Dumper, Locator, JsonStore}
+import scalex.dump.{Dumper, Locator }
 import scalex.model.Def
 import scalex.search.{Search, Query}
 import java.io.File
@@ -32,7 +32,7 @@ object Cli {
       "%d results for %s\n\n%s" format (paginator.nbResults, query, render(paginator.currentPageResults))
   }
 
-  def all: String = JsonStore.read mkString "\n"
+  def all: String = "all"
 
   def dump(fs: List[String]): String = {
     val pack = fs.head

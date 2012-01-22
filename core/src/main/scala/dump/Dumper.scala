@@ -1,5 +1,6 @@
-package scalex
-package dump
+package scalex.dump
+
+import scalex.db.DefRepo
 
 import scala.tools.nsc._
 import java.io.File.pathSeparator
@@ -23,12 +24,13 @@ class Dumper {
     log("Creating universe...")
     val universe = new Compiler(reporter, docSettings) universe files
 
-    log("Extracting functions from the model...")
-    val extractor = new Extractor(pack, config)
-    val defs = extractor explore universe
-    JsonStore write defs.toList
+    log("Dropping previous pack...")
+    DefRepo.removePack(pack)
 
-    log("Indexed %d functions!" format defs.size)
+    log("Extracting functions from the model...")
+    (new Extractor(println, pack, config)).passFunctions(universe, DefRepo.batchInsert)
+
+    log("Saved %d functions!" format DefRepo.count())
   }
 
   private[this] def log(message: String) {
