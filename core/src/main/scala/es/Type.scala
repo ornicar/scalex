@@ -7,7 +7,7 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
 import org.elasticsearch.action.admin.indices.flush.FlushRequest
 import org.elasticsearch.indices.IndexMissingException
 
-class Type(name: String, indexName: String, client: Client) {
+class Type(indexName: String, name: String, client: Client) {
 
   def populate[A](objs: Iterator[A], map: A => XContentBuilder, id: A => String) = {
     drop
