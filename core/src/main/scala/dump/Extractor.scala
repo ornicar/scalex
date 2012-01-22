@@ -6,34 +6,31 @@ import scala.tools.nsc.doc.model.{ TypeEntity => NscTypeEntity, _ }
 import scala.tools.nsc.doc.model.comment._
 import scalex.dump.model._
 
-class Extractor(logger: String => Unit, pack: String, config: Dumper.Config) {
+class Extractor(pack: String, config: Dumper.Config) {
 
-  def passFunctions(universe: Universe, callback: List[scalex.model.Def] => Any) {
+  def explore(universe: Universe): Iterable[scalex.model.Def] = {
 
     val done = mutable.HashSet.empty[Int]
 
-    def gather(tpl: DocTemplateEntity): Unit = {
-
-      def isDeprecated(me: MemberEntity) = me.deprecation.isDefined
+    def gather(tpl: DocTemplateEntity): Iterable[scalex.model.Def] = {
 
       val tplHashCode = tpl.hashCode
+
       if (!(done contains tplHashCode)) {
         done += tplHashCode
 
-        val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract)
+        val defs = (tpl.methods ++ tpl.values) filterNot (_.isAbstract) map makeDef
 
-        println("%s => %d functions" format (tpl, members.size))
+        //println("%s => %d functions" format (tpl, defs.size))
 
-        callback(members map makeDef)
-
-        tpl.templates foreach gather
-      }
+        defs ::: (tpl.templates flatMap gather)
+      } else Nil
     }
 
     gather(universe.rootPackage)
   }
 
-  private[this] def makeDef(fun: NonTemplateMemberEntity) = {
+  private[this] def makeDef(fun: NonTemplateMemberEntity): scalex.model.Def = {
 
     val comment = makeComment(fun.comment)
     val qualifiedName = makeQualifiedName(fun.qualifiedName)

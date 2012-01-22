@@ -21,7 +21,7 @@ case class TypeParam(
   /** The type parameters of this entity. */
   , typeParams: List[TypeParam]
 
-) extends Entity with HigherKinded {
+) extends HigherKinded {
 
   override def toString =
     variance + name + (
@@ -31,6 +31,11 @@ case class TypeParam(
     ) + showTypeParams
 
   def toTypeEntity: TypeEntity = Class(name, name != qualifiedName, typeParams map (_.toTypeEntity))
+
+  override def toMap: Map[String, _] = super.toMap ++ Map(
+    "variance" -> variance,
+    "lo" -> (lo map (_.toMap)),
+    "hi" -> (hi map (_.toMap)))
 }
 
 object TypeParam {

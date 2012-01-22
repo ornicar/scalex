@@ -18,6 +18,9 @@ case class Parent(
   override def toString = name + showTypeParams
 
   def toTypeEntity: TypeEntity = Class(name, true, typeParams map (_.toTypeEntity))
+
+  override def toMap = super.toMap ++ Map(
+    "isObject" -> isObject)
 }
 
 object Parent {

@@ -7,13 +7,15 @@ import scala.tools.nsc.reporters.ConsoleReporter
 import scala.tools.nsc.util.FakePos
 import Properties.msilLibPath
 
+import es.{ Type, Mapper }
+
 class Dumper {
 
   val config = Dumper.Config(Map(
     "StringOps" -> "String"
   ))
 
-  def process(pack: String, files: List[String]): Unit = {
+  def process(pack: String, files: List[String], esType: Type): Unit = {
     var reporter: ConsoleReporter = null
     val docSettings = new doc.Settings(msg => reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
     docSettings.debug.value = false
@@ -24,14 +26,11 @@ class Dumper {
     val universe = new Compiler(reporter, docSettings) universe files
 
     log("Extracting functions from the model...")
-    es.DefType { typ =>
-      typ.drop()
-      (new Extractor(println, pack, config)).passFunctions(universe, defs =>
-        typ.populate(defs, es.Mapper.defToJson, es.Mapper.defToId)
-      )
-    }
+    val extractor = new Extractor(pack, config)
+    val defs = extractor explore universe
+    esType.populate(defs, Mapper.defToJson, Mapper.defToId)
 
-    log("Indexed %s functions!" format "?")
+    log("Indexed %d functions!" format defs.size)
   }
 
   private[this] def log(message: String) {

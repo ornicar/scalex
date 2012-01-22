@@ -9,4 +9,7 @@ trait HigherKinded extends Entity {
   def showTypeParams: String =
     if (typeParams.isEmpty) ""
     else typeParams map (_.toString) mkString ("[", ", ", "]")
+
+  override def toMap = super.toMap ++ Map(
+    "typeParams" -> (typeParams map (_.toMap)))
 }

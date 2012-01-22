@@ -37,7 +37,7 @@ case class Def(
   /** Some deprecation message if this function is deprecated, or none otherwise. */
   , deprecation: Option[Block]
 
-) extends Entity with HigherKinded {
+) extends HigherKinded {
 
   /** Complete signature of the function including host class and return value */
   def signature: String = List(classSignature, paramSignature, resultType) filter (_ != "") mkString " => "
@@ -50,8 +50,12 @@ case class Def(
 
   def id = hashCode toString
 
-  override def toString = (
-    qualifiedName + showTypeParams + ": " + signature
+  override def toString = (qualifiedName + showTypeParams + ": " + signature)
+
+  override def toMap = super.toMap ++ Map(
+    "parent" -> parent.toMap,
+    "resultType" -> resultType.toMap,
+    "comment" -> comment.map(_.toMap)
   )
 }
 

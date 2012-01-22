@@ -19,6 +19,9 @@ sealed trait TypeEntity {
 
   def substitute[F[_]](dict: Dict, types: F[TypeEntity])(implicit f: Functor[F]) =
     f.fmap(types, (t: TypeEntity) => t.rename(dict))
+
+  def toMap = Map(
+    "name" -> toString)
 }
 
 sealed trait Class extends TypeEntity {

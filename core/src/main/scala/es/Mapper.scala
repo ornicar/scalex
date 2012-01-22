@@ -1,31 +1,11 @@
 package scalex
 package es
 
-import org.elasticsearch.common.xcontent.XContentFactory._
-import org.elasticsearch.common.xcontent.XContentBuilder
-import scala.collection.JavaConversions._
-
 import model._
 
-object Mapper {
+object Mapper extends RecursiveMapper {
 
-  def defToJson(d: Def) = obj(d) { (d, o) => o
-    .field("name", d.name)
-    .field("qualifiedName", d.qualifiedName)
-    .field("parent", map(d.parent) { p => Map(
-      "name" -> p.name,
-      "qualifiedName" -> p.qualifiedName
-    )})
-    .field("resultType", d.resultType.toString)
-  }
+  def defToJson(d: Def) = json(d.toMap)
 
   def defToId(d: Def) = d.id
-
-  def obj[A](model: A)(fun: (A, XContentBuilder) => XContentBuilder) = {
-    val o = jsonBuilder.startObject
-    fun(model, o)
-    o.endObject
-  }
-
-  def map[A](model: A)(fun: A => Map[String, Any]) = mapAsJavaMap(fun(model))
 }
