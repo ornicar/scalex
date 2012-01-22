@@ -53,12 +53,6 @@ case class Def(
   def id = hashCode toString
 
   override def toString = (qualifiedName + showTypeParams + ": " + signature)
-
-  override def toMap = super.toMap ++ Map(
-    "parent" -> parent.toMap,
-    "resultType" -> resultType.toMap,
-    "comment" -> comment.map(_.toMap)
-  )
 }
 
 object Def {

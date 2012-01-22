@@ -57,21 +57,4 @@ case class Comment(
     (authors map ("@author " + _.toString)).mkString("\n") +
     (result map ("@return " + _.toString)).mkString("\n") +
     (version map ("@version " + _.toString)).mkString
-
-  def toMap = Map(
-    "body" -> body,
-    "short" -> short,
-    "authors" -> authors,
-    "see" -> see,
-    "result" -> result,
-    "throws" -> throws,
-    "valueParams" -> valueParams,
-    "typeParams" -> typeParams,
-    "version" -> version,
-    "since" -> since,
-    "todo" -> todo,
-    "note" -> note,
-    "example" -> example,
-    "source" -> source,
-    "constructor" -> constructor)
 }
