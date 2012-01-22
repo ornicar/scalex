@@ -26,6 +26,7 @@ class Dumper {
     log("Extracting functions from the model...")
     val extractor = new Extractor(pack, config)
     val defs = extractor explore universe
+    Store write defs.toList
 
     log("Indexed %d functions!" format defs.size)
   }

@@ -29,6 +29,7 @@ trait Dependencies {
   val scalatra = "org.scalatra" %% "scalatra" % "2.0.1"
   val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
+  val sbinary = "org.scala-tools.sbinary" % "sbinary_2.9.0" % "0.4.0"
 }
 
 object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies
@@ -37,7 +38,7 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
     settings = buildSettings ++ Seq(
       name := "scalex-core",
       resolvers := Seq(typesafe, iliaz, sonatype),
-      libraryDependencies ++= Seq(specs2, compiler, paginator, scalaz)))
+      libraryDependencies ++= Seq(specs2, compiler, paginator, scalaz, sbinary)))
 
   lazy val http = Project("http", file("http"),
     settings = buildSettings ++ Seq(

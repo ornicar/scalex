@@ -13,5 +13,5 @@ src_managed/
 project/boot/
 project/plugins/project/
 
-# elasticsearch index
-/data
+# serialized objects
+/store.dat
