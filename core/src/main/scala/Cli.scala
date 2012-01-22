@@ -41,6 +41,7 @@ object Cli {
   }
 
   def index(): String = {
+    es.Elasticsearch populate db.DefRepo.findAll
     "Indexing complete"
   }
 

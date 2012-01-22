@@ -1,8 +1,6 @@
 .class
 *.log
-/index
 /lib
-/ophir
 *.html
 *.js
 *.war
@@ -14,3 +12,6 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+
+# elasticsearch index
+/data

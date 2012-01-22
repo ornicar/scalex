@@ -18,6 +18,7 @@ trait Resolvers {
   val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
   val iliaz = "iliaz.com" at "http://scala.iliaz.com/"
   val novus = "repo.novus snaps" at "http://repo.novus.com/snapshots/"
+  val sonatype = "sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/"
 }
 
 trait Dependencies {
@@ -32,15 +33,22 @@ trait Dependencies {
   val scalatra = "org.scalatra" %% "scalatra" % "2.0.1"
   val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
+  val elasticsearch = "org.elasticsearch" % "elasticsearch" % "0.18.7"
 }
 
 object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies
 {
+  //lazy val scalaElasticsearch = Project("elasticsearch", file("scala-elasticsearch"),
+    //settings = buildSettings ++ Seq(
+      //name := "scala-elasticsearch",
+      //resolvers := Seq(sonatype),
+      //libraryDependencies ++= Seq(specs2, elasticsearch)))
+
   lazy val core = Project("core", file("core"),
     settings = buildSettings ++ Seq(
       name := "scalex-core",
-      resolvers := Seq(typesafe, iliaz, novus),
-      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, paginatorSalat, scalaz)))
+      resolvers := Seq(typesafe, iliaz, novus, sonatype),
+      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, paginatorSalat, scalaz, elasticsearch)))
 
   lazy val http = Project("http", file("http"),
     settings = buildSettings ++ Seq(

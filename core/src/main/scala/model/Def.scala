@@ -50,6 +50,8 @@ case class Def(
   /** Signature of the function parameters, not including the host class */
   def paramSignature: String = valueParams map (_.toString) mkString ""
 
+  def id = hashCode toString
+
   override def toString = (
     qualifiedName + showTypeParams + ": " + signature
   )
