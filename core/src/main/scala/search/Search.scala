@@ -10,11 +10,11 @@ object Search {
 
   private val mixedRegex = """^([^\:]*)\:\s(.+)$""".r
 
+  val defs = db.DefRepo.findAll
+
   def find(query: Query): Result =
     paginator(query.currentPage, query.maxPerPage)
 
   private[this] def paginator(currentPage: Int, maxPerPage: Int) =
-    Paginator(InMemoryAdapter(Seq(): Seq[Def]), currentPage, maxPerPage)
-
+    Paginator(InMemoryAdapter(defs take 10: Seq[Def]), currentPage, maxPerPage)
 }
-
