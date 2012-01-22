@@ -15,7 +15,7 @@ class Dumper {
 
   def process(pack: String, files: List[String]): Unit = {
     var reporter: ConsoleReporter = null
-    val docSettings = new doc.Settings(msg => reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
+    val docSettings = new doc.Settings(msg ⇒ reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
     docSettings.debug.value = false
     docSettings.bootclasspath.value = (docSettings.bootclasspath.value :: jarPaths).mkString(":")
     reporter = new ConsoleReporter(docSettings) { override def hasErrors = false }
@@ -26,7 +26,7 @@ class Dumper {
     log("Extracting functions from the model...")
     val extractor = new Extractor(pack, config)
     val defs = extractor explore universe
-    Store write defs.toList
+    JsonStore write defs.toList
 
     log("Indexed %d functions!" format defs.size)
   }

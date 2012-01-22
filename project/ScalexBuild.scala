@@ -29,16 +29,15 @@ trait Dependencies {
   val scalatra = "org.scalatra" %% "scalatra" % "2.0.1"
   val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
-  val sbinary = "org.scala-tools.sbinary" % "sbinary_2.9.0" % "0.4.0"
+  val liftJson = "net.liftweb" %% "lift-json" % "2.4-RC1"
 }
 
-object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies
-{
+object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies {
   lazy val core = Project("core", file("core"),
     settings = buildSettings ++ Seq(
       name := "scalex-core",
       resolvers := Seq(typesafe, iliaz, sonatype),
-      libraryDependencies ++= Seq(specs2, compiler, paginator, scalaz, sbinary)))
+      libraryDependencies ++= Seq(specs2, compiler, paginator, scalaz, liftJson)))
 
   lazy val http = Project("http", file("http"),
     settings = buildSettings ++ Seq(
@@ -49,5 +48,5 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
 
 object ShellPrompt {
   val buildShellPrompt =
-    (state: State) => "scalex:%s> ".format(Project.extract(state).currentProject.id)
+    (state: State) ⇒ "scalex:%s> ".format(Project.extract(state).currentProject.id)
 }
