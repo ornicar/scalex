@@ -1,6 +1,6 @@
 package scalex
 
-import scalex.dump.{Dumper, Locator}
+import scalex.dump.{Dumper, Locator, Store}
 import scalex.model.Def
 import scalex.search.{Search, Query}
 import java.io.File
@@ -22,6 +22,7 @@ object Cli {
   def process(command: String, args: List[String]) = command match {
     case "dump" => dump(args)
     case "search" => search(args mkString " ")
+    case "all" => all
     case command => "Unknown command " + command
   }
 
@@ -30,6 +31,8 @@ object Cli {
     case Right(paginator) =>
       "%d results for %s\n\n%s" format (paginator.nbResults, query, render(paginator.currentPageResults))
   }
+
+  def all: String = Store.read mkString "\n"
 
   def dump(fs: List[String]): String = {
     val pack = fs.head

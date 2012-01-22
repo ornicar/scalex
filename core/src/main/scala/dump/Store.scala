@@ -3,7 +3,7 @@ package dump
 
 import java.io._
 
-import scalex.model.Def
+import scalex.model._
 
 object Store {
 
@@ -13,6 +13,7 @@ object Store {
     val output = new ObjectOutputStream(new FileOutputStream(file))
     output.writeObject(defs)
     output.close
+    read foreach println
   }
 
   def read = {
