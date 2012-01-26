@@ -27,12 +27,6 @@ case class Def(
   /** The type parameters of this entity. */
   , typeParams: List[TypeParam]
 
-  /** The search text tokens */
-  , tokens: List[String]
-
-  /** The search signature tokens */
-  , sigTokens: List[String]
-
   /** The package containing the def */
   , pack: String
 
@@ -53,10 +47,4 @@ case class Def(
   def id = hashCode toString
 
   override def toString = (qualifiedName + showTypeParams + ": " + signature)
-}
-
-object Def {
-
-  def nameToTokens(name: String): List[String] =
-    name.split(Array('#', '.', ' ')).toList.distinct map (_.toLowerCase.trim)
 }

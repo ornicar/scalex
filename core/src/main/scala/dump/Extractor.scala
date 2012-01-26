@@ -45,14 +45,13 @@ class Extractor(pack: String, config: Dumper.Config) {
     val typeSigEnd = (flatValueParams filter (!_.isImplicit) map (_.resultType)) ::: List(resultType)
     val typeSig = if (!parent.isObject) parent.toTypeEntity :: typeSigEnd else typeSigEnd
     val normSig = scalex.model.RawTypeSig(typeSig).normalize.toString
-    val sigTokens = makeSigTokens(List(normSig), config.aliases.toList) map (_.toLowerCase)
 
     fun match {
       case fun: Def ⇒ scalex.model.Def(
-        fun.name, qualifiedName, parent, resultType, comment, valueParams, makeTypeParams(fun.typeParams), makeTokens(qualifiedName), sigTokens, pack, fun.deprecation map makeBlock
+        fun.name, qualifiedName, parent, resultType, comment, valueParams, makeTypeParams(fun.typeParams), pack, fun.deprecation map makeBlock
       )
       case fun: Val ⇒ scalex.model.Def(
-        fun.name, qualifiedName, parent, resultType, comment, valueParams, makeTypeParams(Nil), makeTokens(qualifiedName), sigTokens, pack, fun.deprecation map makeBlock
+        fun.name, qualifiedName, parent, resultType, comment, valueParams, makeTypeParams(Nil), pack, fun.deprecation map makeBlock
       )
     }
   }
@@ -73,23 +72,6 @@ class Extractor(pack: String, config: Dumper.Config) {
     scalex.model.Block(html, HtmlWriter.htmlToText(html))
 
   private[this] def makeQualifiedName(name: String): String = name
-
-  private[this] def makeTokens(name: String): List[String] =
-    addAliases(scalex.model.Def.nameToTokens(name), config.aliases.toList)
-
-  private[this] def addAliases(tokens: List[String], aliases: List[(String, String)]): List[String] = aliases match {
-    case Nil            ⇒ tokens
-    case (a, b) :: rest ⇒ if (tokens contains a.toLowerCase) addAliases(b.toLowerCase :: tokens, rest) else addAliases(tokens, rest)
-  }
-
-  private[this] def makeSigTokens(sigs: List[String], aliases: List[(String, String)]): List[String] = aliases match {
-    case Nil ⇒ sigs
-    case (a, b) :: rest ⇒
-      if (sigs.head contains a)
-        addAliases(sigs.head.replace(a, b) :: sigs, rest)
-      else
-        addAliases(sigs, rest)
-  }
 
   private[this] def makeTypeParams(tps: List[TypeParam]): List[scalex.model.TypeParam] = tps map { tp ⇒
     scalex.model.TypeParam(
