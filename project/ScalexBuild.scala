@@ -22,14 +22,14 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val specs2 = "org.specs2" %% "specs2" % "1.6.1"
+  val specs2 = "org.specs2" %% "specs2" % "1.7.1"
   val casbah = "com.mongodb.casbah" %% "casbah" % "2.1.5-1"
   val salat = "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT"
   val compiler = "org.scala-lang" % "scala-compiler" % "2.9.1"
-  val slf4j = "org.slf4j" % "slf4j-simple" % "1.6.1" % "runtime"
+  val slf4j = "org.slf4j" % "slf4j-simple" % "1.6.4" % "runtime"
   val paginator = "com.github.ornicar" %% "paginator-core" % "1.2"
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.3"
-  val scalatra = "org.scalatra" %% "scalatra" % "2.0.1"
+  val scalatra = "org.scalatra" %% "scalatra" % "2.0.3"
   val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
 }
