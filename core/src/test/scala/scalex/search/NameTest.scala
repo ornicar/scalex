@@ -1,18 +1,21 @@
 package scalex.test.search
 
-import org.specs2.mutable._
-import org.specs2.matcher.MatchResult
 import scalex.search._
 
-class NameTest extends Specification with WithSearch {
+import org.specs2.mutable._
+import org.specs2.matcher.MatchResult
+import org.specs2.matcher.Matcher
+import scalaz.{ Success, Failure }
+
+class NameTest extends Specification with WithSearch with ScalazMatchers {
 
   "Find by name" in {
-    searchNames("map") must findName("scala.collection.immutable.List#map")
+    searchNames("list map") must findName("scala.collection.immutable.List#map")
   }
 
-  def findName(result: String) = beRight.like(findPartialFunction(result))
+  private def findName(name: String): Matcher[ValidSeq[String]] = succeedWith(defName(name))
 
-  def findPartialFunction(result: String): PartialFunction[Seq[String], MatchResult[Seq[String]]] = {
-    case results => results must contain(result)
+  private def defName(name: String): PartialFunction[Seq[String], MatchResult[Seq[String]]] = {
+    case names => names must contain(name)
   }
 }

@@ -1,4 +1,5 @@
-package scalex.search
+package scalex
+package search
 
 import scalex.model._
 import scala.util.parsing.combinator._

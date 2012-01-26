@@ -3,7 +3,9 @@ package scalex
 import scalex.dump.{ Dumper, Locator }
 import scalex.model.Def
 import scalex.search._
+
 import java.io.File
+import scalaz.Scalaz.{ success, failure }
 
 object Cli {
 
@@ -25,11 +27,11 @@ object Cli {
     case command  ⇒ "Unknown command " + command
   }
 
-  def search(query: String): String = (Search find Query(query, 1, 5)) match {
-    case Left(msg) ⇒ msg
-    case Right(Results(paginator, defs)) ⇒
+  def search(query: String): String =
+    (Search find RawQuery(query, 1, 5)).fold(identity, {
+    case Results(paginator, defs) ⇒
       "%d results for %s\n\n%s" format (paginator.nbResults, query, render(defs))
-  }
+  })
 
   def dump(fs: List[String]): String = {
     val pack = fs.head
