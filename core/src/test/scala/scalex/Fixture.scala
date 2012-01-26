@@ -5,7 +5,10 @@ import scalex.model._
 object Fixture {
 
   val def1 = Def(
+    "id",
     "test",
+    "",
+    "",
     "",
     Parent("ptest", "", Nil, false),
     SimpleClass("ParentClass", true),
@@ -16,8 +19,6 @@ object Fixture {
         ValueParam("b", SimpleClass("B", false), None, false)
       ))
     ),
-    Nil,
-    Nil,
     Nil,
     "test",
     None

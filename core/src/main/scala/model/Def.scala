@@ -4,11 +4,20 @@ import com.novus.salat.annotations._
 
 case class Def(
 
+  /** Used as mongodb id */
+    @Key("_id") id: String
+
   /** See Entity */
-    name: String
+  , name: String
 
   /** See Entity */
   , qualifiedName: String
+
+  /** Function type signature */
+  , signature: String
+
+  /** Full unique function declaration */
+  , declaration: String
 
   /** The function host class, trait or object */
   , parent: Parent
@@ -35,16 +44,8 @@ case class Def(
 
 ) extends HigherKinded {
 
-  /** Complete signature of the function including host class and return value */
-  def signature: String = List(classSignature, paramSignature, resultType) filter (_ != "") mkString " => "
-
-  /** Signature of the host class */
-  def classSignature: String = parent.toString
-
   /** Signature of the function parameters, not including the host class */
   def paramSignature: String = valueParams map (_.toString) mkString ""
 
-  def id = hashCode toString
-
-  override def toString = (qualifiedName + showTypeParams + ": " + signature)
+  override def toString = declaration
 }

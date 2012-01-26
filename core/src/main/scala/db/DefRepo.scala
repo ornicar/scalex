@@ -1,9 +1,9 @@
-package scalex.db
+package scalex
+package db
 
-import scalex.model.Def
+import model.Def
 import com.novus.salat._
 import com.novus.salat.global._
-import com.novus.salat.annotations._
 import com.novus.salat.dao._
 import com.mongodb.casbah.Imports._
 
@@ -11,7 +11,7 @@ object DefRepo extends SalatDAO[Def, ObjectId](collection = MongoConnection()("s
 
   def batchInsert(objs: List[Def]) { collection insert (objs map _grater.asDBObject) }
 
-  def findAll: List[Def] = find(MongoDBObject()).toList
+  def byIds(ids: Seq[String]): List[Def] = find("_id" $in ids).toList
 
   def removePack(pack: String) {
     collection remove MongoDBObject("pack" -> pack)

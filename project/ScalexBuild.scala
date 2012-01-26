@@ -32,6 +32,7 @@ trait Dependencies {
   val scalatra = "org.scalatra" %% "scalatra" % "2.0.3"
   val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
+  val hasher = "com.roundeights" % "hasher" % "0.3" from "http://cloud.github.com/downloads/Nycto/Hasher/hasher_2.9.1-0.3.jar"
 }
 
 object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies {
@@ -39,7 +40,7 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
     settings = buildSettings ++ Seq(
       name := "scalex-core",
       resolvers := Seq(typesafe, iliaz, novus, sonatype),
-      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, scalaz)))
+      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, scalaz, hasher)))
 
   lazy val http = Project("http", file("http"),
     settings = buildSettings ++ Seq(

@@ -2,7 +2,7 @@ package scalex
 
 import scalex.dump.{ Dumper, Locator }
 import scalex.model.Def
-import scalex.search.{ Search, Query }
+import scalex.search._
 import java.io.File
 
 object Cli {
@@ -22,17 +22,14 @@ object Cli {
   def process(command: String, args: List[String]) = command match {
     case "dump"   ⇒ dump(args)
     case "search" ⇒ search(args mkString " ")
-    case "all"    ⇒ all
     case command  ⇒ "Unknown command " + command
   }
 
   def search(query: String): String = (Search find Query(query, 1, 5)) match {
     case Left(msg) ⇒ msg
-    case Right(paginator) ⇒
-      "%d results for %s\n\n%s" format (paginator.nbResults, query, render(paginator.currentPageResults))
+    case Right(Results(paginator, defs)) ⇒
+      "%d results for %s\n\n%s" format (paginator.nbResults, query, render(defs))
   }
-
-  def all: String = db.DefRepo.findAll take 1000 mkString "\n"
 
   def dump(fs: List[String]): String = {
     val pack = fs.head

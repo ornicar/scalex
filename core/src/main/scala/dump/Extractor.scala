@@ -4,6 +4,7 @@ import scala.tools.nsc.doc.Universe
 import scala.collection.mutable
 import scala.tools.nsc.doc.model.{ TypeEntity ⇒ NscTypeEntity, _ }
 import scala.tools.nsc.doc.model.comment._
+import com.roundeights.hasher.Hasher
 import scalex.dump.model._
 
 class Extractor(pack: String, config: Dumper.Config) {
@@ -18,11 +19,11 @@ class Extractor(pack: String, config: Dumper.Config) {
       if (!(done contains tplHashCode)) {
         done += tplHashCode
 
-        val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract)
+        val defs = (tpl.methods ++ tpl.values) filterNot (_.isAbstract) map makeDef
 
-        println("%s => %d functions" format (tpl, members.size))
+        println("%s => %d functions" format (tpl, defs.size))
 
-        callback(members map makeDef)
+        callback(defs)
 
         tpl.templates foreach gather
       }
@@ -37,21 +38,27 @@ class Extractor(pack: String, config: Dumper.Config) {
     val qualifiedName = makeQualifiedName(fun.qualifiedName)
     val parent = makeParent(fun.inTemplate)
     val resultType = makeTypeEntity(fun.resultType)
-    val valueParams = fun match {
-      case fun: Def ⇒ makeValueParams(fun.valueParams)
-      case fun: Val ⇒ makeValueParams(Nil)
-    }
-    val flatValueParams = valueParams.foldLeft(List[scalex.model.ValueParam]())((a, b) ⇒ a ::: b.params)
-    val typeSigEnd = (flatValueParams filter (!_.isImplicit) map (_.resultType)) ::: List(resultType)
-    val typeSig = if (!parent.isObject) parent.toTypeEntity :: typeSigEnd else typeSigEnd
-    val normSig = scalex.model.RawTypeSig(typeSig).normalize.toString
+    val valueParams = makeValueParams(fun match {
+      case fun: Def ⇒ fun.valueParams
+      case fun: Val ⇒ Nil
+    })
+    val typeParams = makeTypeParams(fun match {
+      case fun: Def ⇒ fun.typeParams
+      case fun: Val ⇒ Nil
+    })
+    val showTypeParams = scalex.model.HigherKinded typeParamsToString typeParams
+    val classSignature = parent.toString
+    val paramSignature = valueParams map (_.toString) mkString ""
+    val signature = List(classSignature, paramSignature, resultType) filter (_ != "") mkString " => "
+    val declaration = qualifiedName + showTypeParams + ": " + signature
+    val id = Hasher(declaration).md5
 
     fun match {
       case fun: Def ⇒ scalex.model.Def(
-        fun.name, qualifiedName, parent, resultType, comment, valueParams, makeTypeParams(fun.typeParams), pack, fun.deprecation map makeBlock
+        id, fun.name, qualifiedName, signature, declaration, parent, resultType, comment, valueParams, typeParams, pack, fun.deprecation map makeBlock
       )
       case fun: Val ⇒ scalex.model.Def(
-        fun.name, qualifiedName, parent, resultType, comment, valueParams, makeTypeParams(Nil), pack, fun.deprecation map makeBlock
+        id, fun.name, qualifiedName, signature, declaration, parent, resultType, comment, valueParams, typeParams, pack, fun.deprecation map makeBlock
       )
     }
   }
