@@ -28,8 +28,7 @@ class Dumper {
     DefRepo.removePack(pack)
 
     log("Extracting functions from the model...")
-    val defs = (new Extractor(pack, config)) explore universe
-    DefRepo batchInsert defs.toList
+    (new Extractor(pack, config)).passFunctions(universe, DefRepo.batchInsert)
 
     log("Saved %d functions!" format DefRepo.count())
   }

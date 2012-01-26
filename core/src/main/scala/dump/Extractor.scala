@@ -2,29 +2,30 @@ package scalex.dump
 
 import scala.tools.nsc.doc.Universe
 import scala.collection.mutable
-import scala.tools.nsc.doc.model.{ TypeEntity => NscTypeEntity, _ }
+import scala.tools.nsc.doc.model.{ TypeEntity ⇒ NscTypeEntity, _ }
 import scala.tools.nsc.doc.model.comment._
 import scalex.dump.model._
 
 class Extractor(pack: String, config: Dumper.Config) {
 
-  def explore(universe: Universe): Iterable[scalex.model.Def] = {
+  def passFunctions(universe: Universe, callback: List[scalex.model.Def] ⇒ Unit) {
 
     val done = mutable.HashSet.empty[Int]
 
-    def gather(tpl: DocTemplateEntity): Iterable[scalex.model.Def] = {
+    def gather(tpl: DocTemplateEntity): Unit = {
 
       val tplHashCode = tpl.hashCode
-
       if (!(done contains tplHashCode)) {
         done += tplHashCode
 
-        val defs = (tpl.methods ++ tpl.values) filterNot (_.isAbstract) map makeDef
+        val members = (tpl.methods ++ tpl.values) filterNot (_.isAbstract)
 
-        //println("%s => %d functions" format (tpl, defs.size))
+        println("%s => %d functions" format (tpl, members.size))
 
-        defs ::: (tpl.templates flatMap gather)
-      } else Nil
+        callback(members map makeDef)
+
+        tpl.templates foreach gather
+      }
     }
 
     gather(universe.rootPackage)
@@ -37,62 +38,28 @@ class Extractor(pack: String, config: Dumper.Config) {
     val parent = makeParent(fun.inTemplate)
     val resultType = makeTypeEntity(fun.resultType)
     val valueParams = fun match {
-      case fun: Def => makeValueParams(fun.valueParams)
-      case fun: Val => makeValueParams(Nil)
+      case fun: Def ⇒ makeValueParams(fun.valueParams)
+      case fun: Val ⇒ makeValueParams(Nil)
     }
-    val flatValueParams = valueParams.foldLeft(List[scalex.model.ValueParam]())((a, b) => a ::: b.params)
+    val flatValueParams = valueParams.foldLeft(List[scalex.model.ValueParam]())((a, b) ⇒ a ::: b.params)
     val typeSigEnd = (flatValueParams filter (!_.isImplicit) map (_.resultType)) ::: List(resultType)
     val typeSig = if (!parent.isObject) parent.toTypeEntity :: typeSigEnd else typeSigEnd
     val normSig = scalex.model.RawTypeSig(typeSig).normalize.toString
     val sigTokens = makeSigTokens(List(normSig), config.aliases.toList) map (_.toLowerCase)
 
     fun match {
-      case fun: Def => scalex.model.Def(
-          fun.name
-        , qualifiedName
-        , parent
-        , resultType
-        , comment
-        , valueParams
-        , makeTypeParams(fun.typeParams)
-        , makeTokens(qualifiedName)
-        , sigTokens
-        , pack
-        , fun.deprecation map makeBlock
+      case fun: Def ⇒ scalex.model.Def(
+        fun.name, qualifiedName, parent, resultType, comment, valueParams, makeTypeParams(fun.typeParams), makeTokens(qualifiedName), sigTokens, pack, fun.deprecation map makeBlock
       )
-      case fun: Val => scalex.model.Def(
-          fun.name
-        , qualifiedName
-        , parent
-        , resultType
-        , comment
-        , valueParams
-        , makeTypeParams(Nil)
-        , makeTokens(qualifiedName)
-        , sigTokens
-        , pack
-        , fun.deprecation map makeBlock
+      case fun: Val ⇒ scalex.model.Def(
+        fun.name, qualifiedName, parent, resultType, comment, valueParams, makeTypeParams(Nil), makeTokens(qualifiedName), sigTokens, pack, fun.deprecation map makeBlock
       )
     }
   }
 
-  private[this] def makeComment(comment: Option[Comment]) = comment map { com =>
+  private[this] def makeComment(comment: Option[Comment]) = comment map { com ⇒
     scalex.model.Comment(
-      makeBlock(com.body)
-    , makeBlock(com.short)
-    , com.authors map makeBlock
-    , com.see map makeBlock
-    , com.result map makeBlock
-    , com.throws.toMap map { case (a, b) => (a.replace(".", "_"), makeBlock(b)) }
-    , com.valueParams.toMap map { case (a, b) => (a.replace(".", "_"), makeBlock(b)) }
-    , com.typeParams.toMap map { case (a, b) => (a.replace(".", "_"), makeBlock(b)) }
-    , com.version map makeBlock
-    , com.since map makeBlock
-    , com.todo map makeBlock
-    , com.note map makeBlock
-    , com.example map makeBlock
-    , com.source
-    , com.constructor map makeBlock
+      makeBlock(com.body), makeBlock(com.short), com.authors map makeBlock, com.see map makeBlock, com.result map makeBlock, com.throws.toMap map { case (a, b) ⇒ (a.replace(".", "_"), makeBlock(b)) }, com.valueParams.toMap map { case (a, b) ⇒ (a.replace(".", "_"), makeBlock(b)) }, com.typeParams.toMap map { case (a, b) ⇒ (a.replace(".", "_"), makeBlock(b)) }, com.version map makeBlock, com.since map makeBlock, com.todo map makeBlock, com.note map makeBlock, com.example map makeBlock, com.source, com.constructor map makeBlock
     )
   }
 
@@ -111,41 +78,33 @@ class Extractor(pack: String, config: Dumper.Config) {
     addAliases(scalex.model.Def.nameToTokens(name), config.aliases.toList)
 
   private[this] def addAliases(tokens: List[String], aliases: List[(String, String)]): List[String] = aliases match {
-    case Nil => tokens
-    case (a, b) :: rest => if (tokens contains a.toLowerCase) addAliases(b.toLowerCase :: tokens, rest) else addAliases(tokens, rest)
+    case Nil            ⇒ tokens
+    case (a, b) :: rest ⇒ if (tokens contains a.toLowerCase) addAliases(b.toLowerCase :: tokens, rest) else addAliases(tokens, rest)
   }
 
   private[this] def makeSigTokens(sigs: List[String], aliases: List[(String, String)]): List[String] = aliases match {
-    case Nil => sigs
-    case (a, b) :: rest =>
+    case Nil ⇒ sigs
+    case (a, b) :: rest ⇒
       if (sigs.head contains a)
         addAliases(sigs.head.replace(a, b) :: sigs, rest)
       else
         addAliases(sigs, rest)
   }
 
-  private[this] def makeTypeParams(tps: List[TypeParam]): List[scalex.model.TypeParam] = tps map { tp =>
+  private[this] def makeTypeParams(tps: List[TypeParam]): List[scalex.model.TypeParam] = tps map { tp ⇒
     scalex.model.TypeParam(
-        tp.name
-      , makeQualifiedName(tp.qualifiedName)
-      , tp.variance
-      , tp.lo map makeTypeEntity
-      , tp.hi map makeTypeEntity
-      , makeTypeParams(tp.typeParams)
+      tp.name, makeQualifiedName(tp.qualifiedName), tp.variance, tp.lo map makeTypeEntity, tp.hi map makeTypeEntity, makeTypeParams(tp.typeParams)
     )
   }
 
   private[this] def makeParent(p: DocTemplateEntity): scalex.model.Parent = p match {
-    case o: Object =>
+    case o: Object ⇒
       scalex.model.Parent.makeObject(
-          o.name
-        , makeQualifiedName(o.qualifiedName)
+        o.name, makeQualifiedName(o.qualifiedName)
       )
-    case t: Trait =>
+    case t: Trait ⇒
       scalex.model.Parent.makeTrait(
-          t.name
-        , makeQualifiedName(t.qualifiedName)
-        , makeTypeParams(t.typeParams)
+        t.name, makeQualifiedName(t.qualifiedName), makeTypeParams(t.typeParams)
       )
   }
 
@@ -156,13 +115,10 @@ class Extractor(pack: String, config: Dumper.Config) {
   }
 
   private[this] def makeValueParams(params: List[List[ValueParam]]) =
-    params.map(vs => scalex.model.ValueParams(vs map makeValueParam))
+    params.map(vs ⇒ scalex.model.ValueParams(vs map makeValueParam))
 
   private[this] def makeValueParam(param: ValueParam): scalex.model.ValueParam =
     scalex.model.ValueParam(
-        param.name
-      , makeTypeEntity(param.resultType)
-      , param.defaultValue map (_.expression)
-      , param.isImplicit
+      param.name, makeTypeEntity(param.resultType), param.defaultValue map (_.expression), param.isImplicit
     )
 }
