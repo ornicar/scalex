@@ -2,7 +2,6 @@ package object scalex
   extends scalaz.Identitys
   with scalaz.Equals
   with scalaz.MABs
-  with scalaz.MAs
   with scalaz.Options
   with scalaz.Lists
   with scalaz.Booleans {
