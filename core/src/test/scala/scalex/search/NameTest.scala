@@ -30,6 +30,12 @@ class NameTest extends ScalexSpec with WithSearch {
       "Any order" in {
         "map collection list" finds "scala.collection.immutable.List#map"
       }
+      "Only 2 words" in {
+        "list map" finds "scala.collection.immutable.List#map"
+      }
+      "Only 1 word" in {
+        "mapConserve" finds "scala.collection.immutable.List#mapConserve"
+      }
     }
   }
 

@@ -5,15 +5,11 @@ import index.Def
 
 case class TokenIndex(hash: Map[String, List[Def]]) {
 
-  def matches(tokens: List[String]): List[Def] = {
+  def matches(tokens: List[String]): List[Def] =
     tokens collect hash match {
-      case Nil         ⇒ Nil
-      case head :: Nil ⇒ head
-      case head :: tail ⇒ {
-        tail.foldLeft(head)(_ intersect _)
-      }
+      case Nil          ⇒ Nil
+      case head :: tail ⇒ tail.foldLeft(head)(_ intersect _)
     }
-  }
 }
 
 object TokenIndex {
@@ -27,10 +23,7 @@ object TokenIndex {
     for {
       d ← defs
       token ← d.tokens
-    } {
-      if (hash contains token) hash(token) += d
-      else hash.update(token, mutable.ListBuffer(d))
-    }
+    } hash.getOrElseUpdate(token, mutable.ListBuffer()) += d
 
     TokenIndex(hash mapValues (_.toList) toMap)
   }
