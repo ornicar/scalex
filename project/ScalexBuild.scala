@@ -33,7 +33,7 @@ trait Dependencies {
   val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
   val hasher = "com.roundeights" % "hasher" % "0.3" from "http://cloud.github.com/downloads/Nycto/Hasher/hasher_2.9.1-0.3.jar"
-  val sbinary = "org.scala-tools.sbinary" % "sbinary_2.9.0" % "0.4.0"
+  val sbinary = "org.scala-tools.sbinary" %% "sbinary" % "0.4.1-SNAPSHOT"
 }
 
 object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies {
@@ -46,7 +46,7 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
   lazy val http = Project("http", file("http"),
     settings = buildSettings ++ Seq(
       name := "scalex-http",
-      resolvers := Seq(novus),
+      resolvers := Seq(novus, iliaz),
       libraryDependencies ++= Seq(scalatra, servlet, jetty, slf4j))) dependsOn "core"
 }
 
