@@ -12,15 +12,19 @@ trait WithSearch {
 
   type ValidSeq[A] = Validation[String, Seq[A]]
 
-  def search(query: String): Validation[String, Results] = search(RawQuery(query, 1, 10))
+  def query(q: String) = RawQuery(q, 1, 10)
 
-  def search(query: RawQuery): Validation[String, Results] = Search find query
+  def analyze(q: String) = query(q).analyze
 
-  def search(query: String, nb: Int): ValidSeq[Def] =
-    search(RawQuery(query, 1, nb)).map(_.defs)
+  def search(q: String): Validation[String, Results] = search(query(q))
 
-  def searchNames(query: String, nb: Int): ValidSeq[String] =
-    search(query, nb).map(ds => ds.map(_.qualifiedName))
+  def search(q: RawQuery): Validation[String, Results] = Search find q
 
-  def searchNames(query: String): ValidSeq[String] = searchNames(query, 10)
+  def search(q: String, nb: Int): ValidSeq[Def] =
+    search(RawQuery(q, 1, nb)).map(_.defs)
+
+  def searchNames(q: String, nb: Int): ValidSeq[String] =
+    search(q, nb).map(ds => ds.map(_.qualifiedName))
+
+  def searchNames(q: String): ValidSeq[String] = searchNames(q, 10)
 }

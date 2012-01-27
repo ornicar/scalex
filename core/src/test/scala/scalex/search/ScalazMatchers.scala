@@ -1,5 +1,4 @@
-package scalex
-package test.search
+package scalex.test
 
 import org.specs2.matcher._
 import scalaz.{ Success, Failure }

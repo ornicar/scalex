@@ -1,16 +1,28 @@
-package scalex.test.search
+package scalex.test
+package search
 
 import scalex.search._
 
-import org.specs2.mutable._
 import org.specs2.matcher.MatchResult
 import org.specs2.matcher.Matcher
 import scalaz.{ Success, Failure }
 
-class NameTest extends Specification with WithSearch with ScalazMatchers {
+class NameTest extends ScalexSpec with WithSearch {
 
-  "Find by name" in {
-    searchNames("list map") must findName("scala.collection.immutable.List#map")
+  "Wrong query" should {
+    "Empty" in {
+      searchNames("") must failWith(like("Empty query"))
+    }
+    "Unparsable" in {
+      searchNames("a: (") must failWith(like("failure: string matching regex"))
+    }
+  }
+  "Valid query" should {
+    "Text query" in {
+      "Find by qualified name" in {
+        searchNames("list map") must findName("scala.collection.immutable.List#map")
+      }
+    }
   }
 
   private def findName(name: String): Matcher[ValidSeq[String]] = succeedWith(defName(name))
