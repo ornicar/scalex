@@ -4,6 +4,7 @@ package object scalex
   with scalaz.MABs
   with scalaz.Options
   with scalaz.Lists
+  with scalaz.Semigroups
   with scalaz.Booleans {
 
   /**

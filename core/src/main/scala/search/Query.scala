@@ -1,40 +1,46 @@
 package scalex
 package search
 
+import scalaz.Semigroup
 import scalaz.Validation
 import scalaz.Scalaz.{ success, failure }
+import scalaz.NonEmptyList
 
 import model._
 
 case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
 
-  private val mixedRegex = """^([^\:]*)\:\s(.+)$""".r
+  implicit def QuerySemigroup: Semigroup[Query] = semigroup(_ merge _)
 
-  def analyze: Validation[String, Query] = failure("haha")
-  //def analyze: Validation[String, Query] = string match {
-    //case mixedRegex(text, tpe)      ⇒ mixedQuery(text, tpe)
-    //case tpe if tpe contains " => " ⇒ typeQuery(tpe)
-    //case text                       ⇒ textQuery(text)
-  //}
+  private val splitter = """^([^\:]*)\:\s(.+)$""".r
 
-  //private def mixedQuery(text: String, tpe: String) = success(
-    //textQuery(text) + typeQuery(tpe)
-  //)
+  def analyze: Validation[String, Query] = string match {
+    case splitter(text, tpe)      ⇒ mixedQuery(text, tpe)
+    case tpe if tpe contains " => " ⇒ typeQuery(tpe)
+    case text                       ⇒ textQuery(text)
+  }
 
-  //private def textQuery(text: String) =
-    //Query(TextQuery((text split ' ').toList map (_.trim)).some, none)
+  private def mixedQuery(text: String, tpe: String) =
+    textQuery(text) >>*<< typeQuery(tpe)
 
-  //private def typeQuery(tpe: String) = for {
-    //sig <- SigParser(tpe).right
-  //} yield Query(none, TypeQuery(sig.normalize).some)
+  private def textQuery(text: String) =
+    tokenize(text) map { tokens =>
+      Query(TextQuery(tokens).some, none)
+    } toSuccess "Empty query"
+
+  private def typeQuery(tpe: String) = SigParser(tpe) map { sig ⇒
+    Query(none, TypeQuery(sig.normalize).some)
+  }
+
+  private def tokenize(text: String): Option[NonEmptyList[String]] =
+    (text split ' ').toList map (_.trim) filterNot (_.isEmpty) toNel
 }
 
 case class Query(text: Option[TextQuery], tpe: Option[TypeQuery]) {
 
-  //def +(query: Query) = Query(query.text <+> this.text, query.tpe <+> this.tpe)
+  def merge(query: Query) = Query(query.text <+> this.text, query.tpe <+> this.tpe)
 }
 
-
-case class TextQuery(tokens: List[String])
+case class TextQuery(tokens: NonEmptyList[String])
 
 case class TypeQuery(sig: NormalizedTypeSig)
