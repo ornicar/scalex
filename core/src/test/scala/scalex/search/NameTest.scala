@@ -20,7 +20,9 @@ class NameTest extends ScalexSpec with WithSearch {
   "Valid query" should {
     "Text query" in {
       "Find by qualified name" in {
-        searchNames("list map") must findName("scala.collection.immutable.List#map")
+        searchNames("collection list map") must beSuccess.like {
+          case names => names must contain("scala.collection.immutable.List#map")
+        }
       }
     }
   }
