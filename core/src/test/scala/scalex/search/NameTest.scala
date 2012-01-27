@@ -11,10 +11,10 @@ class NameTest extends ScalexSpec with WithSearch {
 
   "Wrong query" should {
     "Empty" in {
-      searchNames("") must failWith(like("Empty query"))
+      searchNames("") must beAFailure
     }
     "Unparsable" in {
-      searchNames("a: (") must failWith(like("failure: string matching regex"))
+      searchNames("a: (") must beAFailure
     }
   }
   "Valid query" should {
