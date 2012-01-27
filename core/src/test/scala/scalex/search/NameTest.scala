@@ -9,6 +9,11 @@ import scalaz.{ Success, Failure }
 
 class NameTest extends ScalexSpec with WithSearch {
 
+  implicit def toMatchableSearch(search: String) = new {
+    def finds(name: String): MatchResult[ValidSeq[String]] =
+      searchNames(search) must findName(name)
+  }
+
   "Wrong query" should {
     "Empty" in {
       searchNames("") must beAFailure
@@ -17,19 +22,18 @@ class NameTest extends ScalexSpec with WithSearch {
       searchNames("a: (") must beAFailure
     }
   }
-  "Valid query" should {
-    "Text query" in {
-      "Find by qualified name" in {
-        searchNames("collection list map") must beSuccess.like {
-          case names => names must contain("scala.collection.immutable.List#map")
-        }
+  "Valid text query" should {
+    "Find by qualified name" in {
+      "Natural order" in {
+        "collection list map" finds "scala.collection.immutable.List#map"
+      }
+      "Any order" in {
+        "map collection list" finds "scala.collection.immutable.List#map"
       }
     }
   }
 
-  private def findName(name: String): Matcher[ValidSeq[String]] = succeedWith(defName(name))
-
-  private def defName(name: String): PartialFunction[Seq[String], MatchResult[Seq[String]]] = {
+  private def findName(name: String): Matcher[ValidSeq[String]] = beSuccess.like {
     case names => names must contain(name)
   }
 }
