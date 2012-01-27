@@ -12,30 +12,35 @@ class NameTest extends ScalexSpec with WithSearch {
   implicit def toMatchableSearch(search: String) = new {
     def finds(name: String): MatchResult[ValidSeq[String]] =
       searchNames(search) must findName(name)
+    def findsNothing: MatchResult[ValidSeq[String]] =
+      searchNames(search) must beSuccess.like {
+        case names => names must beEmpty
+      }
   }
 
-  "Wrong query" should {
-    "Empty" in {
-      searchNames("") must beAFailure
+  "Find by qualified name" in {
+    "Natural order" in {
+      "collection list map" finds "scala.collection.immutable.List#map"
     }
-    "Unparsable" in {
-      searchNames("a: (") must beAFailure
+    "Any order" in {
+      "map collection list" finds "scala.collection.immutable.List#map"
+    }
+    "Only 2 words" in {
+      "list map" finds "scala.collection.immutable.List#map"
+    }
+    "Only 1 word" in {
+      "mapConserve" finds "scala.collection.immutable.List#mapConserve"
     }
   }
-  "Valid text query" should {
-    "Find by qualified name" in {
-      "Natural order" in {
-        "collection list map" finds "scala.collection.immutable.List#map"
-      }
-      "Any order" in {
-        "map collection list" finds "scala.collection.immutable.List#map"
-      }
-      "Only 2 words" in {
-        "list map" finds "scala.collection.immutable.List#map"
-      }
-      "Only 1 word" in {
-        "mapConserve" finds "scala.collection.immutable.List#mapConserve"
-      }
+  "Find nothing" in {
+    "One known word and one unknown word" in {
+      "list rantanplan".findsNothing
+    }
+    "Two known words and one unknown word" in {
+      "collection list rantanplan".findsNothing
+    }
+    "Only one unknown word" in {
+      "rantanplan".findsNothing
     }
   }
 
