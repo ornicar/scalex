@@ -5,7 +5,7 @@ import org.specs2.mutable._
 import scalex.search._
 import scalex.model.TypeParam
 
-class SigParserTest extends Specification {
+class SigParserTest extends Specification with ScalazMatchers {
 
   "Parse identity" in {
     =/=("a => a")
@@ -46,8 +46,5 @@ class SigParserTest extends Specification {
   private def =/=(sig: String, expected: String): Example =
     sig in { parse(sig) mustEqual expected }
 
-  private def parse(str: String) = SigParser(str) match {
-    case Right(typeSig) => typeSig.toString
-    case Left(error) => error
-  }
+  private def parse(str: String) = SigParser(str).fold(identity, _.toString)
 }
