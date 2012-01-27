@@ -1,6 +1,7 @@
-package scalex.dump
+package scalex
+package dump
 
-import scalex.db.DefRepo
+import db.DefRepo
 
 import scala.tools.nsc._
 import java.io.File.pathSeparator
@@ -8,7 +9,7 @@ import scala.tools.nsc.reporters.ConsoleReporter
 import scala.tools.nsc.util.FakePos
 import Properties.msilLibPath
 
-class Dumper {
+class Dumper(defRepo: DefRepo) {
 
   val config = Dumper.Config(Map(
     "StringOps" -> "String"
@@ -25,12 +26,12 @@ class Dumper {
     val universe = new Compiler(reporter, docSettings) universe files
 
     log("Dropping previous pack...")
-    DefRepo.removePack(pack)
+    defRepo.removePack(pack)
 
     log("Extracting functions from the model...")
-    (new Extractor(pack, config)).passFunctions(universe, DefRepo.batchInsert)
+    (new Extractor(pack, config)).passFunctions(universe, defRepo.batchInsert)
 
-    log("Saved %d functions!" format DefRepo.count())
+    log("Saved %d functions!" format defRepo.count())
   }
 
   private[this] def log(message: String) {

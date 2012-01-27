@@ -1,22 +1,23 @@
 package scalex
 package search
 
-import db.DefRepo
+import db._
 
 import com.github.ornicar.paginator._
 import scalaz.Validation
 import scalaz.Scalaz.{ success, failure }
 
-object Search extends scalaz.Validations {
+class Engine(
+  indexes: List[index.Def],
+  idsToDefs: Seq[String] => List[model.Def]
+) extends scalaz.Validations {
 
   private val mixedRegex = """^([^\:]*)\:\s(.+)$""".r
 
-  val defs: List[index.Def] = db.IndexRepo.findAll
-
   def find(query: RawQuery): Validation[String, Results] = for {
-    q <- query.analyze
-    val adapter = InMemoryAdapter(defs take 10)
-    p <- validation(Paginator(adapter, query.currentPage, query.maxPerPage))
-    defs = DefRepo byIds (p.currentPageResults map (_.id))
+    q ← query.analyze
+    val adapter = InMemoryAdapter(indexes take 10)
+    p ← validation(Paginator(adapter, query.currentPage, query.maxPerPage))
+    defs = idsToDefs(p.currentPageResults map (_.id))
   } yield Results(p, defs)
 }

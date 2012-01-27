@@ -27,12 +27,13 @@ trait Dependencies {
   val salat = "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT"
   val compiler = "org.scala-lang" % "scala-compiler" % "2.9.1"
   val slf4j = "org.slf4j" % "slf4j-simple" % "1.6.4" % "runtime"
-  val paginator = "com.github.ornicar" %% "paginator-core" % "1.3"
+  val paginator = "com.github.ornicar" %% "paginator-core" % "1.4"
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.4"
   val scalatra = "org.scalatra" %% "scalatra" % "2.0.3"
   val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
   val hasher = "com.roundeights" % "hasher" % "0.3" from "http://cloud.github.com/downloads/Nycto/Hasher/hasher_2.9.1-0.3.jar"
+  val sbinary = "org.scala-tools.sbinary" % "sbinary_2.9.0" % "0.4.0"
 }
 
 object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies {
@@ -40,7 +41,7 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
     settings = buildSettings ++ Seq(
       name := "scalex-core",
       resolvers := Seq(typesafe, iliaz, novus, sonatype),
-      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, scalaz, hasher)))
+      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, scalaz, hasher, sbinary)))
 
   lazy val http = Project("http", file("http"),
     settings = buildSettings ++ Seq(

@@ -2,7 +2,7 @@ package scalex
 package http
 
 import org.scalatra._
-import scalex.search.{Search, Query}
+import scalex.search.{Engine, Query}
 import scalex.model.{Def, Block}
 import collection.mutable.WeakHashMap
 import javax.servlet.http._
@@ -41,7 +41,7 @@ class MainServlet extends ScalatraServlet {
 
   def error(msg: String): String = JsonObject(Map("error" -> msg)).toString
 
-  def search(query: Query): String = Search find query match {
+  def search(query: Query): String = Engine find query match {
     case Left(msg) => error(msg)
     case Right(paginator) => Formatter(query.string, paginator).toString
   }

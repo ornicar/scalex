@@ -1,4 +1,5 @@
-package scalex.model
+package scalex
+package model
 
 import com.novus.salat.annotations._
 
@@ -46,6 +47,12 @@ case class Def(
 
   /** Signature of the function parameters, not including the host class */
   def paramSignature: String = valueParams map (_.toString) mkString ""
+
+  def toIndex = index.Def(
+    id = id,
+    name = name,
+    qualifiedName = qualifiedName
+  )
 
   override def toString = declaration
 }

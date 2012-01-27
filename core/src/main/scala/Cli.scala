@@ -1,6 +1,6 @@
 package scalex
 
-import scalex.dump.{ Dumper, Locator }
+import scalex.dump.Locator
 import scalex.model.Def
 import scalex.search._
 
@@ -9,9 +9,7 @@ import scalaz.Scalaz.{ success, failure }
 
 object Cli {
 
-  def dumper = new Dumper
-
-  def locator = new Locator
+  def env = new Env
 
   def main(args: Array[String]): Unit = sys exit {
     println(args.toList match {
@@ -23,22 +21,28 @@ object Cli {
 
   def process(command: String, args: List[String]) = command match {
     case "dump"   ⇒ dump(args)
+    case "index"  ⇒ index()
     case "search" ⇒ search(args mkString " ")
     case command  ⇒ "Unknown command " + command
   }
 
   def search(query: String): String =
-    (Search find RawQuery(query, 1, 5)).fold(identity, {
-    case Results(paginator, defs) ⇒
-      "%d results for %s\n\n%s" format (paginator.nbResults, query, render(defs))
-  })
+    (env.engine find RawQuery(query, 1, 5)).fold(identity, {
+      case Results(paginator, defs) ⇒
+        "%d results for %s\n\n%s" format (paginator.nbResults, query, render(defs))
+    })
 
   def dump(fs: List[String]): String = {
     val pack = fs.head
     val files = fs.tail map (f ⇒ new File(f))
-    val sources = locator locate files map (_.getPath)
-    dumper.process(pack, sources)
+    val sources = (new Locator) locate files map (_.getPath)
+    env.dumper.process(pack, sources)
     "Dump complete"
+  }
+
+  def index(): String = {
+    env.indexRepo write (env.defRepo.findAll map (_.toIndex))
+    "Index complete"
   }
 
   private def render(d: Def): String =

@@ -1,8 +1,9 @@
 package scalex.test
 
 import scalex.model._
+import scalex.index
 
-object Fixture {
+trait Fixtures {
 
   val def1 = Def(
     "id",
@@ -34,5 +35,11 @@ object Fixture {
         ValueParam("c", SimpleClass("C", false), None, false)
       ))
     )
+  )
+
+  val ind1 = index.Def(
+    "id",
+    "name",
+    "qualifiedName"
   )
 }

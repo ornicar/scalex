@@ -1,17 +1,16 @@
-package scalex.test.model
+package scalex.test
+package model
 
-import scalex.test.Fixture
-import org.specs2.mutable._
 import scalex.model._
 
-class DefTest extends Specification {
+class DefTest extends ScalexSpec with Fixtures {
 
   "Get param signature" should {
     "Without curried method" in {
-      Fixture.def1.paramSignature mustEqual "(a: A, b: B)"
+      def1.paramSignature mustEqual "(a: A, b: B)"
     }
     "With curried method" in {
-      Fixture.def2.paramSignature mustEqual "(a: A, b: B)(c: C)"
+      def2.paramSignature mustEqual "(a: A, b: B)(c: C)"
     }
   }
 }
