@@ -14,4 +14,4 @@ project/boot/
 project/plugins/project/
 
 # serialized objects
-/store.dat
+/*.dat

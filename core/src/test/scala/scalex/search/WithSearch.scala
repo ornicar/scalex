@@ -11,7 +11,7 @@ import scalaz.Scalaz.{ success, failure }
 
 trait WithSearch {
 
-  def env = new Env
+  lazy val env = new Env
 
   type ValidSeq[A] = Validation[String, Seq[A]]
 

@@ -3,27 +3,17 @@ package db
 
 import java.io._
 import sbinary._
-import DefaultProtocol._
 import Operations._
 
 import scalex.index.Def
 
-class IndexRepo(file: String) {
+class IndexRepo(filename: String) extends DefaultProtocol {
 
-  def write(defs: List[Def]) {
-    //val bin = toByteArray(defs)
-    //printToFile(new File(file))(_ print bin)
-  }
+  def file = new File(filename)
 
-  lazy val read: List[Def] = {
-    //val d = Def("ha", "he", "ho")
-    //val bin = scala.io.Source.fromFile(file).mkString
-    //fromByteArray[List[Def]](bin)
-    List()
-  }
+  implicit val defFormat = asProduct3(Def)(Def.unapply(_).get)
 
-  def printToFile(f: File)(op: java.io.PrintWriter ⇒ Unit) {
-    val p = new java.io.PrintWriter(file)
-    try { op(p) } finally { p.close() }
-  }
+  def write(defs: List[Def]) { toFile(defs)(file) }
+
+  def read: List[Def] = { fromFile[List[Def]](file) }
 }
