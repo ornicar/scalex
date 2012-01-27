@@ -8,10 +8,7 @@ import com.mongodb.casbah.MongoConnection
 
 class Env(config: Map[String, String] = Map.empty) {
 
-  lazy val engine = new Engine(
-    indexes = indexRepo.read,
-    idsToDefs = defRepo.byIds
-  )
+  lazy val engine = new Engine(indexRepo.read, defRepo.byIds)
 
   lazy val indexRepo = new IndexRepo(
     conf("index.file") | "index.dat"

@@ -13,5 +13,10 @@ case class Def(
 
   /** See Entity */
   , qualifiedName: String
+) {
 
-)
+  def tokens: List[String] =
+    qualifiedName.toLowerCase split Array('.', '#') toList
+
+  override def toString = qualifiedName
+}

@@ -26,7 +26,7 @@ trait Dependencies {
   val casbah = "com.mongodb.casbah" %% "casbah" % "2.1.5-1"
   val salat = "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT"
   val compiler = "org.scala-lang" % "scala-compiler" % "2.9.1"
-  val slf4j = "org.slf4j" % "slf4j-simple" % "1.6.4" % "runtime"
+  val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.6.4"
   val paginator = "com.github.ornicar" %% "paginator-core" % "1.4"
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.4"
   val scalatra = "org.scalatra" %% "scalatra" % "2.0.3"
@@ -41,13 +41,13 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
     settings = buildSettings ++ Seq(
       name := "scalex-core",
       resolvers := Seq(typesafe, iliaz, novus, sonatype),
-      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, scalaz, hasher, sbinary)))
+      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, scalaz, hasher, sbinary, slf4jNop)))
 
   lazy val http = Project("http", file("http"),
     settings = buildSettings ++ Seq(
       name := "scalex-http",
       resolvers := Seq(novus, iliaz),
-      libraryDependencies ++= Seq(scalatra, servlet, jetty, slf4j))) dependsOn "core"
+      libraryDependencies ++= Seq(scalatra, servlet, jetty, slf4jNop))) dependsOn "core"
 }
 
 object ShellPrompt {
