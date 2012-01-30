@@ -39,7 +39,7 @@ trait WithSearch extends ScalexSpec {
       searchNames(search) must findName(name)
 
     def finds(names: Seq[String]): MatchResult[ValidSeq[String]] =
-      searchNames(search) must findName(names.head)
+      searchNames(search) must findNames(names)
 
     def findsNothing: MatchResult[ValidSeq[String]] =
       searchNames(search) must beSuccess.like {
@@ -47,7 +47,11 @@ trait WithSearch extends ScalexSpec {
       }
 
     private def findName(name: String): Matcher[ValidSeq[String]] = beSuccess.like {
-      case names ⇒ names must contain(name)
+      case elems ⇒ elems must contain(name)
+    }
+
+    private def findNames(names: Seq[String]): Matcher[ValidSeq[String]] = beSuccess.like {
+      case elems ⇒ elems must containAllOf(names).inOrder
     }
   }
 }
