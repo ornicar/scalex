@@ -57,4 +57,16 @@ class NameTest extends ScalexSpec with WithSearch {
         "collection.immutable.List#reverseMap")
     }
   }
+  "Reverse tokens" in {
+    "list map" in {
+      "list map" finds Seq(
+        "collection.immutable.List#map",
+        "collection.immutable.Map#toList")
+    }
+    "map list" in {
+      "map list" finds Seq(
+        "collection.immutable.Map#toList",
+        "collection.immutable.List#map")
+    }
+  }
 }
