@@ -47,7 +47,7 @@ object Cli {
   }
 
   private def render(d: Def): String =
-    "[" + d.pack + "] " + d.name + "\n  " + d.toString + "\n"
+    "[" + d.pack + "] " + d.name + "\n  " + d.toString
 
   private def render(ds: Seq[Def]): String =
     ds map render map ("* "+) mkString "\n\n"
