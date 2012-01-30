@@ -27,9 +27,9 @@ object Cli {
   }
 
   def search(query: String): String =
-    (env.engine find RawQuery(query, 1, 5)).fold(identity, {
+    (env.engine find RawQuery(query, 1, 8)).fold(identity, {
       case Results(paginator, defs) ⇒
-        "%d results for %s\n\n%s" format (paginator.nbResults, query, render(defs))
+        "%d results for %s\n\n%s\n" format (paginator.nbResults, query, render(defs))
     })
 
   def dump(fs: List[String]): String = {
