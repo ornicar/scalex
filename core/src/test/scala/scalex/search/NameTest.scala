@@ -35,14 +35,27 @@ class NameTest extends ScalexSpec with WithSearch {
     }
   }
   "Find by partial match" in {
-    "Start" in {
-      "list min" finds "collection.immutable.List#minBy"
+    "One of two" in {
+      "Start" in {
+        "list min" finds "collection.immutable.List#minBy"
+      }
+      "Contain" in {
+        "list thf".findsNothing
+      }
+      "End" in {
+        "list index" finds "collection.immutable.List#zipWithIndex"
+      }
     }
-    "Contain" in {
-      "list thf".findsNothing
-    }
-    "End" in {
-      "list index" finds "collection.immutable.List#zipWithIndex"
+    "Two of two" in {
+      "Start" in {
+        "bit hasDefinite" finds "collection.immutable.BitSet#hasDefiniteSize"
+      }
+      "Contain" in {
+        "bit efini".findsNothing
+      }
+      "End" in {
+        "set size" finds "collection.immutable.BitSet#hasDefiniteSize"
+      }
     }
   }
   "Find exact match first" in {
