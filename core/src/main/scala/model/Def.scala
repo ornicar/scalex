@@ -51,8 +51,12 @@ case class Def(
   def toIndex = index.Def(
     id = id,
     name = name,
-    qualifiedName = qualifiedName
+    qualifiedName = qualifiedNameWithoutScalaPrefix
   )
+
+  def qualifiedNameWithoutScalaPrefix =
+    if (qualifiedName startsWith "scala.") qualifiedName drop 6
+    else qualifiedName
 
   override def toString = declaration
 }
