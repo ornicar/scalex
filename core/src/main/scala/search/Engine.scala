@@ -21,7 +21,7 @@ class Engine(
   } yield Results(p, defs)
 
   def resolve(query: Query): List[index.Def] = query match {
-    case TextQuery(tokens) ⇒ tokenIndex matches tokens.list
+    case TextQuery(tokens) ⇒ tokenIndex matches tokens.list map { _.definition }
     case _                 ⇒ Nil
   }
 }
