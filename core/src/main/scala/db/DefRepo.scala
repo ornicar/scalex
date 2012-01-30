@@ -13,7 +13,11 @@ class DefRepo(collection: MongoCollection) extends SalatDAO[Def, ObjectId](colle
 
   def batchInsert(objs: List[Def]) { collection insert (objs map _grater.asDBObject) }
 
-  def byIds(ids: Seq[String]): List[Def] = find("_id" $in ids).toList
+  def byIds(ids: Seq[String]): List[Def] = {
+    val defs = find("_id" $in ids) toList
+    val sorted = ids map { id => defs.find(_.id == id) }
+    sorted.flatten.toList
+  }
 
   def removePack(pack: String) {
     collection remove MongoDBObject("pack" -> pack)
