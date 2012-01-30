@@ -18,7 +18,7 @@ class NameTest extends ScalexSpec with WithSearch {
       }
   }
 
-  "Find by qualified name" in {
+  "Find by qualified name exact matches" in {
     "Natural order" in {
       "collection list map" finds "scala.collection.immutable.List#map"
     }
@@ -41,6 +41,17 @@ class NameTest extends ScalexSpec with WithSearch {
     }
     "Only one unknown word" in {
       "rantanplan".findsNothing
+    }
+  }
+  "Find by partial match" in {
+    "Start" in {
+      "list min" finds "scala.collection.immutable.List#minBy"
+    }
+    "Contain" in {
+      "list thf".findsNothing
+    }
+    "End" in {
+      "list index" finds "scala.collection.immutable.List#zipWithIndex"
     }
   }
 
