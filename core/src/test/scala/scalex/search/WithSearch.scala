@@ -8,8 +8,10 @@ import scalex.model._
 import com.github.ornicar.paginator._
 import scalaz.Validation
 import scalaz.Scalaz.{ success, failure }
+import org.specs2.matcher.MatchResult
+import org.specs2.matcher.Matcher
 
-trait WithSearch {
+trait WithSearch extends ScalexSpec {
 
   lazy val env = new Env
 
@@ -27,7 +29,25 @@ trait WithSearch {
     search(RawQuery(q, 1, nb)).map(_.defs)
 
   def searchNames(q: String, nb: Int): ValidSeq[String] =
-    search(q, nb).map(ds => ds.map(_.qualifiedName))
+    search(q, nb).map(ds ⇒ ds.map(_.qualifiedName))
 
   def searchNames(q: String): ValidSeq[String] = searchNames(q, 10)
+
+  class MatchableSearch(search: String) {
+
+    def finds(name: String): MatchResult[ValidSeq[String]] =
+      searchNames(search) must findName(name)
+
+    def finds(names: Seq[String]): MatchResult[ValidSeq[String]] =
+      searchNames(search) must findName(names.head)
+
+    def findsNothing: MatchResult[ValidSeq[String]] =
+      searchNames(search) must beSuccess.like {
+        case names ⇒ names must beEmpty
+      }
+
+    private def findName(name: String): Matcher[ValidSeq[String]] = beSuccess.like {
+      case names ⇒ names must contain(name)
+    }
+  }
 }
