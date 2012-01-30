@@ -22,12 +22,13 @@ object Cli {
   def process(command: String, args: List[String]) = command match {
     case "dump"   ⇒ dump(args)
     case "index"  ⇒ index()
-    case "search" ⇒ search(args mkString " ")
+    case "search" ⇒ search(args mkString " ", 10)
+    case "all"    ⇒ search(args mkString " ", 10000)
     case command  ⇒ "Unknown command " + command
   }
 
-  def search(query: String): String =
-    (env.engine find RawQuery(query, 1, 8)).fold(identity, {
+  def search(query: String, nb: Int): String =
+    (env.engine find RawQuery(query, 1, nb)).fold(identity, {
       case Results(paginator, defs) ⇒
         "%d results for %s\n\n%s\n" format (paginator.nbResults, query, render(defs))
     })
@@ -46,9 +47,7 @@ object Cli {
   }
 
   private def render(d: Def): String =
-    "[" + d.pack + "] " + d.name + "\n  " + d.toString + "\n" + (
-      d.comment map (_.short) getOrElse "no comment"
-    )
+    "[" + d.pack + "] " + d.name + "\n  " + d.toString + "\n"
 
   private def render(ds: Seq[Def]): String =
     ds map render map ("* "+) mkString "\n\n"
