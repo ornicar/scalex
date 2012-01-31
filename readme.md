@@ -17,9 +17,11 @@ Run it with sbt.
 
 ### Create the database
 
-    > run dump scala /path/to/scala/library
+    > run dump arbitrary.package_name /path/to/arbitrary/src
 
-Where `scala` is the arbitrary package name and `/path/to/scala/library` is the source code directory.
+For example, when indexing scala standard library, you will want to run:
+
+    > run dump scala /path/to/scala/src/library/scala
 
 ### Create the binary index
 
