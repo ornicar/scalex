@@ -15,7 +15,7 @@ class Engine(
 
   def find(query: RawQuery): Validation[String, Results] = for {
     q ← query.analyze
-    val adapter = InMemoryAdapter(resolve(q))
+    adapter = InMemoryAdapter(resolve(q))
     p ← validation(Paginator(adapter, query.currentPage, query.maxPerPage))
     defs = idsToDefs(p.currentPageResults map (_.id))
   } yield Results(p, defs)

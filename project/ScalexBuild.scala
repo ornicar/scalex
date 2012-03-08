@@ -22,7 +22,7 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val specs2 = "org.specs2" %% "specs2" % "1.7.1"
+  val specs2 = "org.specs2" %% "specs2" % "1.8.2"
   val casbah = "com.mongodb.casbah" %% "casbah" % "2.1.5-1"
   val salat = "com.novus" %% "salat-core" % "0.0.8-SNAPSHOT"
   val compiler = "org.scala-lang" % "scala-compiler" % "2.9.1"
@@ -34,6 +34,7 @@ trait Dependencies {
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
   val hasher = "com.roundeights" % "hasher" % "0.3" from "http://cloud.github.com/downloads/Nycto/Hasher/hasher_2.9.1-0.3.jar"
   val sbinary = "org.scala-tools.sbinary" %% "sbinary" % "0.4.1-SNAPSHOT"
+  val scalalib = "com.github.ornicar" %% "scalalib" % "1.20"
 }
 
 object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies {
@@ -41,7 +42,7 @@ object ScalexBuild extends Build with BuildSettings with Resolvers with Dependen
     settings = buildSettings ++ Seq(
       name := "scalex-core",
       resolvers := Seq(typesafe, iliaz, novus, sonatype),
-      libraryDependencies ++= Seq(specs2, casbah, salat, compiler, paginator, scalaz, hasher, sbinary, slf4jNop)))
+      libraryDependencies ++= Seq(specs2, scalalib, casbah, salat, compiler, paginator, scalaz, hasher, sbinary, slf4jNop)))
 
   lazy val http = Project("http", file("http"),
     settings = buildSettings ++ Seq(

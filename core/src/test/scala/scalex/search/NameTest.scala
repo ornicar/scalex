@@ -1,11 +1,11 @@
-package scalex.test
+package scalex
 package search
 
-import scalex.search._
+import search._
 
 import scalaz.{ Success, Failure }
 
-class NameTest extends ScalexSpec with WithSearch {
+class NameTest extends ScalexTest with WithSearch {
 
   implicit def toMatchableSearch(search: String) = new MatchableSearch(search)
 
