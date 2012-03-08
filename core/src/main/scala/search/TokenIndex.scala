@@ -18,9 +18,8 @@ case class TokenIndex(hash: Map[String, List[Def]]) {
 
   private def tokenExactMatchDefs(token: String): List[Def] = hash get token getOrElse Nil
 
-  private def tokenSubstringMatchDefs(token: String): List[Def] = {
-    (hash filterKeys { k => k.startsWith(token) || k.endsWith(token) }).values.flatten.toList
-  }
+  private def tokenSubstringMatchDefs(token: String): List[Def] =
+    (hash filterKeys { k => k startsWith token }).values.flatten.toList
 }
 
 object TokenIndex {

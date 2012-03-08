@@ -1,7 +1,6 @@
-package scalex.test
+package scalex
 
-import scalex.model._
-import scalex.index
+import model._
 
 trait Fixtures {
 

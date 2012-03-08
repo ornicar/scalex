@@ -1,9 +1,9 @@
-package scalex.test
+package scalex
 package model
 
-import scalex.model._
+import model._
 
-class DefTest extends ScalexSpec with Fixtures {
+class DefTest extends ScalexTest with Fixtures {
 
   "Get param signature" should {
     "Without curried method" in {

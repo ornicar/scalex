@@ -1,10 +1,9 @@
-package scalex.test
+package scalex
 package db
 
-import scalex.index.Def
-import scalex.db.IndexRepo
+import index.Def
 
-class IndexRepoTest extends ScalexSpec with Fixtures {
+class IndexRepoTest extends ScalexTest with Fixtures {
 
   val tmpFile = "/tmp/scalex_test_index_repo.dat"
 

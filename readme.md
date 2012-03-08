@@ -17,11 +17,23 @@ Run it with sbt.
 
 ### Create the database
 
-    > run dump /path/to/scala/library
+    > run dump arbitrary.package_name /path/to/arbitrary/src
+
+For example, when indexing scala standard library, you will want to run:
+
+    > run dump scala /path/to/scala/src/library/scala
+
+### Create the binary index
+
+    > run index
 
 ### Query the database
 
-    > run search List[A] => (A => B) => List[B]
+    > run search list map
+
+    * map
+      collection.immutable.List#map[B]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
+      Builds a new collection by applying a function to all elements of this list.
 
     * mapConserve
       collection.immutable.List#mapConserve[B<Some(A)>Some(A)]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
@@ -30,10 +42,6 @@ Run it with sbt.
     * reverseMap
       collection.immutable.List#reverseMap[B]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
       Builds a new collection by applying a function to all elements of this list andcollecting the results in reversed order.
-
-    * map
-      collection.immutable.List#map[B]: List[+A] ⇒ (f: (A => B)) ⇒ List[B]
-      Builds a new collection by applying a function to all elements of this list.
 
 ## HTTP
 

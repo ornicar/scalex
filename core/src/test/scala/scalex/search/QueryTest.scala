@@ -1,16 +1,16 @@
-package scalex.test
+package scalex
 package search
 
-import scalex.search._
+import search._
 
-class QueryTest extends ScalexSpec with WithSearch {
+class QueryTest extends ScalexTest with WithSearch {
 
   "Wrong query" should {
     "Empty" in {
-      analyze("") must beAFailure
+      analyze("") must beFailure
     }
     "Unparsable" in {
-      analyze("token: (") must beAFailure
+      analyze("token: (") must beFailure
     }
   }
 }

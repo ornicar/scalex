@@ -1,26 +1,30 @@
-package scalex.test
+package scalex
 package search
 
-import scalex.search._
+import search._
 
 import scalaz.{ Success, Failure }
 
-class NameTest extends ScalexSpec with WithSearch {
+class NameTest extends ScalexTest with WithSearch {
 
   implicit def toMatchableSearch(search: String) = new MatchableSearch(search)
 
+  val immutable = new {
+    def +(str: String) = "scala.collection.immutable." ++ str
+  }
+
   "Find by qualified name exact matches" in {
     "Natural order" in {
-      "collection list map" finds "collection.immutable.List#map"
+      "collection list map" finds immutable+"List#map"
     }
     "Any order" in {
-      "map collection list" finds "collection.immutable.List#map"
+      "map collection list" finds immutable+"List#map"
     }
     "Only 2 words" in {
-      "list map" finds "collection.immutable.List#map"
+      "list map" finds immutable+"List#map"
     }
     "Only 1 word" in {
-      "mapConserve" finds "collection.immutable.List#mapConserve"
+      "mapConserve" finds immutable+"List#mapConserve"
     }
   }
   "Find nothing" in {
@@ -37,49 +41,49 @@ class NameTest extends ScalexSpec with WithSearch {
   "Find by partial match" in {
     "One of two" in {
       "Start" in {
-        "list min" finds "collection.immutable.List#minBy"
+        "list min" finds immutable+"List#minBy"
       }
       "Contain" in {
         "list thf".findsNothing
       }
       "End" in {
-        "list index" finds "collection.immutable.List#zipWithIndex"
+        "list index" finds immutable+"List#zipWithIndex"
       }
     }
     "Two of two" in {
       "Start" in {
-        "bit hasDefinite" finds "collection.immutable.BitSet#hasDefiniteSize"
+        "bit hasDefinite" finds immutable+"BitSet#hasDefiniteSize"
       }
       "Contain" in {
         "bit efini".findsNothing
       }
       "End" in {
-        "set size" finds "collection.immutable.BitSet#hasDefiniteSize"
+        "set size" finds immutable+"BitSet#hasDefiniteSize"
       }
     }
   }
   "Find exact match first" in {
     "Start" in {
       "list zip" finds Seq(
-        "collection.immutable.List#zip",
-        "collection.immutable.List#zipAll")
+        immutable+"List#zip",
+        immutable+"List#zipAll")
     }
     "End" in {
       "list map" finds Seq(
-        "collection.immutable.List#map",
-        "collection.immutable.List#reverseMap")
+        immutable+"List#map",
+        immutable+"List#reverseMap")
     }
   }
   "Reverse tokens" in {
     "list map" in {
       "list map" finds Seq(
-        "collection.immutable.List#map",
-        "collection.immutable.Map#toList")
+        immutable+"List#map",
+        immutable+"Map#toList")
     }
     "map list" in {
       "map list" finds Seq(
-        "collection.immutable.Map#toList",
-        "collection.immutable.List#map")
+        immutable+"Map#toList",
+        immutable+"List#map")
     }
   }
 }

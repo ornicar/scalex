@@ -1,11 +1,11 @@
-package scalex.test
+package scalex
 package search
 
 import org.specs2.specification.Example
-import scalex.search._
-import scalex.model.TypeParam
+import search._
+import model.TypeParam
 
-class SigParserTest extends ScalexSpec {
+class SigParserTest extends ScalexTest {
 
   "Parse identity" in {
     =/=("a => a")

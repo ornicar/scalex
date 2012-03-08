@@ -1,9 +1,7 @@
-package scalex.test
+package scalex
 package search
 
-import scalex.Env
-import scalex.search._
-import scalex.model._
+import model._
 
 import com.github.ornicar.paginator._
 import scalaz.Validation
@@ -11,7 +9,7 @@ import scalaz.Scalaz.{ success, failure }
 import org.specs2.matcher.MatchResult
 import org.specs2.matcher.Matcher
 
-trait WithSearch extends ScalexSpec {
+trait WithSearch extends ScalexTest {
 
   lazy val env = new Env
 
