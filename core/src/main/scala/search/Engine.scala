@@ -7,7 +7,7 @@ import com.github.ornicar.paginator._
 import scalaz.Validation
 import scalaz.Scalaz.{ success, failure }
 
-class Engine(
+final class Engine(
     defs: List[index.Def],
     idsToDefs: Seq[String] ⇒ List[model.Def]) extends scalaz.Validations {
 
@@ -21,7 +21,8 @@ class Engine(
   } yield Results(p, defs)
 
   def resolve(query: Query): List[index.Def] = query match {
-    case TextQuery(tokens) ⇒ tokenIndex matches tokens.list map { _.definition }
+    case TextQuery(tokens) ⇒
+      TokenSearch(tokenIndex, tokens.list).search map { _.definition }
     case _                 ⇒ Nil
   }
 }

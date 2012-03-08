@@ -10,7 +10,7 @@ class NameTest extends ScalexTest with WithSearch {
   implicit def toMatchableSearch(search: String) = new MatchableSearch(search)
 
   val immutable = new {
-    def +(str: String) = "scala.collection.immutable." ++ str
+    def +(str: String) = "scala.collection.immutable." + str
   }
 
   "Find by qualified name exact matches" in {
