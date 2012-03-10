@@ -13,7 +13,7 @@ case class Def(
   , qualifiedName: String
 ) {
 
-  def tokens: List[String] =
+  lazy val tokens: List[String] =
     qualifiedName.toLowerCase split Array('.', '#') toList
 
   override def toString = qualifiedName

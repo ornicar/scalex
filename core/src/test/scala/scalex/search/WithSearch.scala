@@ -34,10 +34,10 @@ trait WithSearch extends ScalexTest {
   class MatchableSearch(search: String) {
 
     def finds(name: String): MatchResult[ValidSeq[String]] =
-      searchNames(search) must findName(name)
+      searchNames(search, 300) must findName(name)
 
     def finds(names: Seq[String]): MatchResult[ValidSeq[String]] =
-      searchNames(search) must findNames(names)
+      searchNames(search, 300) must findNames(names)
 
     def findsNothing: MatchResult[ValidSeq[String]] =
       searchNames(search) must beSuccess.like {

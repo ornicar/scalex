@@ -9,12 +9,16 @@ case class TokenSearch(tokenIndex: TokenIndex, tokens: List[Token]) {
   type Score = Int
   type DefMap = Map[Def, Score]
 
-  def search: List[Result] =
-    defScores.toList sortWith {
+  def search: List[Result] = {
+    val res = defScores.toList sortWith {
       case (a, b) ⇒ a._2 > b._2
     } map {
       case (d, s) ⇒ Result(s, d)
     }
+    //println(res filter (x => x.definition.tokens contains "flatmap"))
+    //println(res.size)
+    res
+  }
 
   def defScores: DefMap =
     tokens.foldLeft((Map.empty, tokenIndex): (DefMap, TokenIndex)) {
@@ -50,7 +54,9 @@ case class TokenSearch(tokenIndex: TokenIndex, tokens: List[Token]) {
             case defs ⇒ {
               val defMap = defs map { _ -> score } toMap
               val accMap = acc ++ defMap
-              (accMap, reduceIndexExceptDefs(left, defMap.keySet))
+              //println(atomic + " " + defMap.size.toString + " " + i.size.toString)
+              //println(accMap filter (_._1.qualifiedName endsWith "List#flatMap"))
+              (accMap, left)
             }
           }
         }

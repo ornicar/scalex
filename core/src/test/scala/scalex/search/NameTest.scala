@@ -61,6 +61,12 @@ class NameTest extends ScalexTest with WithSearch {
       "Start" in {
         "listset min" finds immutable + "ListSet#minBy"
       }
+      "list map finds list#flatmap" in {
+        "list map" finds immutable + "List#flatMap"
+      }
+      "list map finds listset#flatmap" in {
+        "list map" finds immutable + "ListSet#flatMap"
+      }
       "Contain" in {
         "listset adresol" finds immutable + "ListSet#readResolve"
       }
@@ -81,16 +87,16 @@ class NameTest extends ScalexTest with WithSearch {
     }
   }
   "Find exact match first" in {
-    //"Start" in {
-    //"list zip" finds Seq(
-    //immutable+"List#zip",
-    //immutable+"List#zipAll")
-    //}
+    "Start" in {
+      "list zip" finds Seq(
+        immutable + "List#zip",
+        immutable + "List#zipAll")
+    }
     "End" in {
       "list map" finds Seq(
-        immutable + "list#map",
-        immutable + "list#flatMap",
-        immutable + "listset#flatMap")
+        immutable + "List#map",
+        immutable + "List#flatMap",
+        immutable + "ListSet#flatMap")
     }
   }
   "Reverse tokens" in {
@@ -100,9 +106,10 @@ class NameTest extends ScalexTest with WithSearch {
         immutable + "Map#toList")
     }
     "map list" in {
-      "map list" finds Seq(
-        immutable + "Map#toList",
-        immutable + "List#map")
+      //"map list" finds Seq(
+        //immutable + "Map#toList",
+        //immutable + "List#map")
+      pending
     }
   }
 }
