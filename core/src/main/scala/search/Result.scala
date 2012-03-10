@@ -1,5 +1,7 @@
 package scalex
-package index
+package search
+
+import index.Def
 
 case class Result (
     score: Float,

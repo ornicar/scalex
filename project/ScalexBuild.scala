@@ -34,7 +34,7 @@ trait Dependencies {
   val jetty = "org.eclipse.jetty" % "jetty-webapp" % "8.0.4.v20111024" % "container"
   val hasher = "com.roundeights" % "hasher" % "0.3" from "http://cloud.github.com/downloads/Nycto/Hasher/hasher_2.9.1-0.3.jar"
   val sbinary = "org.scala-tools.sbinary" %% "sbinary" % "0.4.1-SNAPSHOT"
-  val scalalib = "com.github.ornicar" %% "scalalib" % "1.20"
+  val scalalib = "com.github.ornicar" %% "scalalib" % "1.21"
 }
 
 object ScalexBuild extends Build with BuildSettings with Resolvers with Dependencies {

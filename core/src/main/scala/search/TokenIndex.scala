@@ -3,8 +3,6 @@ package search
 
 import index.Def
 
-case class TokenIndex(hash: Map[String, List[Def]])
-
 object TokenIndex {
 
   def apply(defs: List[Def]): TokenIndex = {
@@ -18,6 +16,6 @@ object TokenIndex {
       token ← d.tokens
     } hash.getOrElseUpdate(token, mutable.ListBuffer()) += d
 
-    TokenIndex(hash mapValues (_.toList) toMap)
+    hash mapValues (_.toList) toMap
   }
 }

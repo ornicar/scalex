@@ -13,18 +13,36 @@ class NameTest extends ScalexTest with WithSearch {
     def +(str: String) = "scala.collection.immutable." + str
   }
 
+  def duplicates(list: Seq[_]) = list diff (list.distinct)
+
+  "No duplicated functions" in {
+    "One word" in {
+      search("list", 200) must beSuccess.like {
+        case defs ⇒ {
+          duplicates(defs) must_== Nil
+        }
+      }
+    }
+    "Two words" in {
+      search("list map", 200) must beSuccess.like {
+        case defs ⇒ {
+          duplicates(defs) must_== Nil
+        }
+      }
+    }
+  }
   "Find by qualified name exact matches" in {
     "Natural order" in {
-      "collection list map" finds immutable+"List#map"
+      "collection list map" finds immutable + "List#map"
     }
     "Any order" in {
-      "map collection list" finds immutable+"List#map"
+      "map collection list" finds immutable + "List#map"
     }
     "Only 2 words" in {
-      "list map" finds immutable+"List#map"
+      "list map" finds immutable + "List#map"
     }
     "Only 1 word" in {
-      "mapConserve" finds immutable+"List#mapConserve"
+      "mapConserve" finds immutable + "List#mapConserve"
     }
   }
   "Find nothing" in {
@@ -41,49 +59,50 @@ class NameTest extends ScalexTest with WithSearch {
   "Find by partial match" in {
     "One of two" in {
       "Start" in {
-        "list min" finds immutable+"List#minBy"
+        "listset min" finds immutable + "ListSet#minBy"
       }
       "Contain" in {
-        "list thf".findsNothing
+        "listset adresol" finds immutable + "ListSet#readResolve"
       }
       "End" in {
-        "list index" finds immutable+"List#zipWithIndex"
+        "listset index" finds immutable + "ListSet#zipWithIndex"
       }
     }
     "Two of two" in {
       "Start" in {
-        "bit hasDefinite" finds immutable+"BitSet#hasDefiniteSize"
+        "bit hasDefinite" finds immutable + "BitSet.BitSetN#hasDefiniteSize"
       }
       "Contain" in {
-        "bit efini".findsNothing
+        "itse efini" finds immutable + "BitSet.BitSetN#hasDefiniteSize"
       }
       "End" in {
-        "set size" finds immutable+"BitSet#hasDefiniteSize"
+        "setn size" finds immutable + "BitSet.BitSetN#hasDefiniteSize"
       }
     }
   }
   "Find exact match first" in {
-    "Start" in {
-      "list zip" finds Seq(
-        immutable+"List#zip",
-        immutable+"List#zipAll")
-    }
+    //"Start" in {
+    //"list zip" finds Seq(
+    //immutable+"List#zip",
+    //immutable+"List#zipAll")
+    //}
     "End" in {
       "list map" finds Seq(
-        immutable+"List#map",
-        immutable+"List#reverseMap")
+        immutable + "list#map",
+        immutable + "list#flatMap",
+        immutable + "listset#flatMap")
     }
   }
   "Reverse tokens" in {
     "list map" in {
       "list map" finds Seq(
-        immutable+"List#map",
-        immutable+"Map#toList")
+        immutable + "List#map",
+        immutable + "Map#toList")
     }
     "map list" in {
       "map list" finds Seq(
-        immutable+"Map#toList",
-        immutable+"List#map")
+        immutable + "Map#toList",
+        immutable + "List#map")
     }
   }
 }
