@@ -7,75 +7,47 @@ import scalaz.NonEmptyList
 case class TokenSearch(tokenIndex: TokenIndex, tokens: List[Token]) {
 
   type Score = Int
-  type DefMap = Map[Def, Score]
+  type Fragment = Map[Def, Score]
+  case class Filter(f: Token ⇒ Boolean)
 
-  def search: List[Result] = {
-    val res = defScores.toList sortWith {
+  def search: List[Result] =
+    tokensFragment(tokens).toList sortWith {
       case (a, b) ⇒ a._2 > b._2
     } map {
       case (d, s) ⇒ Result(s, d)
     }
-    //println(res filter (x => x.definition.tokens contains "flatmap"))
-    //println(res.size)
-    res
-  }
 
-  def defScores: DefMap =
-    tokens.foldLeft((Map.empty, tokenIndex): (DefMap, TokenIndex)) {
-      case ((acc, i), t) ⇒ {
-        val defMap = tokenDefMap(Atomic(t), i)
-        val accMap =
-          if (acc.isEmpty) defMap
-          else defMap collect {
-            case (d, s) if acc contains d ⇒ d -> (s + acc(d))
-          }
-        (accMap, reduceIndexOnlyDefs(i, defMap.keySet))
+  def tokensFragment(tokens: List[Token]): Fragment = tokens match {
+    case Nil          ⇒ Map.empty
+    case token :: Nil ⇒ tokenFragment(token)
+    case token :: otherTokens ⇒ {
+      val othersFragment = tokensFragment(otherTokens)
+      tokenFragment(token) collect {
+        case (d, s) if othersFragment contains d ⇒ (d, s + othersFragment(d))
       }
-    } _1
-
-  def reduceIndexOnlyDefs(index: TokenIndex, defs: Set[Def]) = index filterValues {
-    tdefs ⇒ tdefs exists defs.contains
+    }
   }
 
-  def reduceIndexExceptDefs(index: TokenIndex, defs: Set[Def]) = index filterValues {
-    tdefs ⇒ !(tdefs exists defs.contains)
-  }
+  def tokenFragment(token: Token): Fragment = {
 
-  def tokenDefMap(atomic: Atomic, index: TokenIndex): DefMap = {
-    List(
-      (atomic.exact _, 5),
-      (atomic.startWith _, 3),
-      (atomic.endWith _, 2),
-      (atomic.contain _, 2)
-    ).foldLeft((Map.empty, index): (DefMap, TokenIndex)) {
-        case ((acc, i), (func, score)) ⇒ func(i) match {
-          case (found, left) ⇒ found.values.toList.flatten match {
-            case Nil ⇒ (acc, left)
-            case defs ⇒ {
-              val defMap = defs map { _ -> score } toMap
-              val accMap = acc ++ defMap
-              //println(atomic + " " + defMap.size.toString + " " + i.size.toString)
-              //println(accMap filter (_._1.qualifiedName endsWith "List#flatMap"))
-              (accMap, left)
-            }
-          }
-        }
-      } _1
-  }
+    def indexToFragment(index: TokenIndex, score: Score): Fragment =
+      index.values.toList.flatten map (_ -> score) toMap
 
-  case class Atomic(token: Token) {
-
-    def exact(i: TokenIndex) = filter(i)(token==)
-
-    def startWith(i: TokenIndex) = filter(i) { _ startsWith token }
-
-    def endWith(i: TokenIndex) = filter(i) { _ endsWith token }
-
-    def contain(i: TokenIndex) = filter(i) { _ contains token }
-
-    def filter(i: TokenIndex)(f: Token ⇒ Boolean): (TokenIndex, TokenIndex) =
-      i partition {
-        case (key, _) ⇒ f(key)
+    def tokenFilterFragment(
+      index: TokenIndex,
+      filters: List[(Token ⇒ Boolean, Score)]): Fragment =
+      filters match {
+        case Nil                    ⇒ Map.empty
+        case (filter, score) :: Nil ⇒ indexToFragment(index filterKeys filter, score)
+        case (filter, score) :: otherFilters ⇒
+          val (found, left) = index partition { case (key, _) ⇒ filter(key) }
+          tokenFilterFragment(left, otherFilters) ++ indexToFragment(found, score)
       }
+
+    tokenFilterFragment(tokenIndex, List(
+      Filter(_ == token).f -> 7,
+      Filter(_ startsWith token).f -> 3,
+      Filter(_ contains token).f -> 2
+    ))
   }
 }
