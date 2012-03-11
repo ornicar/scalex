@@ -35,7 +35,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     organization := "com.github.ornicar",
     version := "1.0",
     scalaVersion := "2.9.1",
-    libraryDependencies := Seq(scalalib),
+    libraryDependencies := Seq(config, scalalib),
     libraryDependencies in test := Seq(specs2),
     resolvers := Seq(typesafe, iliaz, novusS, sonatype),
     shellPrompt := {
@@ -45,7 +45,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
   )
 
   lazy val core = Project("core", file("core"), settings = buildSettings).settings(
-    libraryDependencies ++= Seq(config, casbah, salat, compiler, paginator, scalaz, hasher, sbinary, slf4jNop)
+    libraryDependencies ++= Seq(casbah, salat, compiler, paginator, scalaz, hasher, sbinary, slf4jNop)
   )
 
   lazy val benchmark = Project("benchmark", file("benchmark"), settings = buildSettings).settings(

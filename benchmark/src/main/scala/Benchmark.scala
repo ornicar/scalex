@@ -14,9 +14,7 @@ class Benchmark extends SimpleScalaBenchmark {
   var engine: search.Engine = _
 
   override def setUp() {
-    val env = new Env(Map(
-      "index.file" -> "/home/thib/scalex/index.dat"
-    ))
+    val env = Env("scalex.conf")
     engine = env.engine
   }
 
