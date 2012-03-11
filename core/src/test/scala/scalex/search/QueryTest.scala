@@ -6,11 +6,27 @@ import search._
 class QueryTest extends ScalexTest with WithSearch {
 
   "Wrong query" should {
-    "Empty" in {
+    "empty" in {
       analyze("") must beFailure
     }
+    "parsable" in {
+      analyze("list map") must beSuccess.like {
+        case q ⇒ q.toString must_== "list + map"
+      }
+
+    }
+    "name and imparsable sig" in {
+      analyze("token: (") must beSuccess.like {
+        case q ⇒ q.toString must_== "token"
+      }
+    }
+    "name and parsable sig" in {
+      analyze("token: a => b") must beSuccess.like {
+        case q ⇒ q.toString must_== "token : A => B"
+      }
+    }
     "Unparsable" in {
-      analyze("token: (") must beFailure
+      analyze("a => (") must beFailure
     }
   }
 }

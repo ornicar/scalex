@@ -38,8 +38,14 @@ case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
 
 trait Query
 
-case class MixQuery(tokens: NonEmptyList[String], sig: NormalizedTypeSig) extends Query
+case class MixQuery(tokens: NonEmptyList[String], sig: NormalizedTypeSig) extends Query {
+  override def toString = "%s : %s".format(tokens.list mkString " + ", sig)
+}
 
-case class TextQuery(tokens: NonEmptyList[String]) extends Query
+case class TextQuery(tokens: NonEmptyList[String]) extends Query {
+  override def toString = tokens.list mkString " + "
+}
 
-case class SigQuery(sig: NormalizedTypeSig) extends Query
+case class SigQuery(sig: NormalizedTypeSig) extends Query {
+  override def toString = sig.toString
+}
