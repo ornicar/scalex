@@ -40,6 +40,9 @@ class TypeTest extends ScalexTest with WithSearch {
     "list[r] => (r => s) => list[s]" in {
       "list[r] => (r => s) => list[s]" finds immutable + "List#map"
     }
+    "list[r] => ( r => s ) => list[s]" in {
+      "list[r] => ( r => s ) => list[s]" finds immutable + "List#map"
+    }
   }
   "Find nothing" in {
     "One known type and one unknown type" in {

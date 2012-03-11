@@ -28,9 +28,14 @@ class Benchmark extends SimpleScalaBenchmark {
 
   //def timeSearchList(reps: Int) = tSearch(reps, "list")
 
-  def timeSearchListMap(reps: Int) = tSearch(reps, "list map")
+  def timeSearchListMap(reps: Int) =
+    tSearch(reps, "list map")
 
-  def timeSearchListMapSig(reps: Int) = tSearch(reps, "list[r] => (r => c) => list[c]")
+  def timeSearchListMapSig(reps: Int) =
+    tSearch(reps, "list[r] => (r => c) => list[c]")
+
+  def timeSearchListMapMix(reps: Int) =
+    tSearch(reps, "list map : list[r] => (r => s) => list[s]")
 
   //def timeSearchBitSetWithFilter(reps: Int) = tSearch(reps, "bitset withFilter")
 
