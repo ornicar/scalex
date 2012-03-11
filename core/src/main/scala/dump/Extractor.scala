@@ -53,15 +53,26 @@ class Extractor(pack: String, config: Dumper.Config) {
     val declaration = qualifiedName + showTypeParams + ": " + signature
     val id = Hasher(declaration).md5
 
+    val flatValueParams = valueParams.foldLeft(List[scalex.model.ValueParam]())((a, b) ⇒ a ::: b.params)
+    val typeSigEnd = (flatValueParams filter (!_.isImplicit) map (_.resultType)) ::: List(resultType)
+    val typeSig = if (!parent.isObject) parent.toTypeEntity :: typeSigEnd else typeSigEnd
+    val normSig = scalex.model.RawTypeSig(typeSig).normalize.toString
+    val aliasedSig = aliasSigToken(normSig, config.aliases.toList).toLowerCase
+
     fun match {
       case fun: Def ⇒ scalex.model.Def(
-        id, fun.name, qualifiedName, signature, declaration, parent, resultType, comment, valueParams, typeParams, pack, fun.deprecation map makeBlock
+        id, fun.name, qualifiedName, signature, aliasedSig, declaration, parent, resultType, comment, valueParams, typeParams, pack, fun.deprecation map makeBlock
       )
       case fun: Val ⇒ scalex.model.Def(
-        id, fun.name, qualifiedName, signature, declaration, parent, resultType, comment, valueParams, typeParams, pack, fun.deprecation map makeBlock
+        id, fun.name, qualifiedName, signature, aliasedSig, declaration, parent, resultType, comment, valueParams, typeParams, pack, fun.deprecation map makeBlock
       )
     }
   }
+
+  def aliasSigToken(sig: String, aliases: List[(String, String)]): String =
+    aliases.foldLeft(sig) {
+      case (acc, (from, to)) ⇒ acc.replace(from, to)
+    }
 
   private[this] def makeComment(comment: Option[Comment]) = comment map { com ⇒
     scalex.model.Comment(

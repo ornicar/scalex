@@ -44,18 +44,18 @@ case class TokenSearch(tokenIndex: TokenIndex, tokens: List[Token]) {
       filters: List[(Token ⇒ Boolean, Score)],
       exceptTokens: Set[Token] = Set.empty): List[(Set[Token], Score)] = {
 
-        def filterTokens(f: Token => Boolean) = (indexTokens filter f) diff exceptTokens
+      def filterTokens(f: Token ⇒ Boolean) = (indexTokens filter f) diff exceptTokens
 
-        filters match {
-          case Nil               ⇒ Nil
-          case (f, score) :: Nil ⇒ (filterTokens(f) -> score) :: Nil
-          case (f, score) :: rest ⇒ {
-            val foundTokens = filterTokens(f)
-            val restTokens = tokenTokens(rest, exceptTokens ++ foundTokens)
-            (foundTokens -> score) :: restTokens
-          }
+      filters match {
+        case Nil               ⇒ Nil
+        case (f, score) :: Nil ⇒ (filterTokens(f) -> score) :: Nil
+        case (f, score) :: rest ⇒ {
+          val foundTokens = filterTokens(f)
+          val restTokens = tokenTokens(rest, exceptTokens ++ foundTokens)
+          (foundTokens -> score) :: restTokens
         }
       }
+    }
 
     scoredTokensToFragment(tokenTokens(List(
       Filter(_ == token).f -> 7,

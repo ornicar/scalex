@@ -10,6 +10,7 @@ trait Fixtures {
     "",
     "",
     "",
+    "",
     Parent("ptest", "", Nil, false),
     SimpleClass("ParentClass", true),
     None,
@@ -39,6 +40,7 @@ trait Fixtures {
   val ind1 = index.Def(
     "id",
     "name",
-    "qualifiedName"
+    "qualifiedName",
+    "signature"
   )
 }

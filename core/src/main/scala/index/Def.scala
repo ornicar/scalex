@@ -6,11 +6,11 @@ case class Def(
   /** Matches the mongodb id */
     id: String
 
-  /** See Entity */
   , name: String
 
-  /** See Entity */
   , qualifiedName: String
+
+  , signature: String
 ) {
 
   lazy val tokens: List[String] =

@@ -12,6 +12,7 @@ final class Engine(
     idsToDefs: Seq[String] ⇒ List[model.Def]) extends scalaz.Validations {
 
   private val tokenIndex = TokenIndex(defs)
+  private val sigIndex = SigIndex(defs)
 
   def find(query: RawQuery): Validation[String, Results] = for {
     q ← query.analyze
@@ -24,6 +25,6 @@ final class Engine(
     case TextQuery(tokens) ⇒
       TokenSearch(tokenIndex, tokens.list).search map (_.definition)
     case SigQuery(sig) ⇒
-      SigSearch(sig).search map (_.definition)
+      SigSearch(sigIndex, sig).search map (_.definition)
   }
 }
