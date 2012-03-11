@@ -7,14 +7,6 @@ import scalaz.{ Success, Failure }
 
 class TypeTest extends ScalexTest with WithSearch {
 
-  implicit def toMatchableSearch(search: String) = new MatchableSearch(search)
-
-  val immutable = new {
-    def +(str: String) = "scala.collection.immutable." + str
-  }
-
-  def duplicates(list: Seq[_]) = list diff (list.distinct)
-
   "No duplicated functions" in {
     "simple type" in {
       search("string => int", 200) must beSuccess.like {
@@ -44,15 +36,17 @@ class TypeTest extends ScalexTest with WithSearch {
       "list[a] => option[a]" finds immutable + "List#headOption"
     }
   }
+  "list map" in {
+    "list[r] => (r => s) => list[s]" in {
+      "list[r] => (r => s) => list[s]" finds immutable + "List#map"
+    }
+  }
   "Find nothing" in {
     "One known type and one unknown type" in {
       "string => rantanplan".findsNothing
     }
     "Two known words and one unknown word" in {
       "string => rantanplan => string".findsNothing
-    }
-    "Only one unknown word" in {
-      ": rantanplan".findsNothing
     }
   }
 }

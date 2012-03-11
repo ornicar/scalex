@@ -9,4 +9,7 @@ package object search {
   type TokenIndex = Map[String, List[Def]]
 
   type SigIndex = Map[String, List[Def]]
+
+  type Score = Int
+  type Fragment = Map[Def, Score]
 }

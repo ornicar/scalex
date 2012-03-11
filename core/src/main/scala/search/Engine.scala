@@ -23,8 +23,17 @@ final class Engine(
 
   def resolve(query: Query): List[index.Def] = query match {
     case TextQuery(tokens) ⇒
-      TokenSearch(tokenIndex, tokens.list).search map (_.definition)
+      defsOf(TokenSearch(tokenIndex, tokens.list).search)
     case SigQuery(sig) ⇒
-      SigSearch(sigIndex, sig).search map (_.definition)
+      defsOf(SigSearch(sigIndex, sig).search)
+    case MixQuery(tokens, sig) ⇒
+      defsOf(
+        SigSearch(sigIndex, sig).search |+| TokenSearch(tokenIndex, tokens.list).search
+      )
   }
+
+  def defsOf(fragment: Fragment): List[index.Def] =
+    fragment.toList sortWith {
+      case (a, b) ⇒ a._2 > b._2
+    } map (_._1)
 }

@@ -6,17 +6,10 @@ import index.Def
 
 case class SigSearch(sigIndex: SigIndex, sig: NormalizedTypeSig) {
 
-  type Score = Int
-  type Fragment = Map[Def, Score]
   type Sig = String
   case class Filter(f: Token ⇒ Boolean)
 
-  def search: List[Result] =
-    sigFragment(sig.toString.toLowerCase).toList sortWith {
-      case (a, b) ⇒ a._2 > b._2
-    } map {
-      case (d, s) ⇒ Result(s, d)
-    }
+  def search: Fragment = sigFragment(sig.toString.toLowerCase)
 
   def sigFragment(sig: Sig): Fragment = {
 

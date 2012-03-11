@@ -13,6 +13,12 @@ trait WithSearch extends ScalexTest {
 
   lazy val env = new Env
 
+  val immutable = new {
+    def +(str: String) = "scala.collection.immutable." + str
+  }
+
+  implicit def toMatchableSearch(search: String) = new MatchableSearch(search)
+
   type ValidSeq[A] = Validation[String, Seq[A]]
 
   def query(q: String) = RawQuery(q, 1, 10)
@@ -52,4 +58,6 @@ trait WithSearch extends ScalexTest {
       case elems ⇒ elems must containAllOf(names).inOrder
     }
   }
+
+  def duplicates(list: Seq[_]) = list diff (list.distinct)
 }

@@ -5,16 +5,9 @@ import index.Def
 
 case class TokenSearch(tokenIndex: TokenIndex, tokens: List[Token]) {
 
-  type Score = Int
-  type Fragment = Map[Def, Score]
   case class Filter(f: Token ⇒ Boolean)
 
-  def search: List[Result] =
-    tokensFragment(tokens).toList sortWith {
-      case (a, b) ⇒ a._2 > b._2
-    } map {
-      case (d, s) ⇒ Result(s, d)
-    }
+  def search: Fragment = tokensFragment(tokens)
 
   def tokensFragment(tokens: List[Token]): Fragment = tokens match {
     case Nil          ⇒ Map.empty

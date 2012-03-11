@@ -7,14 +7,6 @@ import scalaz.{ Success, Failure }
 
 class NameTest extends ScalexTest with WithSearch {
 
-  implicit def toMatchableSearch(search: String) = new MatchableSearch(search)
-
-  val immutable = new {
-    def +(str: String) = "scala.collection.immutable." + str
-  }
-
-  def duplicates(list: Seq[_]) = list diff (list.distinct)
-
   "No duplicated functions" in {
     "One word" in {
       search("list", 200) must beSuccess.like {

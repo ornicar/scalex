@@ -3,7 +3,7 @@ package search
 
 import scalaz.Semigroup
 import scalaz.Validation
-import scalaz.Scalaz.{ success, failure }
+import scalaz.{ Success, Failure }
 import scalaz.NonEmptyList
 
 import model.NormalizedTypeSig
@@ -18,10 +18,13 @@ case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
     case text                       ⇒ textQuery(text)
   }
 
-  private def mixQuery(text: String, tpe: String) = for {
-    text ← textQuery(text)
-    sig ← sigQuery(tpe)
-  } yield MixQuery(text.tokens, sig.sig)
+  private def mixQuery(text: String, tpe: String) =
+    (textQuery(text), sigQuery(tpe)) match {
+      case (Failure(_), sig @ Success(_)) => sig
+      case (txt @ Success(_), Failure(_)) => txt
+      case (Success(txt), Success(sig)) => Success(MixQuery(txt.tokens, sig.sig))
+      case _ => Failure("Empty query")
+    }
 
   private def textQuery(text: String) =
     tokenize(text) map TextQuery toSuccess "Empty query"
