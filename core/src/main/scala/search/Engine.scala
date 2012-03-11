@@ -26,10 +26,13 @@ final class Engine(
       defsOf(TokenSearch(tokenIndex, tokens.list).search)
     case SigQuery(sig) ⇒
       defsOf(SigSearch(sigIndex, sig).search)
-    case MixQuery(tokens, sig) ⇒
-      defsOf(
-        SigSearch(sigIndex, sig).search |+| TokenSearch(tokenIndex, tokens.list).search
-      )
+    case MixQuery(tokens, sig) ⇒ defsOf {
+      val sigResults = SigSearch(sigIndex, sig).search
+      val txtResults = TokenSearch(tokenIndex, tokens.list).search
+      txtResults collect {
+        case (d, s) if sigResults contains d ⇒ (d, s + sigResults(d))
+      }
+    }
   }
 
   def defsOf(fragment: Fragment): List[index.Def] =
