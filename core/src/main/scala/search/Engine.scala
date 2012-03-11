@@ -22,7 +22,8 @@ final class Engine(
 
   def resolve(query: Query): List[index.Def] = query match {
     case TextQuery(tokens) ⇒
-      TokenSearch(tokenIndex, tokens.list).search map { _.definition }
-    case _                 ⇒ Nil
+      TokenSearch(tokenIndex, tokens.list).search map (_.definition)
+    case SigQuery(sig) ⇒
+      SigSearch(sig).search map (_.definition)
   }
 }

@@ -2,7 +2,6 @@ package scalex
 package search
 
 import index.Def
-import scalaz.NonEmptyList
 
 case class TokenSearch(tokenIndex: TokenIndex, tokens: List[Token]) {
 
@@ -30,24 +29,38 @@ case class TokenSearch(tokenIndex: TokenIndex, tokens: List[Token]) {
 
   def tokenFragment(token: Token): Fragment = {
 
-    def indexToFragment(index: TokenIndex, score: Score): Fragment =
-      index.values.toList.flatten map (_ -> score) toMap
+    def scoredTokensToFragment(scoredTokens: List[(Set[Token], Score)]): Fragment = {
+      for {
+        tokensAndScore ← scoredTokens
+        (tokens, score) = tokensAndScore
+        token ← tokens.toList
+        d ← tokenIndex(token)
+      } yield (d -> score)
+    } toMap
 
-    def tokenFilterFragment(
-      index: TokenIndex,
-      filters: List[(Token ⇒ Boolean, Score)]): Fragment =
-      filters match {
-        case Nil                    ⇒ Map.empty
-        case (filter, score) :: Nil ⇒ indexToFragment(index filterKeys filter, score)
-        case (filter, score) :: otherFilters ⇒
-          val (found, left) = index partition { case (key, _) ⇒ filter(key) }
-          tokenFilterFragment(left, otherFilters) ++ indexToFragment(found, score)
+    val indexTokens = tokenIndex.keySet
+
+    def tokenTokens(
+      filters: List[(Token ⇒ Boolean, Score)],
+      exceptTokens: Set[Token] = Set.empty): List[(Set[Token], Score)] = {
+
+        def filterTokens(f: Token => Boolean) = (indexTokens filter f) diff exceptTokens
+
+        filters match {
+          case Nil               ⇒ Nil
+          case (f, score) :: Nil ⇒ (filterTokens(f) -> score) :: Nil
+          case (f, score) :: rest ⇒ {
+            val foundTokens = filterTokens(f)
+            val restTokens = tokenTokens(rest, exceptTokens ++ foundTokens)
+            (foundTokens -> score) :: restTokens
+          }
+        }
       }
 
-    tokenFilterFragment(tokenIndex, List(
+    scoredTokensToFragment(tokenTokens(List(
       Filter(_ == token).f -> 7,
       Filter(_ startsWith token).f -> 3,
       Filter(_ contains token).f -> 2
-    ))
+    )))
   }
 }

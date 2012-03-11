@@ -30,9 +30,9 @@ class Benchmark extends SimpleScalaBenchmark {
 
   def timeSearchListMap(reps: Int) = tSearch(reps, "list map")
 
-  def timeSearchBitSetWithFilter(reps: Int) = tSearch(reps, "bitset withFilter")
+  //def timeSearchBitSetWithFilter(reps: Int) = tSearch(reps, "bitset withFilter")
 
-  def timeSearchConvoluted(reps: Int) = tSearch(reps, "immutable option collection flatMap")
+  //def timeSearchConvoluted(reps: Int) = tSearch(reps, "immutable option collection flatMap")
 
   //def timeSearchTrollitoErgoSum(reps: Int) = tSearch(reps, "trollito ergo sum")
 
