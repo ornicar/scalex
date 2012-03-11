@@ -16,6 +16,9 @@ trait WithSearch extends ScalexTest {
   val immutable = new {
     def +(str: String) = "scala.collection.immutable." + str
   }
+  val mutable = new {
+    def +(str: String) = "scala.collection.mutable." + str
+  }
 
   implicit def toMatchableSearch(search: String) = new MatchableSearch(search)
 

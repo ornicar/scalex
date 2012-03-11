@@ -56,8 +56,8 @@ class NameTest extends ScalexTest with WithSearch {
       "list map finds list#flatmap" in {
         "list map" finds immutable + "List#flatMap"
       }
-      "list map finds listset#flatmap" in {
-        "list map" finds immutable + "ListSet#flatMap"
+      "list map finds ListBuffer#toMap" in {
+        "list map" finds mutable + "ListBuffer#toMap"
       }
       "Contain" in {
         "listset adresol" finds immutable + "ListSet#readResolve"
@@ -88,7 +88,7 @@ class NameTest extends ScalexTest with WithSearch {
       "list map" finds Seq(
         immutable + "List#map",
         immutable + "List#flatMap",
-        immutable + "ListSet#flatMap")
+        mutable + "ListBuffer#toMap")
     }
   }
   "Reverse tokens" in {
