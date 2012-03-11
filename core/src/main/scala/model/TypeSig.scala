@@ -38,4 +38,7 @@ case class RawTypeSig(types: List[TypeEntity]) extends TypeSig {
   }
 }
 
-case class NormalizedTypeSig(types: List[TypeEntity]) extends TypeSig
+case class NormalizedTypeSig(types: List[TypeEntity]) extends TypeSig {
+
+  def lowerCase = toString.toLowerCase
+}

@@ -35,7 +35,7 @@ final class Engine(
     }
   }
 
-  def defsOf(fragment: Fragment): List[index.Def] =
+  def defsOf(fragment: Map[index.Def, Score]): List[index.Def] =
     fragment.toList sortWith {
       case (a, b) ⇒ a._2 > b._2
     } map (_._1)

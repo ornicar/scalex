@@ -3,57 +3,22 @@ package search
 
 import index.Def
 
-case class TokenSearch(tokenIndex: TokenIndex, tokens: List[Token]) {
+case class TokenSearch(
+  tokenIndex: TokenIndex,
+  tokens: List[Token]) extends IndexSearch[String, Def] {
 
-  case class Filter(f: Token ⇒ Boolean)
+  val keyIndex = tokenIndex
 
-  def search: Fragment = tokensFragment(tokens)
+  def search = tokensFragment(tokens)
 
-  def tokensFragment(tokens: List[Token]): Fragment = tokens match {
+  def tokensFragment(tokens: List[Token]): Map[Def, Score] = tokens match {
     case Nil          ⇒ Map.empty
-    case token :: Nil ⇒ tokenFragment(token)
+    case token :: Nil ⇒ fragment(token)
     case token :: otherTokens ⇒ {
       val othersFragment = tokensFragment(otherTokens)
-      tokenFragment(token) collect {
+      fragment(token) collect {
         case (d, s) if othersFragment contains d ⇒ (d, s + othersFragment(d))
       }
     }
-  }
-
-  def tokenFragment(token: Token): Fragment = {
-
-    def scoredTokensToFragment(scoredTokens: List[(Set[Token], Score)]): Fragment = {
-      for {
-        tokensAndScore ← scoredTokens
-        (tokens, score) = tokensAndScore
-        token ← tokens.toList
-        d ← tokenIndex(token)
-      } yield (d -> score)
-    } toMap
-
-    val indexTokens = tokenIndex.keySet
-
-    def tokenTokens(
-      filters: List[(Token ⇒ Boolean, Score)],
-      exceptTokens: Set[Token] = Set.empty): List[(Set[Token], Score)] = {
-
-      def filterTokens(f: Token ⇒ Boolean) = (indexTokens filter f) diff exceptTokens
-
-      filters match {
-        case Nil               ⇒ Nil
-        case (f, score) :: Nil ⇒ (filterTokens(f) -> score) :: Nil
-        case (f, score) :: rest ⇒ {
-          val foundTokens = filterTokens(f)
-          val restTokens = tokenTokens(rest, exceptTokens ++ foundTokens)
-          (foundTokens -> score) :: restTokens
-        }
-      }
-    }
-
-    scoredTokensToFragment(tokenTokens(List(
-      Filter(_ == token).f -> 7,
-      Filter(_ startsWith token).f -> 3,
-      Filter(_ contains token).f -> 2
-    )))
   }
 }

@@ -11,5 +11,4 @@ package object search {
   type SigIndex = Map[String, List[Def]]
 
   type Score = Int
-  type Fragment = Map[Def, Score]
 }
