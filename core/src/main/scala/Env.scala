@@ -5,29 +5,50 @@ import search.Engine
 import dump.Dumper
 
 import com.mongodb.casbah.MongoConnection
+import com.typesafe.config._
 
-class Env(config: Map[String, String] = Map.empty) {
+trait Env {
+
+  val config: Config
 
   lazy val engine = new Engine(indexRepo.read, defRepo.byIds)
 
   lazy val indexRepo = new IndexRepo(
-    conf("index.file") | "index.dat"
+    config getString "scalex.index"
   )
 
   lazy val defRepo = new DefRepo(
-    mongoDatabase(conf("mongo.collection.def") | "def")
+    mongoDatabase(config getString "scalex.mongo.def_collection")
   )
 
   def dumper = new Dumper(defRepo)
 
   private lazy val mongoConnection = MongoConnection(
-    conf("mongo.host") | "localhost",
-    conf("mongo.port") some (_.toInt) none 27017
+    config getString "scalex.mongo.host",
+    config getInt "scalex.mongo.port"
   )
 
   private lazy val mongoDatabase = mongoConnection(
-    conf("mongo.dbname") | "scalex"
+    config getString "scalex.mongo.dbName"
   )
+}
 
-  def conf(key: String) = config get key
+object Env extends EnvBuilder {
+
+  def apply(overrides: String = "") = new Env {
+    val config = makeConfig(overrides)
+  }
+}
+
+trait EnvBuilder {
+
+  import java.io.File
+
+  def makeConfig(sources: String*) = sources.foldLeft(ConfigFactory.defaultOverrides) {
+    case (config, source) if source isEmpty ⇒ config
+    case (config, source) if source contains '=' ⇒
+      config.withFallback(ConfigFactory parseString source)
+    case (config, source) ⇒
+      config.withFallback(ConfigFactory parseFile (new File(source)))
+  }
 }

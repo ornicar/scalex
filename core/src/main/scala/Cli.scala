@@ -9,7 +9,7 @@ import scalaz.Scalaz.{ success, failure }
 
 object Cli {
 
-  def env = new Env
+  def env = Env("scalex.conf")
 
   def main(args: Array[String]): Unit = sys exit {
     println(args.toList match {

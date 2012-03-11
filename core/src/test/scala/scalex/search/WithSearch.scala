@@ -11,7 +11,7 @@ import org.specs2.matcher.Matcher
 
 trait WithSearch extends ScalexTest {
 
-  lazy val env = new Env
+  lazy val env = Env("scalex.conf")
 
   val immutable = new {
     def +(str: String) = "scala.collection.immutable." + str
