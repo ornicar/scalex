@@ -7,13 +7,15 @@ import com.mongodb.WriteConcern
 
 final class IncSearch(collection: MongoCollection) {
 
-  collection.ensureIndex(MongoDBObject("c" -> -1))
+  // there will be more write than read,
+  // so not sure the index makes sense
+  // collection.ensureIndex(MongoDBObject("c" -> -1))
 
   def apply(q: String) {
     try {
       collection.update(
         MongoDBObject("_id" -> q),
-        MongoDBObject("$inc" -> ("c" -> 1)),
+        MongoDBObject("$inc" -> MongoDBObject("c" -> 1)),
         true,
         false,
         WriteConcern.NONE)
