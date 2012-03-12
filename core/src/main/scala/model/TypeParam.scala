@@ -25,9 +25,9 @@ case class TypeParam(
 
   override def toString =
     variance + name + (
-      lo some ("<" + _) none ""
+      hi some ("<:" + _) none ""
     ) + (
-      hi some (">" + _) none ""
+      lo some (">:" + _) none ""
     ) + showTypeParams
 
   def toTypeEntity: TypeEntity = Class(name, name != qualifiedName, typeParams map (_.toTypeEntity))

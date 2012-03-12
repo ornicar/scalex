@@ -5,7 +5,7 @@ import index.Def
 
 class DefRepoTest extends ScalexTest {
 
-  val repo = env.defRepo
+  lazy val repo = env.defRepo
 
   "The index repo" should {
     "find by declaration" in {
@@ -38,6 +38,15 @@ class DefRepoTest extends ScalexTest {
         "def encoded docUrl" in {
           listmap must beSome.like {
             case d => d.encodedDocUrl must_== encodedDocUrl
+          }
+        }
+      }
+      "list mapConserve with bidirectional constrained type param" in {
+        val declaration = "scala.collection.immutable.List#mapConserve[B<:AnyRef>:A]: List[+A] => (f: (A => B)) => List[B]"
+        val fun = repo findByDeclaration declaration
+        "function exsits" in {
+          fun must beSome.like {
+            case d => d.declaration must_== declaration
           }
         }
       }
