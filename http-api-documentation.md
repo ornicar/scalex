@@ -18,6 +18,13 @@ Use this API to build new clients!
 
     curl http://scalex-web/?q=map:%20List[A]%20=%3E%20(A%20=%3E%20B)%20=%3E%20List[B]
 
+## Query parameters
+
+    q: String               the query to search
+    page: Int = 1           the pagination page
+    per_page: Int = 20      number of results per page
+    callback: String = ""   optional jsonp callback name
+
 ## JSON output
 
 The results are paginated by 15. Here is an output example for `http://api.scalex.org/?q=list+map&page=2`
