@@ -16,9 +16,7 @@ class QueryTest extends ScalexTest with WithSearch {
 
     }
     "name and imparsable sig" in {
-      analyze("token: (") must beSuccess.like {
-        case q ⇒ q.toString must_== "token"
-      }
+      analyze("token: (") must beFailure
     }
     "name and parsable sig" in {
       analyze("token: a => b") must beSuccess.like {
