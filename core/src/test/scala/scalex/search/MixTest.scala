@@ -8,8 +8,8 @@ import scalaz.{ Success, Failure }
 class MixTest extends ScalexTest with WithSearch {
 
   ": a" in {
-    ": string" in {
-      ": string" finds "scala.sys.Prop#toString"
+    ": long" in {
+      ": long" finds immutable + "LongMap#keysIterator"
     }
   }
   ": a => b" in {

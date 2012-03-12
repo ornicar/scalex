@@ -22,7 +22,7 @@ object Cli {
   def process(command: String, args: List[String]) = command match {
     case "dump"   ⇒ dump(args)
     case "index"  ⇒ index()
-    case "search" ⇒ search(args mkString " ", 10)
+    case "search" ⇒ search(args mkString " ", 3)
     case "all"    ⇒ search(args mkString " ", 10000)
     case command  ⇒ "Unknown command " + command
   }
@@ -47,7 +47,7 @@ object Cli {
   }
 
   private def render(d: Def): String =
-    "[" + d.pack + "] " + d.name + "\n  " + d.toString
+    "[" + d.pack + "] " + d.name + "\n  " + d.toString + "\n  " + d.encodedDocUrl
 
   private def render(ds: Seq[Def]): String =
     ds map render map ("* "+) mkString "\n\n"

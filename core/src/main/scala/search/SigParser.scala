@@ -30,24 +30,24 @@ object SigParser extends RegexParsers {
 
   private def unrealParameterizedClass: Parser[ParameterizedClass] =
     """\w""".r ~ "[" ~ typeEntityList ~ "]" ^^ {
-      case name ~ "[" ~ tpes ~ "]" ⇒ ParameterizedClass(name, false, tpes)
+      case name ~ "[" ~ tpes ~ "]" ⇒ ParameterizedClass("", name, false, tpes)
     }
 
   private def parameterizedClass: Parser[ParameterizedClass] =
     """\w{2,}""".r ~ "[" ~ typeEntityList ~ "]" ^^ {
-      case name ~ "[" ~ tpes ~ "]" ⇒ ParameterizedClass(name, true, tpes)
+      case name ~ "[" ~ tpes ~ "]" ⇒ ParameterizedClass("", name, true, tpes)
     }
 
   private def function: Parser[Fun] =
     "(" ~ typeEntities ~ ")" ^^ {
-      case "(" ~ tpes ~ ")" ⇒ Fun(tpes)
+      case "(" ~ tpes ~ ")" ⇒ Fun("", tpes)
     }
 
   private def tuple: Parser[Tuple] =
     "(" ~ typeEntityList ~ ")" ^^ {
-      case "(" ~ tpes ~ ")" ⇒ Tuple(tpes)
+      case "(" ~ tpes ~ ")" ⇒ Tuple("", tpes)
     }
 
   private def literal: Parser[TypeEntity] =
-    """[\w\[\]\(\)]+""".r ^^ { str ⇒ Other(str) }
+    """[\w\[\]\(\)]+""".r ^^ { str ⇒ Other("", str) }
 }

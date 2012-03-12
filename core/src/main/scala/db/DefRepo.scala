@@ -24,4 +24,8 @@ class DefRepo(collection: MongoCollection) extends SalatDAO[Def, ObjectId](colle
   }
 
   def findAll: List[Def] = find(MongoDBObject()).toList
+
+  def findByDeclaration(dec: String) = findOne(MongoDBObject(
+    "declaration" -> dec
+  ))
 }

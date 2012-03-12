@@ -64,5 +64,28 @@ case class Def(
     if (qualifiedName startsWith "scala.") qualifiedName drop 6
     else qualifiedName
 
+  def docUrl = "http://www.scala-lang.org/api/current/%s#%s".format(
+    parent.qualifiedName.replace(".", "/"),
+    urlFragment
+  )
+
+  def encodedDocUrl = "http://www.scala-lang.org/api/current/%s#%s".format(
+    parent.qualifiedName.replace(".", "/"),
+    UrlFragmentEncoder.encode(urlFragment)
+  )
+
+  def urlFragment: String = "%s%s%s:%s".format(
+    name,
+    showTypeParams,
+    nicer {
+      valueParams map (ps ⇒
+        ps.params map (_.resultType.name.pp) mkString ("(", ",", ")")
+      ) mkString
+    },
+    resultType.toString
+  )
+
+  def nicer(str: String) = str.replace("=>", "⇒")
+
   override def toString = declaration
 }

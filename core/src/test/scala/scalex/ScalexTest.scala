@@ -11,6 +11,8 @@ trait ScalexTest
     with ScalazIOMatchers
     with Fixtures {
 
+  lazy val env = Env("scalex.conf")
+
   protected def like(expr: String): PartialFunction[String, MatchResult[String]] = {
     case a => a must =~(expr)
   }
