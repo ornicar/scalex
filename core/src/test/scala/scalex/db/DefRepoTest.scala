@@ -50,6 +50,16 @@ class DefRepoTest extends ScalexTest {
           }
         }
       }
+      "predef <%<" in {
+        val docUrl = "http://www.scala-lang.org/api/current/scala/Predef$.html"
+        val declaration = "scala.Predef.<%<###: <%< => Int"
+        val fun = repo findByDeclaration declaration
+        "def docUrl" in {
+          fun flatMap (_.docUrl) must beSome.like {
+            case u => u must_== docUrl
+          }
+        }
+      }
     }
   }
 }

@@ -66,19 +66,20 @@ case class Def(
 
   def isScala = pack == "scala"
 
-  def docUrl = isScala option {
-    "http://www.scala-lang.org/api/current/%s#%s".format(
-      parent.qualifiedName.replace(".", "/"),
-      urlFragment
-    )
-  }
+  def scalaBaseUrl = "http://www.scala-lang.org/api/current/"
 
-  def encodedDocUrl = isScala option {
-    "http://www.scala-lang.org/api/current/%s#%s".format(
-      parent.qualifiedName.replace(".", "/"),
-      UrlFragmentEncoder.encode(urlFragment)
-    )
-  }
+  def docUrl(implicit encoded: Boolean = false) =
+    isScala option {
+      if (parent.qualifiedName startsWith "scala.Predef")
+        scalaBaseUrl + "scala/Predef$.html"
+      else
+        scalaBaseUrl + "%s#%s".format(
+          parent.qualifiedName.replace(".", "/"),
+          if (encoded) UrlFragmentEncoder.encode(urlFragment) else urlFragment
+        )
+    }
+
+  def encodedDocUrl = docUrl(true)
 
   private def urlFragment: String = "%s%s%s:%s".format(
     name,
