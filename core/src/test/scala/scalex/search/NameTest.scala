@@ -65,6 +65,12 @@ class NameTest extends ScalexTest with WithSearch {
       "End" in {
         "listset index" finds immutable + "ListSet#zipWithIndex"
       }
+      "Not existing def" in {
+        "list map" notFinds mutable + "ListSet#slicePouetPouet"
+      }
+      "Not" in {
+        "list map" notFinds mutable + "ListSet#slice"
+      }
     }
     "Two of two" in {
       "Start" in {
