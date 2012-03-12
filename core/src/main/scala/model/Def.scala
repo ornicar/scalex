@@ -47,6 +47,9 @@ case class Def(
     /** The package containing the def */
     pack: String,
 
+    /** Position in the source code */
+    inSource: Option[String],
+
     /** Some deprecation message if this function is deprecated, or none otherwise. */
     deprecation: Option[Block]) extends HigherKinded {
 
@@ -91,6 +94,18 @@ case class Def(
     },
     resultType.toString
   )
+
+  def source = inSource flatMap { str ⇒
+    str.split('#').toList match {
+      case f :: l :: Nil ⇒ Some(new {
+        def file = f
+        def line = l
+        def url = "https://github.com/scala/scala/tree/2.9.x/%s#L%s"
+          .format(file, line)
+      })
+      case _ ⇒ None
+    }
+  }
 
   def sugar(str: String) = str.replace("=>", "⇒")
 

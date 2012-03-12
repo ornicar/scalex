@@ -37,6 +37,10 @@ class Extractor(pack: String, config: Dumper.Config) {
     val comment = makeComment(fun.comment)
     val qualifiedName = makeQualifiedName(fun.qualifiedName)
     val parent = makeParent(fun.inTemplate)
+    val source = fun.inTemplate.inSource flatMap {
+      case (file, line) ⇒ config patchSourceFile file.path map { p ⇒ p + "#" + line }
+      case _            ⇒ None
+    }
     val resultType = makeTypeEntity(fun.resultType)
     val valueParams = makeValueParams(fun match {
       case fun: Def ⇒ fun.valueParams
@@ -61,10 +65,36 @@ class Extractor(pack: String, config: Dumper.Config) {
 
     fun match {
       case fun: Def ⇒ scalex.model.Def(
-        id, fun.name, qualifiedName, signature, aliasedSig, declaration, parent, resultType, comment, valueParams, typeParams, pack, fun.deprecation map makeBlock
+        id,
+        fun.name,
+        qualifiedName,
+        signature,
+        aliasedSig,
+        declaration,
+        parent,
+        resultType,
+        comment,
+        valueParams,
+        typeParams,
+        pack,
+        source,
+        fun.deprecation map makeBlock
       )
       case fun: Val ⇒ scalex.model.Def(
-        id, fun.name, qualifiedName, signature, aliasedSig, declaration, parent, resultType, comment, valueParams, typeParams, pack, fun.deprecation map makeBlock
+        id,
+        fun.name,
+        qualifiedName,
+        signature,
+        aliasedSig,
+        declaration,
+        parent,
+        resultType,
+        comment,
+        valueParams,
+        typeParams,
+        pack,
+        source,
+        fun.deprecation map makeBlock
       )
     }
   }
@@ -76,7 +106,21 @@ class Extractor(pack: String, config: Dumper.Config) {
 
   private[this] def makeComment(comment: Option[Comment]) = comment map { com ⇒
     scalex.model.Comment(
-      makeBlock(com.body), makeBlock(com.short), com.authors map makeBlock, com.see map makeBlock, com.result map makeBlock, com.throws.toMap map { case (a, b) ⇒ (a.replace(".", "_"), makeBlock(b)) }, com.valueParams.toMap map { case (a, b) ⇒ (a.replace(".", "_"), makeBlock(b)) }, com.typeParams.toMap map { case (a, b) ⇒ (a.replace(".", "_"), makeBlock(b)) }, com.version map makeBlock, com.since map makeBlock, com.todo map makeBlock, com.note map makeBlock, com.example map makeBlock, com.source, com.constructor map makeBlock
+      makeBlock(com.body),
+      makeBlock(com.short),
+      com.authors map makeBlock,
+      com.see map makeBlock,
+      com.result map makeBlock,
+      com.throws.toMap map { case (a, b) ⇒ (a.replace(".", "_"), makeBlock(b)) },
+      com.valueParams.toMap map { case (a, b) ⇒ (a.replace(".", "_"), makeBlock(b)) },
+      com.typeParams.toMap map { case (a, b) ⇒ (a.replace(".", "_"), makeBlock(b)) },
+      com.version map makeBlock,
+      com.since map makeBlock,
+      com.todo map makeBlock,
+      com.note map makeBlock,
+      com.example map makeBlock,
+      com.source,
+      com.constructor map makeBlock
     )
   }
 

@@ -11,16 +11,17 @@ import Properties.msilLibPath
 
 class Dumper(defRepo: DefRepo) {
 
-  val config = Dumper.Config(Map(
+  val aliases = Map(
     "StringOps" -> "String"
-  ))
+  )
 
-  def process(pack: String, files: List[String]): Unit = {
+  def process(pack: String, files: List[String], sourceBase: String): Unit = {
     var reporter: ConsoleReporter = null
     val docSettings = new doc.Settings(msg ⇒ reporter.error(FakePos("scaladoc"), msg + "\n  scaladoc -help  gives more information"))
     docSettings.debug.value = false
     docSettings.bootclasspath.value = (docSettings.bootclasspath.value :: jarPaths).mkString(":")
     reporter = new ConsoleReporter(docSettings) { override def hasErrors = false }
+    val config = Dumper.Config(aliases, sourceBase)
 
     log("Creating universe...")
     val universe = new Compiler(reporter, docSettings) universe files
@@ -51,5 +52,13 @@ class Dumper(defRepo: DefRepo) {
 
 object Dumper {
 
-  case class Config(aliases: Map[String, String])
+  case class Config(aliases: Map[String, String], sourceBase: String) {
+
+    val FileRegex = ("""^.*(%s.+)$""" format sourceBase).r.pp
+
+    def patchSourceFile(file: String): Option[String] = file.pp match {
+      case FileRegex(path) => Some(path.pp)
+      case _ => None
+    }
+  }
 }
