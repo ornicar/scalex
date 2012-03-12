@@ -10,7 +10,7 @@ import model.NormalizedTypeSig
 
 case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
 
-  private val splitter = """^([^\:]*)\:\s(.+)$""".r
+  val splitter = """^([^\:]*)\:\s(.+)$""".r
 
   def analyze: Validation[String, Query] = string match {
     case splitter(text, tpe)        ⇒ mixQuery(text, tpe)

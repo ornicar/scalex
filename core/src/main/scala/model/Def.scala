@@ -76,15 +76,15 @@ case class Def(
   def urlFragment: String = "%s%s%s:%s".format(
     name,
     showTypeParams,
-    nicer {
+    sugar {
       valueParams map (ps ⇒
-        ps.params map (_.resultType.name.pp) mkString ("(", ",", ")")
+        ps.params map (_.resultType.name) mkString ("(", ",", ")")
       ) mkString
     },
     resultType.toString
   )
 
-  def nicer(str: String) = str.replace("=>", "⇒")
+  def sugar(str: String) = str.replace("=>", "⇒")
 
   override def toString = declaration
 }
