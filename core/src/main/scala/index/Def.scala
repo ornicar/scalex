@@ -6,8 +6,6 @@ case class Def(
   /** Matches the mongodb id */
     id: String
 
-  , name: String
-
   , qualifiedName: String
 
   , signature: String

@@ -39,7 +39,6 @@ trait Fixtures {
 
   val ind1 = index.Def(
     "id",
-    "name",
     "qualifiedName",
     "signature"
   )
