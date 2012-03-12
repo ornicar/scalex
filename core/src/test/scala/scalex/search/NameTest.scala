@@ -105,9 +105,17 @@ class NameTest extends ScalexTest with WithSearch {
     }
     "map list" in {
       //"map list" finds Seq(
-        //immutable + "Map#toList",
-        //immutable + "List#map")
+      //immutable + "Map#toList",
+      //immutable + "List#map")
       pending
+    }
+  }
+  "Simple signature first" in {
+    "map list" in {
+      "map list" findsDeclarations Seq(
+        "scala.collection.immutable.List#map[B]: List[+A] => (f: (A => B)) => List[B]",
+        "scala.collection.immutable.List#map[B, That]: List[+A] => (f: (A => B))(implicit bf: CanBuildFrom[List[A], B, That]) => That"
+      )
     }
   }
 }

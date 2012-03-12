@@ -11,7 +11,7 @@ class IndexRepo(filename: String) extends DefaultProtocol {
 
   def file = new File(filename)
 
-  implicit val defFormat = asProduct3(Def)(Def.unapply(_).get)
+  implicit val defFormat = asProduct4(Def)(Def.unapply(_).get)
 
   def write(defs: List[Def]) { toFile(defs)(file) }
 

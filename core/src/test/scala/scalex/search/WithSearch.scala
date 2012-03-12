@@ -38,16 +38,24 @@ trait WithSearch extends ScalexTest {
 
   def searchNames(q: String): ValidSeq[String] = searchNames(q, 10)
 
+  def searchDeclarations(q: String, nb: Int): ValidSeq[String] =
+    search(q, nb).map(ds ⇒ ds.map(_.declaration))
+
+  def searchDeclarations(q: String): ValidSeq[String] = searchDeclarations(q, 10)
+
   class MatchableSearch(search: String) {
 
     def finds(name: String): MatchResult[ValidSeq[String]] =
       searchNames(search, 2000) must findName(name)
 
+    def finds(names: Seq[String]): MatchResult[ValidSeq[String]] =
+      searchNames(search, 2000) must findNames(names)
+
     def notFinds(name: String): MatchResult[ValidSeq[String]] =
       searchNames(search, 2000) must notFindName(name)
 
-    def finds(names: Seq[String]): MatchResult[ValidSeq[String]] =
-      searchNames(search, 2000) must findNames(names)
+    def findsDeclarations(decs: Seq[String]): MatchResult[ValidSeq[String]] =
+      searchDeclarations(search, 2000) must findDeclarations(decs)
 
     def findsNothing: MatchResult[ValidSeq[String]] =
       searchNames(search) must beSuccess.like {
@@ -64,6 +72,10 @@ trait WithSearch extends ScalexTest {
 
     private def findNames(names: Seq[String]): Matcher[ValidSeq[String]] = beSuccess.like {
       case elems ⇒ elems must containAllOf(names).inOrder
+    }
+
+    private def findDeclarations(decs: Seq[String]): Matcher[ValidSeq[String]] = beSuccess.like {
+      case elems ⇒ elems must containAllOf(decs).inOrder
     }
   }
 

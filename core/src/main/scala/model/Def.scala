@@ -56,7 +56,8 @@ case class Def(
   def toIndex = index.Def(
     id = id,
     qualifiedName = qualifiedNameWithoutScalaPrefix,
-    signature = normSignature
+    signature = normSignature,
+    decSize = declaration.size
   )
 
   def qualifiedNameWithoutScalaPrefix =

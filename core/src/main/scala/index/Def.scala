@@ -9,6 +9,8 @@ case class Def(
   , qualifiedName: String
 
   , signature: String
+
+  , decSize: Int
 ) {
 
   lazy val tokens: List[String] =
