@@ -25,7 +25,7 @@ object Cli {
     def apply(command: String, args: List[String]) = command match {
       case "dump"   ⇒ dump(args)
       case "index"  ⇒ index()
-      case "search" ⇒ search(args mkString " ", 3)
+      case "search" ⇒ search(args mkString " ", 5)
       case "all"    ⇒ search(args mkString " ", 10000)
       case command  ⇒ "Unknown command " + command
     }

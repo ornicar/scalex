@@ -11,6 +11,7 @@ trait Env {
 
   val config: Config
 
+
   lazy val engine = new Engine(indexRepo.read, defRepo.byIds)
 
   lazy val indexRepo = new IndexRepo(
@@ -35,8 +36,11 @@ trait Env {
 
 object Env extends EnvBuilder {
 
-  def apply(overrides: String = "") = new Env {
-    val config = makeConfig(overrides)
+  def apply(overrides: String = "") = {
+    val c = makeConfig(overrides)
+    // early config check
+    c getString "scalex.index"
+    new Env { val config = c }
   }
 }
 
