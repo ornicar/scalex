@@ -15,13 +15,13 @@ class DefRepoTest extends ScalexTest {
         val encodedDocUrl = "http://www.scala-lang.org/api/current/scala/collection/immutable/List#map%5BB%5D((A)%20%E2%87%92%20B)%3AList%5BB%5D"
         val listmap = repo findByDeclaration declaration
         "def docUrl" in {
-          listmap must beSome.like {
-            case d => d.docUrl must_== docUrl
+          listmap flatMap (_.docUrl) must beSome.like {
+            case u => u must_== docUrl
           }
         }
         "def encoded docUrl" in {
-          listmap must beSome.like {
-            case d => d.encodedDocUrl must_== encodedDocUrl
+          listmap flatMap (_.encodedDocUrl) must beSome.like {
+            case u => u must_== encodedDocUrl
           }
         }
       }
@@ -31,13 +31,13 @@ class DefRepoTest extends ScalexTest {
         val encodedDocUrl = "http://www.scala-lang.org/api/current/scala/collection/immutable/List#map%5BB%2C%20That%5D((A)%20%E2%87%92%20B)(CanBuildFrom%5BList%5BA%5D%2C%20B%2C%20That%5D)%3AThat"
         val listmap = repo findByDeclaration declaration
         "def docUrl" in {
-          listmap must beSome.like {
-            case d => d.docUrl must_== docUrl
+          listmap flatMap (_.docUrl) must beSome.like {
+            case u => u must_== docUrl
           }
         }
         "def encoded docUrl" in {
-          listmap must beSome.like {
-            case d => d.encodedDocUrl must_== encodedDocUrl
+          listmap flatMap (_.encodedDocUrl) must beSome.like {
+            case u => u must_== encodedDocUrl
           }
         }
       }

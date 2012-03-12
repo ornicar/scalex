@@ -64,17 +64,23 @@ case class Def(
     if (qualifiedName startsWith "scala.") qualifiedName drop 6
     else qualifiedName
 
-  def docUrl = "http://www.scala-lang.org/api/current/%s#%s".format(
-    parent.qualifiedName.replace(".", "/"),
-    urlFragment
-  )
+  def isScala = pack == "scala"
 
-  def encodedDocUrl = "http://www.scala-lang.org/api/current/%s#%s".format(
-    parent.qualifiedName.replace(".", "/"),
-    UrlFragmentEncoder.encode(urlFragment)
-  )
+  def docUrl = isScala option {
+    "http://www.scala-lang.org/api/current/%s#%s".format(
+      parent.qualifiedName.replace(".", "/"),
+      urlFragment
+    )
+  }
 
-  def urlFragment: String = "%s%s%s:%s".format(
+  def encodedDocUrl = isScala option {
+    "http://www.scala-lang.org/api/current/%s#%s".format(
+      parent.qualifiedName.replace(".", "/"),
+      UrlFragmentEncoder.encode(urlFragment)
+    )
+  }
+
+  private def urlFragment: String = "%s%s%s:%s".format(
     name,
     showTypeParams,
     sugar {
