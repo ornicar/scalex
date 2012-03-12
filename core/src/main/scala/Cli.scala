@@ -36,12 +36,12 @@ object Cli {
           "%d results for %s\n\n%s\n" format (paginator.nbResults, query, render(defs))
       })
 
-    def dump(fs: List[String]): String = fs match {
-      case pack :: file :: sourceBase :: Nil ⇒
-        val sources = (new Locator) locate List(new File(file)) map (_.getPath)
-        env.dumper.process(pack, sources, sourceBase)
-        "Dump complete"
-      case _ ⇒ "Usage: dump package /path/to/file /src/source/base"
+    def dump(fs: List[String]): String = {
+      val pack = fs.head
+      val files = fs.tail map (f ⇒ new File(f))
+      val sources = (new Locator) locate files map (_.getPath)
+      env.dumper.process(pack, sources)
+      "Dump complete"
     }
 
     def index(): String = {
@@ -50,7 +50,7 @@ object Cli {
     }
 
     private def render(d: Def): String =
-      "[" + d.pack + "] " + d.name + "\n  " + d.toString + "\n  " + (d.source map (_.url) getOrElse "Unknown source")
+      "[" + d.pack + "] " + d.name + "\n  " + d.toString + "\n  " + d.encodedDocUrl
 
     private def render(ds: Seq[Def]): String =
       ds map render map ("* "+) mkString "\n\n"
