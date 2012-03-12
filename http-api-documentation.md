@@ -30,6 +30,7 @@ The results are paginated by 15. Here is an output example for `http://api.scale
       nbPages: 3                      // Number of pages of results
       results: [                      // List of functions found on this page
         {
+          docUrl: "http://www.scala-lang.org/api/current/scala/collection/immutable/List#map%5BB%5D%28%28A%29%20%E2%87%92%20B%29%3AList%5BB%5D"
           name: "map"                 // Function short name
           qualifiedName: "scala.collection.immutable.ListMap#map" // Function full name
           typeParams: "[C]"           // Function type params
