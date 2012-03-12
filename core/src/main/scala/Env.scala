@@ -1,6 +1,6 @@
 package scalex
 
-import db.{ IndexRepo, DefRepo }
+import db.{ IndexRepo, DefRepo, IncSearch }
 import search.Engine
 import dump.Dumper
 
@@ -11,8 +11,10 @@ trait Env {
 
   val config: Config
 
-
-  lazy val engine = new Engine(indexRepo.read, defRepo.byIds)
+  lazy val engine = new Engine(
+    indexRepo.read,
+    defRepo.byIds,
+    incSearch.apply)
 
   lazy val indexRepo = new IndexRepo(
     config getString "scalex.index"
@@ -23,6 +25,10 @@ trait Env {
   )
 
   def dumper = new Dumper(defRepo)
+
+  def incSearch = new IncSearch(
+    mongoDatabase(config getString "scalex.mongo.search_collection")
+  )
 
   private lazy val mongoConnection = MongoConnection(
     config getString "scalex.mongo.host",
