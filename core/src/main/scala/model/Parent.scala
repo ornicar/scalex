@@ -1,4 +1,5 @@
-package scalex.model
+package scalex
+package model
 
 case class Parent(
 
@@ -14,6 +15,11 @@ case class Parent(
   , isObject: Boolean
 
 ) extends HigherKinded {
+
+  def toUrl: String =
+    NameTransformer(qualifiedName).replace(".", "/") + {
+      if (isObject) "$" else ""
+    }
 
   override def toString = name + showTypeParams
 

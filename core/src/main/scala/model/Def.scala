@@ -73,9 +73,8 @@ case class Def(
       if (parent.qualifiedName startsWith "scala.Predef")
         scalaBaseUrl + "scala/Predef$.html"
       else
-        scalaBaseUrl + "%s%s#%s".format(
-          parent.qualifiedName.replace(".", "/"),
-          if (parent.isObject) "$" else "",
+        scalaBaseUrl + "%s#%s".format(
+          parent.toUrl,
           if (encoded) UrlFragmentEncoder.encode(urlFragment) else urlFragment
         )
     }

@@ -50,7 +50,7 @@ class DefRepoTest extends ScalexTest {
           }
         }
       }
-      "predef <%<" in {
+      "predef.<%<" in {
         val docUrl = "http://www.scala-lang.org/api/current/scala/Predef$.html"
         val declaration = "scala.Predef.<%<###: <%< => Int"
         val fun = repo findByDeclaration declaration
@@ -60,9 +60,19 @@ class DefRepoTest extends ScalexTest {
           }
         }
       }
-      "Nil:::" in {
+      "Nil.:::" in {
         val docUrl = "http://www.scala-lang.org/api/current/scala/collection/immutable/Nil$#:::[B>:Nothing](List[B]):List[B]"
         val declaration = "scala.collection.immutable.Nil#:::[B>:Nothing]: Nil => (prefix: List[B]) => List[B]"
+        val fun = repo findByDeclaration declaration
+        "def docUrl" in {
+          fun flatMap (_.docUrl) must beSome.like {
+            case u ⇒ u must_== docUrl
+          }
+        }
+      }
+      "::.mapConserve" in {
+        val docUrl = "http://www.scala-lang.org/api/current/scala/collection/immutable/$colon$colon#mapConserve((B) ⇒ B):List[B]"
+        val declaration = "scala.collection.immutable.::#mapConserve: ::[B] => (f: (B => B)) => List[B]"
         val fun = repo findByDeclaration declaration
         "def docUrl" in {
           fun flatMap (_.docUrl) must beSome.like {
