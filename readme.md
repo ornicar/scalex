@@ -45,4 +45,4 @@ For example, when indexing scala standard library, you will want to run:
 
 ## HTTP
 
-A HTTP service is being developed.
+A HTTP API is available, [see the doc](https://github.com/ornicar/scalex/blob/master/http-api-documentation.md)
