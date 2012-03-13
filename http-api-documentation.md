@@ -34,6 +34,7 @@ The results are paginated by 15. Here is an output example for `http://api.scale
       nbResults: 26                   // Total number of results
       page: 2                         // Page requested, defaults to 1
       nbPages: 3                      // Number of pages of results
+      milliseconds: 12                // Duration of the query
       results: [                      // List of functions found on this page
         {
           docUrl: "http://www.scala-lang.org/api/current/scala/collection/immutable/List#map%5BB%5D%28%28A%29%20%E2%87%92%20B%29%3AList%5BB%5D"
@@ -44,7 +45,6 @@ The results are paginated by 15. Here is an output example for `http://api.scale
           valueParams: "f: (B => C)"  // Params the function accepts
           signature: "ListMap[A, +B] => (f: (B => C)) => Map[A, C]" // Normalized signature of the function
           package: "scala"            // Name of the package containing the function
-          milliseconds: 12            // Duration of the query
           deprecation: {              // Deprecation message if the function is deprecated, otherwise nothing
             html:                     // HTML deprecation message
             txt:                      // TXT deprecation message
