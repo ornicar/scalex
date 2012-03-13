@@ -2,8 +2,6 @@
 
 Scalex offers an HTTP API allowing to search for scala functions based on keywords and signatures.
 
-Use this API to build new clients!
-
 ## Clients using this API
 
 - [scalex.org](http://scalex.org) (JavaScript)
@@ -14,7 +12,7 @@ Use this API to build new clients!
 
     curl http://api.scalex.org/?q=list+map
 
-    curl http://api.scalex.org/?q=list+map&page=2
+    curl http://api.scalex.org/?q=list+map&per_page=50&page=2
 
     curl http://scalex-web/?q=map:%20List[A]%20=%3E%20(A%20=%3E%20B)%20=%3E%20List[B]
 
@@ -27,7 +25,7 @@ Use this API to build new clients!
 
 ## JSON output
 
-The results are paginated by 15. Here is an output example for `http://api.scalex.org/?q=list+map&page=2`
+Here is an output example for `http://api.scalex.org/?q=list+map&page=2`
 
     {
       query: "list map"               // Query we are searching for
