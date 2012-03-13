@@ -16,12 +16,12 @@ class DefRepoTest extends ScalexTest {
         val listmap = repo findByDeclaration declaration
         "def docUrl" in {
           listmap flatMap (_.docUrl) must beSome.like {
-            case u => u must_== docUrl
+            case u ⇒ u must_== docUrl
           }
         }
         "def encoded docUrl" in {
           listmap flatMap (_.encodedDocUrl) must beSome.like {
-            case u => u must_== encodedDocUrl
+            case u ⇒ u must_== encodedDocUrl
           }
         }
       }
@@ -32,12 +32,12 @@ class DefRepoTest extends ScalexTest {
         val listmap = repo findByDeclaration declaration
         "def docUrl" in {
           listmap flatMap (_.docUrl) must beSome.like {
-            case u => u must_== docUrl
+            case u ⇒ u must_== docUrl
           }
         }
         "def encoded docUrl" in {
           listmap flatMap (_.encodedDocUrl) must beSome.like {
-            case u => u must_== encodedDocUrl
+            case u ⇒ u must_== encodedDocUrl
           }
         }
       }
@@ -46,7 +46,7 @@ class DefRepoTest extends ScalexTest {
         val fun = repo findByDeclaration declaration
         "function exsits" in {
           fun must beSome.like {
-            case d => d.declaration must_== declaration
+            case d ⇒ d.declaration must_== declaration
           }
         }
       }
@@ -56,7 +56,17 @@ class DefRepoTest extends ScalexTest {
         val fun = repo findByDeclaration declaration
         "def docUrl" in {
           fun flatMap (_.docUrl) must beSome.like {
-            case u => u must_== docUrl
+            case u ⇒ u must_== docUrl
+          }
+        }
+      }
+      "Nil:::" in {
+        val docUrl = "http://www.scala-lang.org/api/current/scala/collection/immutable/Nil$#:::[B>:Nothing](List[B]):List[B]"
+        val declaration = "scala.collection.immutable.Nil#:::[B>:Nothing]: Nil => (prefix: List[B]) => List[B]"
+        val fun = repo findByDeclaration declaration
+        "def docUrl" in {
+          fun flatMap (_.docUrl) must beSome.like {
+            case u ⇒ u must_== docUrl
           }
         }
       }
