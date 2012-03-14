@@ -25,19 +25,20 @@ final class Engine(
     } yield Results(p, defs)
   }
 
-  def resolve(query: Query): List[index.Def] = query match {
-    case TextQuery(tokens) ⇒
-      defsOf(TokenSearch(tokenIndex, tokens.list).search)
-    case SigQuery(sig) ⇒
-      defsOf(SigSearch(sigIndex, sig).search)
-    case MixQuery(tokens, sig) ⇒ defsOf {
-      val sigResults = SigSearch(sigIndex, sig).search
-      val txtResults = TokenSearch(tokenIndex, tokens.list).search
-      txtResults collect {
-        case (d, s) if sigResults contains d ⇒ (d, s + sigResults(d))
+  def resolve(scopedQuery: ScopedQuery): List[index.Def] =
+    scopedQuery.query match {
+      case TextQuery(tokens) ⇒
+        defsOf(TokenSearch(tokenIndex, tokens.list).search)
+      case SigQuery(sig) ⇒
+        defsOf(SigSearch(sigIndex, sig).search)
+      case MixQuery(tokens, sig) ⇒ defsOf {
+        val sigResults = SigSearch(sigIndex, sig).search
+        val txtResults = TokenSearch(tokenIndex, tokens.list).search
+        txtResults collect {
+          case (d, s) if sigResults contains d ⇒ (d, s + sigResults(d))
+        }
       }
     }
-  }
 
   def defsOf(fragment: Map[index.Def, Score]): List[index.Def] = {
     fragment.toList sortBy {

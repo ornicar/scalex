@@ -1,7 +1,6 @@
 package scalex
 package search
 
-import scalaz.Semigroup
 import scalaz.Validation
 import scalaz.{ Success, Failure }
 import scalaz.NonEmptyList
@@ -11,11 +10,32 @@ import model.NormalizedTypeSig
 case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
 
   val splitter = """^([^\:]*)\:\s(.+)$""".r
+  val scoper = """^(\-|\+)([a-z]+)$""".r
 
-  def analyze: Validation[String, Query] = string match {
-    case splitter(text, tpe)        ⇒ mixQuery(text, tpe)
-    case tpe if tpe contains " => " ⇒ sigQuery(tpe)
-    case text                       ⇒ textQuery(text)
+  def analyze: Validation[String, ScopedQuery] = for {
+    queryAndScope ← scopeQuery(string)
+    (queryString, scope) = queryAndScope
+    query ← queryString match {
+      case splitter(text, tpe)        ⇒ mixQuery(text, tpe)
+      case tpe if tpe contains " => " ⇒ sigQuery(tpe)
+      case text                       ⇒ textQuery(text)
+    }
+  } yield ScopedQuery(query, scope)
+
+  private def scopeQuery(text: String) = Success {
+    if ((text contains "-") || (text contains "+")) {
+      val words = text split ' ' toList
+      val parsed = words.foldLeft((List[String](), Scope())) {
+        case ((ws, scope), scoper(sign, pack)) ⇒ sign match {
+          case "-" ⇒ (ws, scope - pack)
+          case "+" ⇒ (ws, scope + pack)
+          case _   ⇒ (ws, scope)
+        }
+        case ((ws, scope), w) ⇒ (w :: ws, scope)
+      }
+      (parsed._1.reverse mkString " ", parsed._2)
+    }
+    else (text, Scope())
   }
 
   private def mixQuery(text: String, tpe: String) =
@@ -36,12 +56,28 @@ case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
 
 trait Query
 
-case class MixQuery(tokens: NonEmptyList[String], sig: NormalizedTypeSig) extends Query {
-  override def toString = "%s : %s".format(tokens.list mkString " + ", sig)
+case class Scope(
+    only: List[String] = Nil,
+    without: List[String] = Nil) {
+
+  def +(pack: String) = copy(only = only :+ pack)
+
+  def -(pack: String) = copy(without = without :+ pack)
+
+  override def toString =
+    (only map ("+" + _)) ::: (without map ("-" + _)) mkString " "
+}
+
+case class ScopedQuery(query: Query, scope: Scope)
+
+case class MixQuery(
+    tokens: NonEmptyList[String],
+    sig: NormalizedTypeSig) extends Query {
+  override def toString = "%s : %s".format(tokens.list mkString " and ", sig)
 }
 
 case class TextQuery(tokens: NonEmptyList[String]) extends Query {
-  override def toString = tokens.list mkString " + "
+  override def toString = tokens.list mkString " and "
 }
 
 case class SigQuery(sig: NormalizedTypeSig) extends Query {
