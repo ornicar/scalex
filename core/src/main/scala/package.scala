@@ -3,12 +3,10 @@ import ornicar.scalalib._
 package object scalex
   extends OrnicarCommon
   with scalaz.Identitys
-  with scalaz.Equals
   with scalaz.MABs
   with scalaz.Options
   with scalaz.Lists
   with scalaz.NonEmptyLists
-  with scalaz.Semigroups
   with scalaz.Booleans {
 
   implicit def addCollectValues[A](m: Map[_, A]) = new {

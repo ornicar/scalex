@@ -12,7 +12,7 @@ object IndexBuilder {
     val packs = (defs map (_.pack)).distinct
     val scopes = permutationsInclusive(packs)
     val nameIndex = keyIndex(defs, _.tokens)
-    val sigIndex = keyIndex(defs, _.signature :: Nil)
+    val sigIndex = keyIndex(defs, d ⇒ List(d.signature))
 
     scopes map { scope ⇒
       scope -> ScopeIndex(
@@ -27,7 +27,9 @@ object IndexBuilder {
       defs filter { d ⇒
         scope contains d.pack
       }
-    } filterValues { defs ⇒ !defs.isEmpty }
+    } filterValues { defs ⇒
+      defs.nonEmpty
+    }
 
   def keyIndex(defs: List[Def], defKeys: Def ⇒ List[String]): TokenIndex = {
 

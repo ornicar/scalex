@@ -1,11 +1,11 @@
 package scalex
 package search
 
-import db._
-
 import com.github.ornicar.paginator._
 import scalaz.Validation
 import scalaz.Scalaz.{ success, failure }
+
+case class Results(paginator: PaginatorLike[index.Def], defs: List[model.Def])
 
 final class Engine(
     defs: List[index.Def],
@@ -20,7 +20,8 @@ final class Engine(
     for {
       q ← query.analyze
       index ← queryScopeIndex(q.scope) toSuccess "Invalid query scope"
-      adapter = InMemoryAdapter(resolve(q.query, index))
+      defs = resolve(q.query, index)
+      adapter = InMemoryAdapter(defs)
       p ← validation(Paginator(adapter, query.currentPage, query.maxPerPage))
       defs = idsToDefs(p.currentPageResults map (_.id))
     } yield Results(p, defs)
@@ -33,14 +34,14 @@ final class Engine(
 
   def resolve(query: Query, scopeIndex: ScopeIndex): List[index.Def] =
     query match {
-      case TextQuery(tokens) ⇒
-        defsOf(TokenSearch(scopeIndex.nameIndex, tokens.list).search)
+      case NameQuery(tokens) ⇒
+        defsOf(NameSearch(scopeIndex.nameIndex, tokens.list).search)
       case SigQuery(sig) ⇒
         defsOf(SigSearch(scopeIndex.sigIndex, sig).search)
       case MixQuery(tokens, sig) ⇒ defsOf {
         val sigResults = SigSearch(scopeIndex.sigIndex, sig).search
-        val txtResults = TokenSearch(scopeIndex.nameIndex, tokens.list).search
-        txtResults collect {
+        val nameResults = NameSearch(scopeIndex.nameIndex, tokens.list).search
+        nameResults collect {
           case (d, s) if sigResults contains d ⇒ (d, s + sigResults(d))
         }
       }

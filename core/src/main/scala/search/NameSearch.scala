@@ -3,7 +3,7 @@ package search
 
 import index.Def
 
-case class TokenSearch(
+case class NameSearch(
   tokenIndex: TokenIndex,
   tokens: List[Token]) extends IndexSearch[String, Def] {
 
