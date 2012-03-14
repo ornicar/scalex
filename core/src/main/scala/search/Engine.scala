@@ -12,28 +12,34 @@ final class Engine(
     idsToDefs: Seq[String] ⇒ List[model.Def],
     incSearch: String ⇒ Unit) extends scalaz.Validations {
 
-  private val tokenIndex = TokenIndex(defs)
-  private val sigIndex = SigIndex(defs)
+  lazy val scopeIndexes: Map[Scope, ScopeIndex] = IndexBuilder scopeIndexes defs
+  lazy val scopes = scopeIndexes.keys.toList
 
   def find(query: RawQuery): Validation[String, Results] = {
     if (query.currentPage == 1) incSearch(query.string)
     for {
       q ← query.analyze
-      adapter = InMemoryAdapter(resolve(q))
+      index ← queryScopeIndex(q.scope) toSuccess "Invalid query scope"
+      adapter = InMemoryAdapter(resolve(q.query, index))
       p ← validation(Paginator(adapter, query.currentPage, query.maxPerPage))
       defs = idsToDefs(p.currentPageResults map (_.id))
     } yield Results(p, defs)
   }
 
-  def resolve(scopedQuery: ScopedQuery): List[index.Def] =
-    scopedQuery.query match {
+  def queryScopeIndex(queryScope: QueryScope): Option[ScopeIndex] = for {
+    scope ← queryScope matchScope scopes
+    scopeIndex ← scopeIndexes get scope
+  } yield scopeIndex
+
+  def resolve(query: Query, scopeIndex: ScopeIndex): List[index.Def] =
+    query match {
       case TextQuery(tokens) ⇒
-        defsOf(TokenSearch(tokenIndex, tokens.list).search)
+        defsOf(TokenSearch(scopeIndex.nameIndex, tokens.list).search)
       case SigQuery(sig) ⇒
-        defsOf(SigSearch(sigIndex, sig).search)
+        defsOf(SigSearch(scopeIndex.sigIndex, sig).search)
       case MixQuery(tokens, sig) ⇒ defsOf {
-        val sigResults = SigSearch(sigIndex, sig).search
-        val txtResults = TokenSearch(tokenIndex, tokens.list).search
+        val sigResults = SigSearch(scopeIndex.sigIndex, sig).search
+        val txtResults = TokenSearch(scopeIndex.nameIndex, tokens.list).search
         txtResults collect {
           case (d, s) if sigResults contains d ⇒ (d, s + sigResults(d))
         }

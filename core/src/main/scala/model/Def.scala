@@ -55,14 +55,10 @@ case class Def(
 
   def toIndex = index.Def(
     id = id,
-    qualifiedName = qualifiedNameWithoutScalaPrefix,
+    qualifiedName = qualifiedName,
     signature = normSignature,
     decSize = declaration.size
   )
-
-  def qualifiedNameWithoutScalaPrefix =
-    if (qualifiedName startsWith "scala.") qualifiedName drop 6
-    else qualifiedName
 
   def isScala = pack == "scala"
 

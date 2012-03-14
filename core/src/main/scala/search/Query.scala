@@ -25,7 +25,7 @@ case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
   private def scopeQuery(text: String) = Success {
     if ((text contains "-") || (text contains "+")) {
       val words = text split ' ' toList
-      val parsed = words.foldLeft((List[String](), Scope())) {
+      val parsed = words.foldLeft((List[String](), QueryScope())) {
         case ((ws, scope), scoper(sign, pack)) ⇒ sign match {
           case "-" ⇒ (ws, scope - pack)
           case "+" ⇒ (ws, scope + pack)
@@ -35,7 +35,7 @@ case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
       }
       (parsed._1.reverse mkString " ", parsed._2)
     }
-    else (text, Scope())
+    else (text, QueryScope())
   }
 
   private def mixQuery(text: String, tpe: String) =
@@ -56,19 +56,28 @@ case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
 
 trait Query
 
-case class Scope(
-    only: List[String] = Nil,
-    without: List[String] = Nil) {
+case class QueryScope(
+    only: Set[String] = Set.empty,
+    without: Set[String] = Set.empty) {
 
-  def +(pack: String) = copy(only = only :+ pack)
+  def +(pack: String) = copy(only = only + pack)
 
-  def -(pack: String) = copy(without = without :+ pack)
+  def -(pack: String) = copy(without = without + pack)
+
+  def matchScope(scopes: Seq[Scope]): Option[Scope] =
+    scopes sortBy (-_.size) find { scope ⇒
+      {
+        if (only.isEmpty) true else scope forall only.contains
+      } && {
+        if (without.isEmpty) true else scope forall (s ⇒ !(without contains s))
+      }
+    }
 
   override def toString =
-    (only map ("+" + _)) ::: (without map ("-" + _)) mkString " "
+    (only map ("+" + _)) ++ (without map ("-" + _)) mkString " "
 }
 
-case class ScopedQuery(query: Query, scope: Scope)
+case class ScopedQuery(query: Query, scope: QueryScope)
 
 case class MixQuery(
     tokens: NonEmptyList[String],
