@@ -67,7 +67,7 @@ trait WithSearch extends ScalexTest {
     }
 
     private def notFindName(name: String): Matcher[ValidSeq[String]] = beSuccess.like {
-      case elems ⇒ elems must not be contain(name)
+      case elems ⇒ elems must not contain(name)
     }
 
     private def findNames(names: Seq[String]): Matcher[ValidSeq[String]] = beSuccess.like {
