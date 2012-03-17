@@ -7,6 +7,7 @@ Scalex offers an HTTP API allowing to search for scala functions based on keywor
 - [scalex.org](http://scalex.org) (JavaScript)
 - [scalex CLI](https://github.com/jonifreeman/Scalex-CLI) (scala)
 - [#scala multibot](https://github.com/lopex/multibot/blob/master/src/main/scala/org/multibot/Multibot.scala)
+- [XMPP bot](https://github.com/charleso/Scala-XMPP-Bot)
 
 ## Try it
 
