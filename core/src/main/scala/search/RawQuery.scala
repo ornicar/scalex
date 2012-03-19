@@ -46,7 +46,7 @@ case class RawQuery(string: String, currentPage: Int, maxPerPage: Int) {
     SigParser(tpe) map { sig ⇒ SigQuery(sig.normalize) }
 
   private def tokenize(text: String): Option[NonEmptyList[String]] =
-    (text.toLowerCase split ' ').toList map (_.trim) filterNot (_.isEmpty) toNel
+    (text.toLowerCase split Array('.', ' ', '#')).toList map (_.trim) filterNot (_.isEmpty) toNel
 }
 
 object RawQuery {

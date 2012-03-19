@@ -16,6 +16,18 @@ class QueryTest extends ScalexTest with WithSearch {
       analyze("a => (") must beFailure
     }
   }
+  "dotted namespace" should {
+    "translate to spaced namespace" in {
+      analyze("collection.immutable.List") must beSuccess.like {
+        case q => q.query.toString must_== "collection and immutable and list"
+      }
+    }
+    "with # translate to spaced namespace" in {
+      analyze("immutable.List#sorted") must beSuccess.like {
+        case q => q.query.toString must_== "immutable and list and sorted"
+      }
+    }
+  }
   "parsable unscoped text query" should {
     "tokens" in {
       analyze("list map") must beSuccess.like {
