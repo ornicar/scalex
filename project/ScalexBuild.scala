@@ -48,31 +48,31 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     libraryDependencies ++= Seq(casbah, salat, compiler, paginator, scalaz, hasher, sbinary, slf4jNop)
   )
 
-  lazy val benchmark = Project("benchmark", file("benchmark"), settings = buildSettings).settings(
-    fork in run := true,
-    libraryDependencies ++= Seq(instrumenter, gson),
-    // we need to add the runtime classpath as a "-cp" argument
-    // to the `javaOptions in run`, otherwise caliper
-    // will not see the right classpath and die with a ConfigurationException
-    // unfortunately `javaOptions` is a SettingsKey and
-    // `fullClasspath in Runtime` is a TaskKey, so we need to
-    // jump through these hoops here in order to
-    // feed the result of the latter into the former
-    onLoad in Global ~= { previous ⇒
-      state ⇒
-        previous {
-          state get key match {
-            case None ⇒
-              // get the runtime classpath, turn into a colon-delimited string
-              val classPath = Project.runTask(fullClasspath in Runtime, state).get._2.toEither.right.get.files.mkString(":")
-              // return a state with javaOptionsPatched = true and javaOptions set correctly
-              Project.extract(state).append(Seq(javaOptions in run ++= Seq("-cp", classPath)), state.put(key, true))
-            case Some(_) ⇒ state // the javaOptions are already patched
-          }
-        }
-    }
-  ) dependsOn (core)
+  //lazy val benchmark = Project("benchmark", file("benchmark"), settings = buildSettings).settings(
+    //fork in run := true,
+    //libraryDependencies ++= Seq(instrumenter, gson),
+    //// we need to add the runtime classpath as a "-cp" argument
+    //// to the `javaOptions in run`, otherwise caliper
+    //// will not see the right classpath and die with a ConfigurationException
+    //// unfortunately `javaOptions` is a SettingsKey and
+    //// `fullClasspath in Runtime` is a TaskKey, so we need to
+    //// jump through these hoops here in order to
+    //// feed the result of the latter into the former
+    //onLoad in Global ~= { previous ⇒
+      //state ⇒
+        //previous {
+          //state get key match {
+            //case None ⇒
+              //// get the runtime classpath, turn into a colon-delimited string
+              //val classPath = Project.runTask(fullClasspath in Runtime, state).get._2.toEither.right.get.files.mkString(":")
+              //// return a state with javaOptionsPatched = true and javaOptions set correctly
+              //Project.extract(state).append(Seq(javaOptions in run ++= Seq("-cp", classPath)), state.put(key, true))
+            //case Some(_) ⇒ state // the javaOptions are already patched
+          //}
+        //}
+    //}
+  //) dependsOn (core)
 
-  // attribute key to prevent circular onLoad hook (for benchmark)
-  val key = AttributeKey[Boolean]("javaOptionsPatched")
+  //// attribute key to prevent circular onLoad hook (for benchmark)
+  //val key = AttributeKey[Boolean]("javaOptionsPatched")
 }
