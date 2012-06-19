@@ -22,7 +22,7 @@ trait Dependencies {
   val hasher = "com.roundeights" % "hasher" % "0.3" from "http://cloud.github.com/downloads/Nycto/Hasher/hasher_2.9.1-0.3.jar"
   val sbinary = "org.scala-tools.sbinary" %% "sbinary" % "0.4.1-SNAPSHOT"
   val scalalib = "com.github.ornicar" %% "scalalib" % "1.22"
-  val config = "com.typesafe.config" % "config" % "0.3.0"
+  val config = "com.typesafe" % "config" % "0.4.1"
 
   // benchmark
   val instrumenter = "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0"
