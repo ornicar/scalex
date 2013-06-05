@@ -1,17 +1,9 @@
-.class
-*.log
-/lib
-*.html
-*.js
-*.war
+conf/application.conf
+logs
+project/project
+project/target
+target
+dist/
+play-2*
 
-# sbt specific
-dist/*
-target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-
-# serialized objects
-/*.dat
+RUNNING_PID

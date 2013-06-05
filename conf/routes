@@ -1,0 +1,9 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET / controllers.Application.index(page: Int ?= 1, per_page: Int ?= 20, callback ?= "")
+
+# Useless but play2 wants it
+GET /assets/*file controllers.Assets.at(path="/public", file)
