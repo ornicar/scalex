@@ -1,6 +1,4 @@
-# Scalex 3, Hoogle-like documentation search engine for scala library.
-
-This is the development version.
+# Hoogle-like documentation search engine for scala library.
 
 - [See it in action](http://scalex.org)
 
