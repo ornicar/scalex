@@ -1,17 +1,5 @@
-.class
-*.log
-/lib
-*.html
-*.js
-*.war
-
 # sbt specific
 dist/*
 target/
-lib_managed/
-src_managed/
 project/boot/
-project/plugins/project/
-
-# serialized objects
-/*.dat
+sbt-launch.jar

@@ -3,7 +3,7 @@ package cli
 
 object Parser {
 
-  def make = new scopt.OptionParser[Config]("scalex") {
+  def parse(args: Array[String]) = (new scopt.OptionParser[Config]("scalex") {
     head("scalex", "3.0")
     cmd("index") text ("Index a library") children {
       arg[File]("<dir>...") required () unbounded () action { (x, c) ⇒
@@ -20,5 +20,5 @@ object Parser {
         c.withSearch(_ add x)
       } text ("Search words")
     }
-  }
+  }) parse (args, Config())
 }

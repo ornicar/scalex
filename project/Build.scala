@@ -29,11 +29,41 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     // libraryDependencies in test := Seq(specs2),
     resolvers := Seq(typesafe, typesafeS, iliaz, sonatype, sonatypeS, sonatypeP),
     scalacOptions := Seq("-deprecation", "-unchecked", "-feature", "-language:_")
-  )
+  ) //++ Seq(scalexTask)
 
-  lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
-    libraryDependencies ++= Seq(compiler, scalaz, scalazContrib, sbinary, scopt)
-  )
+  // lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
+  //   libraryDependencies ++= Seq(compiler, scalaz, scalazContrib, sbinary, scopt)
+  // )
+
+  def scalexTask = TaskKey[File]("scalex", "Generates scalex database.")
+
+	def docTaskSettings(key: TaskKey[File] = scalexTask): Seq[Setting[_]] = inTask(key)(Seq(
+		sbt.Keys.apiMappings ++= { if(autoAPIMappings.value) APIMappings.extract(dependencyClasspath.value, streams.value.log).toMap else Map.empty[File,URL] },
+		key in TaskGlobal := {
+			val s = streams.value
+			val cs = compilers.value
+			val srcs = sources.value
+			val out = target.value
+			val sOpts = scalacOptions.value
+			val jOpts = javacOptions.value
+			val xapis = apiMappings.value
+			val hasScala = srcs.exists(_.name.endsWith(".scala"))
+			val hasJava = srcs.exists(_.name.endsWith(".java"))
+			val cp = data(dependencyClasspath.value).toList
+			val label = nameForSrc(configuration.value.name)
+			val (options, runDoc) =
+				if(hasScala)
+					(sOpts ++ Opts.doc.externalAPI(xapis), // can't put the .value calls directly here until 2.10.2
+						Doc.scaladoc(label, s.cacheDirectory / "scala", cs.scalac.onArgs(exported(s, "scaladoc"))))
+				else if(hasJava)
+					(jOpts,
+						Doc.javadoc(label, s.cacheDirectory / "java", cs.javac.onArgs(exported(s, "javadoc"))))
+				else
+					(Nil, RawCompileLike.nop)
+			runDoc(srcs, cp, out, options, maxErrors.value, s.log)
+			out
+		}
+	))
 
   // lazy val core = Project("core", file("core"), settings = buildSettings).settings(
   //   libraryDependencies ++= Seq(compiler, scalaz, sbinary)

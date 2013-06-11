@@ -13,8 +13,6 @@ package object scalex
 
   type File = java.io.File
 
-  def badArg(msg: String) = new IllegalArgumentException(msg)
-
   implicit final class ScalexPimpAny[A](any: A) {
 
     def asTry(cond: Boolean, error: ⇒ Exception): Try[A] =
@@ -26,4 +24,14 @@ package object scalex
     def asTry(error: ⇒ Exception): Try[A] =
       oa.fold[Try[A]](Failure(error))(Success(_))
   }
+
+  implicit final class ScalexPimpTry[A](ta: Try[A]) {
+
+    def failureEffect(f: PartialFunction[Throwable, Unit]): Try[A] = {
+      ta recover f
+      ta
+    }
+  }
+
+  def badArg(msg: String) = new IllegalArgumentException(msg)
 }
