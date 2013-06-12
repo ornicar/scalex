@@ -35,7 +35,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     libraryDependencies ++= Seq(compiler, scalaz, scalazContrib, sbinary, scopt)
   )
 
-  def scalexTaskKey = TaskKey[File]("scalex", "Generates scalex database.") 
+  def scalexTaskKey = TaskKey[File]("s", "Generates scalex database.") 
 
 	import java.io.{File, PrintWriter}
   def scalexTask = scalexTaskKey <<= (
@@ -55,20 +55,21 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     val cp = Attributed.data(depCP).toList
     val label = Defaults.nameForSrc(config.name)
     val (options, runDoc) =
-      if(hasScala)
+      // if(hasScala)
         (sOpts ++ Opts.doc.externalAPI(xapis), // can't put the .value calls directly here until 2.10.2
           Doc.scaladoc(label, s.cacheDirectory / "scala", cs.scalac.onArgs(exported(s, "scaladoc"))))
-      else if(hasJava)
-        (jOpts,
-          Doc.javadoc(label, s.cacheDirectory / "java", cs.javac.onArgs(exported(s, "javadoc"))))
-      else
-        (Nil, RawCompileLike.nop)
+      // else if(hasJava)
+      //   (jOpts,
+      //     Doc.javadoc(label, s.cacheDirectory / "java", cs.javac.onArgs(exported(s, "javadoc"))))
+      // else
+        // (Nil, RawCompileLike.nop)
     runDoc(srcs, cp, out, options, maxE, s.log)
     out
   }
 
-	private[this] def exported(w: PrintWriter, command: String): Seq[String] => Unit = args =>
-		w.println( (command +: args).mkString(" ") )
+  private[this] def exported(w: PrintWriter, command: String): Seq[String] => Unit = args => 
+    w.println( (command +: args).mkString(" ") )
+
 	private[this] def exported(s: TaskStreams, command: String): Seq[String] => Unit = args =>
 		exported(s.text("export"), command)
 }
