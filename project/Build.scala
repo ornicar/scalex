@@ -38,66 +38,37 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
   def scalexTaskKey = TaskKey[File]("scalex", "Generates scalex database.") 
 
 	import java.io.{File, PrintWriter}
-  def scalexTask = scalexTaskKey in Compile <<= (configuration in Compile, dependencyClasspath in Compile) map {
-    (config, depCP) =>
-    // val s = streams.value
-    // val cs = compilers.value
-    // val srcs = sources.value
-    // val out = target.value
-    // val sOpts = scalacOptions.value
-    // val jOpts = javacOptions.value
-    // val xapis = apiMappings.value
-    // val hasScala = srcs.exists(_.name.endsWith(".scala"))
-    // val hasJava = srcs.exists(_.name.endsWith(".java"))
+  def scalexTask = scalexTaskKey <<= (
+    configuration in Compile, 
+    dependencyClasspath in Compile,
+    streams in Compile,
+    compilers in Compile,
+    sources in Compile,
+    target in Compile,
+    scalacOptions in Compile,
+    javacOptions in Compile,
+    apiMappings in Compile,
+    maxErrors in Compile) map {
+    (config, depCP, s, cs, srcs, out, sOpts, jOpts, xapis, maxE) =>
+    val hasScala = srcs.exists(_.name.endsWith(".scala"))
+    val hasJava = srcs.exists(_.name.endsWith(".java"))
     val cp = Attributed.data(depCP).toList
     val label = Defaults.nameForSrc(config.name)
-    // val (options, runDoc) =
-    //   if(hasScala)
-    //     (sOpts ++ Opts.doc.externalAPI(xapis), // can't put the .value calls directly here until 2.10.2
-    //       Doc.scaladoc(label, s.cacheDirectory / "scala", cs.scalac.onArgs(exported(s, "scaladoc"))))
-    //   else if(hasJava)
-    //     (jOpts,
-    //       Doc.javadoc(label, s.cacheDirectory / "java", cs.javac.onArgs(exported(s, "javadoc"))))
-    //   else
-    //     (Nil, RawCompileLike.nop)
-    // runDoc(srcs, cp, out, options, maxErrors.value, s.log)
-    // out
-    new File(".")
+    val (options, runDoc) =
+      if(hasScala)
+        (sOpts ++ Opts.doc.externalAPI(xapis), // can't put the .value calls directly here until 2.10.2
+          Doc.scaladoc(label, s.cacheDirectory / "scala", cs.scalac.onArgs(exported(s, "scaladoc"))))
+      else if(hasJava)
+        (jOpts,
+          Doc.javadoc(label, s.cacheDirectory / "java", cs.javac.onArgs(exported(s, "javadoc"))))
+      else
+        (Nil, RawCompileLike.nop)
+    runDoc(srcs, cp, out, options, maxE, s.log)
+    out
   }
-
-	// def scalexTaskSettings(key: TaskKey[File] = scalexTask): Seq[Setting[_]] = inTask(key)(Seq(
-	// 	key in Defaults.TaskGlobal := {
-	// 		val s = streams.value
-	// 		val cs = compilers.value
-	// 		val srcs = sources.value
-	// 		val out = target.value
-	// 		val sOpts = scalacOptions.value
-	// 		val jOpts = javacOptions.value
-	// 		val xapis = apiMappings.value
-	// 		val hasScala = srcs.exists(_.name.endsWith(".scala"))
-	// 		val hasJava = srcs.exists(_.name.endsWith(".java"))
-	// 		val cp = Attributed.data(dependencyClasspath.value).toList
-	// 		val label = Defaults.nameForSrc(configuration.value.name)
-	// 		val (options, runDoc) =
-	// 			if(hasScala)
-	// 				(sOpts ++ Opts.doc.externalAPI(xapis), // can't put the .value calls directly here until 2.10.2
-	// 					Doc.scaladoc(label, s.cacheDirectory / "scala", cs.scalac.onArgs(exported(s, "scaladoc"))))
-	// 			else if(hasJava)
-	// 				(jOpts,
-	// 					Doc.javadoc(label, s.cacheDirectory / "java", cs.javac.onArgs(exported(s, "javadoc"))))
-	// 			else
-	// 				(Nil, RawCompileLike.nop)
-	// 		runDoc(srcs, cp, out, options, maxErrors.value, s.log)
-	// 		out
-	// 	}
-	// ))
 
 	private[this] def exported(w: PrintWriter, command: String): Seq[String] => Unit = args =>
 		w.println( (command +: args).mkString(" ") )
 	private[this] def exported(s: TaskStreams, command: String): Seq[String] => Unit = args =>
 		exported(s.text("export"), command)
-
-  // lazy val core = Project("core", file("core"), settings = buildSettings).settings(
-  //   libraryDependencies ++= Seq(compiler, scalaz, sbinary)
-  // )
 }
