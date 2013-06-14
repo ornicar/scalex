@@ -11,7 +11,7 @@ case class ImplicitConversion(
   targetType: TypeEntity,
 
   /** The components of the implicit conversion type parents */
-  targetTypeComponents: List[(Template, TypeEntity)],
+  targetTypeComponents: List[TemplateAndType],
 
   /** The entity for the method that performed the conversion, if it's documented (or just its name, otherwise) */
   convertorMethod: Either[Member, String],

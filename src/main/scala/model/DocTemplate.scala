@@ -10,11 +10,11 @@ case class DocTemplate(
 
   /** The source file in which the current template is defined and the line where the definition starts, if they exist.
     * A source file exists for all templates, except for those that are generated synthetically by Scaladoc. */
-  inSource: Option[(String, Int)],
+  // inSource: Option[(String, Int)],
 
   /** An HTTP address at which the source of this template is available, if it is available. An address is available
     * only if the `docsourceurl` setting has been set. */
-  sourceUrl: Option[java.net.URL],
+  sourceUrl: Option[String],
 
   /** All class, trait and object templates which are part of this template's linearization, in lineratization order.
     * This template's linearization contains all of its direct and indirect super-classes and super-traits. */

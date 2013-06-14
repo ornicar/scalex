@@ -22,10 +22,8 @@ object Universer {
 
     def docTemplate(o: nsc.DocTemplateEntity): DocTemplate = DocTemplate(
       memberTemplate = memberTemplate(o),
-      inSource = o.inSource map {
-        case (file, line) ⇒ (file.path, line)
-      },
-      sourceUrl = o.sourceUrl,
+      // inSource = o.inSource map { case (file, line) ⇒ (file.path, line) },
+      sourceUrl = o.sourceUrl map (_.toString),
       members = o.members map member,
       templates = o.templates collect {
         case t: nsc.DocTemplateEntity ⇒ docTemplate(t)
@@ -36,7 +34,7 @@ object Universer {
       higherKinded = higherKinded(o),
       valueParams = o.valueParams map (_ map valueParam),
       parentTypes = o.parentTypes map {
-        case (tpl, typ) ⇒ (template(tpl), typeEntity(typ))
+        case (tpl, typ) ⇒ TemplateAndType(template(tpl), typeEntity(typ))
       })
 
     def template(o: nsc.TemplateEntity) = Template(
@@ -52,12 +50,12 @@ object Universer {
 
     def member(o: nsc.MemberEntity): Member = Member(
       entity = entity(o),
-      comment = o.comment map comment,
+      // comment = o.comment map comment,
       flags = o.flags collect {
         case nscComment.Paragraph(nscComment.Text(flag)) ⇒ flag
       },
-      deprecation = o.deprecation,
-      migration = o.migration,
+      deprecation = o.deprecation.isDefined,
+      migration = o.migration.isDefined,
       resultType = typeEntity(o.resultType),
       isDef = o.isDef,
       isVal = o.isVal,
@@ -81,9 +79,7 @@ object Universer {
       qualifiedName = o.qualifiedName,
       kind = o.kind)
 
-    def typeEntity(o: nsc.TypeEntity) = TypeEntity(
-      name = o.name,
-      refEntity = o.refEntity)
+    def typeEntity(o: nsc.TypeEntity) = o.name
 
     def comment(o: nscComment.Comment) = Comment(body = o.body)
 
@@ -91,7 +87,7 @@ object Universer {
       source = docTemplate(o.source),
       targetType = typeEntity(o.targetType),
       targetTypeComponents = o.targetTypeComponents map {
-        case (tpl, typ) ⇒ (template(tpl), typeEntity(typ))
+        case (tpl, typ) ⇒ TemplateAndType(template(tpl), typeEntity(typ))
       },
       convertorMethod = o.convertorMethod.left map member,
       conversionShortName = o.conversionShortName,

@@ -26,5 +26,5 @@ case class MemberTemplate(
    * e.g: {{{class A extends B[C[Int]] with D[E]}}} will have two direct parents: class B and D
    * NOTE: we are dropping the refinement here!
    */
-  parentTypes: List[(Template, TypeEntity)]
+  parentTypes: List[TemplateAndType]
 ) 

@@ -10,7 +10,7 @@ case class ValueParam(
   resultType: TypeEntity,
 
   /** The devault value of this value parameter, if it has been defined. */
-  defaultValue: Option[String],
+  defaultValue: Option[Expression],
 
   /** Whether this value parameter is implicit. */
   isImplicit: Boolean)

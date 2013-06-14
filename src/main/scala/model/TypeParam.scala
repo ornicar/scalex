@@ -10,7 +10,7 @@ case class TypeParam(
   higherKinded: HigherKinded,
 
   /** The variance of this type parameter. Valid values are "+", "-", and the empty string. */
-  variance: String,
+  variance: Variance,
 
   /** The lower bound for this type parameter, if it has been defined. */
   lo: Option[TypeEntity],

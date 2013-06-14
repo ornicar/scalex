@@ -1,7 +1,7 @@
 package ornicar.scalex
 package model
 
-import scala.tools.nsc.doc.base.comment.Body
+// import scala.tools.nsc.doc.base.comment.Body
 
 /**
  * An entity that is a member of a template. All entities, including templates, are member of another entity
@@ -14,7 +14,7 @@ case class Member(
   entity: Entity,
 
   /** The comment attached to this member, if any. */
-  comment: Option[Comment],
+  // comment: Option[Comment],
 
   /** The group this member is from */
   // def group: String
@@ -23,13 +23,13 @@ case class Member(
    * The flags that have been set for this entity. The following flags are supported: `implicit`, `sealed`, `abstract`,
    * and `final`.
    */
-  flags: List[String],
+  flags: List[Flag],
 
   /** Some deprecation message if this member is deprecated, or none otherwise. */
-  deprecation: Option[Body],
+  deprecation: Boolean,
 
   /** Some migration warning if this member has a migration annotation, or none otherwise. */
-  migration: Option[Body],
+  migration: Boolean,
 
   /**
    * For members representing values: the type of the value returned by this member; for members
