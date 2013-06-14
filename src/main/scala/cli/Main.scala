@@ -1,4 +1,4 @@
-package scalex
+package ornicar.scalex
 package cli
 
 import scala.tools.nsc
@@ -26,7 +26,8 @@ object Main {
 
   private def process(args: Array[String]): Try[Unit] =
     Parser.parse(args) asTry badArg(args mkString " ") flatMap {
-      case Config(Some(indexConfig), _) ⇒ index Indexer indexConfig
+      // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
+      case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
       case c                            ⇒ Failure(badArg(c.toString))
     }
 }

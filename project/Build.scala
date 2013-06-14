@@ -1,4 +1,5 @@
 import sbt._, Keys._
+// import ornicar.scalex_sbt.ScalexSbtPlugin
 
 trait Resolvers {
   val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
@@ -22,6 +23,7 @@ trait Dependencies {
 object ScalexBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Defaults.defaultSettings ++ Seq(
+    offline := true,
     organization := "com.github.ornicar",
     version := "3.0",
     scalaVersion := "2.11.0-M3",
@@ -29,47 +31,9 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     // libraryDependencies in test := Seq(specs2),
     resolvers := Seq(typesafe, typesafeS, iliaz, sonatype, sonatypeS, sonatypeP),
     scalacOptions := Seq("-deprecation", "-unchecked", "-feature", "-language:_")
-  ) ++ Seq(scalexTask)
+  ) //++ ScalexSbtPlugin.defaultSettings
 
   lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
     libraryDependencies ++= Seq(compiler, scalaz, scalazContrib, sbinary, scopt)
   )
-
-  def scalexTaskKey = TaskKey[File]("s", "Generates scalex database.") 
-
-	import java.io.{File, PrintWriter}
-  def scalexTask = scalexTaskKey <<= (
-    configuration in Compile, 
-    dependencyClasspath in Compile,
-    streams in Compile,
-    compilers in Compile,
-    sources in Compile,
-    target in Compile,
-    scalacOptions in Compile,
-    javacOptions in Compile,
-    apiMappings in Compile,
-    maxErrors in Compile) map {
-    (config, depCP, s, cs, srcs, out, sOpts, jOpts, xapis, maxE) =>
-    val hasScala = srcs.exists(_.name.endsWith(".scala"))
-    val hasJava = srcs.exists(_.name.endsWith(".java"))
-    val cp = Attributed.data(depCP).toList
-    val label = Defaults.nameForSrc(config.name)
-    val (options, runDoc) =
-      // if(hasScala)
-        (sOpts ++ Opts.doc.externalAPI(xapis), // can't put the .value calls directly here until 2.10.2
-          Doc.scaladoc(label, s.cacheDirectory / "scala", cs.scalac.onArgs(exported(s, "scaladoc"))))
-      // else if(hasJava)
-      //   (jOpts,
-      //     Doc.javadoc(label, s.cacheDirectory / "java", cs.javac.onArgs(exported(s, "javadoc"))))
-      // else
-        // (Nil, RawCompileLike.nop)
-    runDoc(srcs, cp, out, options, maxE, s.log)
-    out
-  }
-
-  private[this] def exported(w: PrintWriter, command: String): Seq[String] => Unit = args => 
-    w.println( (command +: args).mkString(" ") )
-
-	private[this] def exported(s: TaskStreams, command: String): Seq[String] => Unit = args =>
-		exported(s.text("export"), command)
 }

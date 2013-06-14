@@ -1,4 +1,4 @@
-package scalex
+package ornicar.scalex
 package cli
 
 import api.{ Index, Search }
