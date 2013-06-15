@@ -28,7 +28,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     offline := true,
     organization := "com.github.ornicar",
     version := "3.0",
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.11.0-M3",
     libraryDependencies := Seq(config, scalalib),
     // libraryDependencies in test := Seq(specs2),
     resolvers := Seq(typesafe, typesafeS, iliaz, sonatype, sonatypeS, sonatypeP, mandubianS),
