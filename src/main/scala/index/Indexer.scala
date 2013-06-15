@@ -30,6 +30,12 @@ object Indexer {
     val command = new ScalaDoc.Command(args.toList, docSettings)
     def hasFiles = command.files.nonEmpty || docSettings.uncompilableFiles.nonEmpty
 
+    val destination = if (docSettings.d.isDefault || docSettings.d.value == ".") {
+      val default = "database.scalex"
+      reporter.warning(null, "No destination set (-d), will output to " + default)
+      default
+    }
+    else docSettings.d.value
     if (docSettings.version.value)
       reporter.echo(versionMsg)
     else if (docSettings.Xhelp.value)
@@ -42,22 +48,22 @@ object Indexer {
       reporter.warning(null, "Phases are restricted when using Scalex")
     else if (docSettings.help.value || !hasFiles)
       reporter.echo(command.usageMsg)
-    else
-      try {
-        val factory = new doc.DocFactory(reporter, docSettings)
-        factory makeUniverse Left(command.files) map { universe ⇒
-          val database = Universer(universe)
-          println(database.describe)
-        } getOrElse {
-          reporter.error(null, "No universe found")
-        }
+    else try {
+      val factory = new doc.DocFactory(reporter, docSettings)
+      factory makeUniverse Left(command.files) map { universe ⇒
+        val database = Universer(universe)
+        Storage.write(destination, database)
+        reporter.echo("Scalex database saved to " + destination)
+      } getOrElse {
+        reporter.error(null, "No universe found")
       }
-      catch {
-        case ex @ FatalError(msg) ⇒
-          if (docSettings.debug.value) ex.printStackTrace()
-          reporter.error(null, "fatal error: " + msg)
-      }
-      finally reporter.printSummary()
+    }
+    catch {
+      case ex @ FatalError(msg) ⇒
+        if (docSettings.debug.value) ex.printStackTrace()
+        reporter.error(null, "fatal error: " + msg)
+    }
+    finally reporter.printSummary()
 
     // not much point in returning !reporter.hasErrors when it has
     // been overridden with constant false.
