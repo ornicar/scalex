@@ -91,5 +91,5 @@ case class DocTemplate(
 
   def qualifiedName = template.entity.qualifiedName
 
-  // override def toString = qualifiedName
+  override def toString = qualifiedName
 }

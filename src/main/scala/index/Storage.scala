@@ -1,29 +1,41 @@
 package ornicar.scalex
 package index
 
-import play.api.libs.json._
 import java.io._
+import java.io.{ FileOutputStream, ObjectOutputStream }
 
 import model._
 
-object IndexRepo {
+object Storage {
 
   // def toJson(db: Database): JsValue = Format.database writes db
 
-  // def read(file: File): Database = { fromFile[Database](file) }
+  def read(fileName: String): Database = {
+    val fileIn = new FileInputStream(fileName)
+    val in = new ObjectInputStream(fileIn) {
+      override def resolveClass(desc: java.io.ObjectStreamClass): Class[_] = {
+        try { Class.forName(desc.getName, false, getClass.getClassLoader) }
+        catch { case ex: ClassNotFoundException ⇒ super.resolveClass(desc) }
+      }
+    }
+    try {
+      in.readObject().asInstanceOf[Database]
+    }
+    finally {
+      in.close()
+      fileIn.close()
+    }
+  }
 
-  private object Format {
-
-    // def database = Json.format[Database]
-
-    implicit def memberTemplate = Json.format[MemberTemplate]
-    implicit def docTemplate = Json.format[DocTemplate]
-    implicit def template = Json.format[Template]
-    implicit def higherKinded = Json.format[HigherKinded]
-    implicit def templateAndType = Json.format[TemplateAndType]
-    implicit def entity = Json.format[Entity]
-    implicit def valueParam = Json.format[ValueParam]
-    implicit def member = Json.format[Member]
-    implicit def implicitConversion = Json.format[ImplicitConversion]
+  def write(fileName: String, db: Database) {
+    val fileOut = new FileOutputStream(fileName)
+    val out = new ObjectOutputStream(fileOut)
+    try {
+      out.writeObject(db)
+    }
+    finally {
+      out.close()
+      fileOut.close()
+    }
   }
 }
