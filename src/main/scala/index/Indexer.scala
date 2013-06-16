@@ -20,36 +20,38 @@ object Indexer {
 
   private def process(args: List[String]): Boolean = {
     var reporter: reporters.ConsoleReporter = null
-    val docSettings = new doc.Settings(msg ⇒ reporter.error(FakePos("scalex"), msg + "\n  scalex index -help  gives more information"),
-      msg ⇒ reporter.printMessage(msg))
-    reporter = new reporters.ConsoleReporter(docSettings) {
+    val settings = new Settings(
+      msg ⇒ reporter.error(FakePos("scalex"), 
+      msg + "\n  scalex index -help  gives more information"),
+      reporter.printMessage)
+    reporter = new reporters.ConsoleReporter(settings) {
       // need to do this so that the Global instance doesn't trash all the
       // symbols just because there was an error
       override def hasErrors = false
     }
-    val command = new ScalaDoc.Command(args.toList, docSettings)
-    def hasFiles = command.files.nonEmpty || docSettings.uncompilableFiles.nonEmpty
+    val command = new Command(args.toList, settings)
+    def hasFiles = command.files.nonEmpty 
 
-    val destination = if (docSettings.d.isDefault || docSettings.d.value == ".") {
+    val destination = if (settings.d.isDefault || settings.d.value == ".") {
       val default = "database.scalex"
       reporter.warning(null, "No destination set (-d), will output to " + default)
       default
     }
-    else docSettings.d.value
-    if (docSettings.version.value)
+    else settings.d.value
+    if (settings.version.value)
       reporter.echo(versionMsg)
-    else if (docSettings.Xhelp.value)
+    else if (settings.Xhelp.value)
       reporter.echo(command.xusageMsg)
-    else if (docSettings.Yhelp.value)
+    else if (settings.Yhelp.value)
       reporter.echo(command.yusageMsg)
-    else if (docSettings.showPlugins.value)
+    else if (settings.showPlugins.value)
       reporter.warning(null, "Plugins are not available when using Scalex")
-    else if (docSettings.showPhases.value)
+    else if (settings.showPhases.value)
       reporter.warning(null, "Phases are restricted when using Scalex")
-    else if (docSettings.help.value || !hasFiles)
+    else if (settings.help.value || !hasFiles)
       reporter.echo(command.usageMsg)
     else try {
-      val factory = new doc.DocFactory(reporter, docSettings)
+      val factory = new doc.DocFactory(reporter, settings)
       factory makeUniverse Left(command.files) map { universe ⇒
         val database = Universer(universe)
         Storage.write(destination, database)
@@ -60,7 +62,7 @@ object Indexer {
     }
     catch {
       case ex @ FatalError(msg) ⇒
-        if (docSettings.debug.value) ex.printStackTrace()
+        if (settings.debug.value) ex.printStackTrace()
         reporter.error(null, "fatal error: " + msg)
     }
     finally reporter.printSummary()

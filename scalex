@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+sbt013 run "$@"

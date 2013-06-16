@@ -11,4 +11,15 @@ import java.io.File
 class Settings(
     error: String ⇒ Unit,
     val printMsg: String ⇒ Unit = println(_)) extends scala.tools.nsc.Settings(error) {
+
+  val outputFile = PathSetting (
+    "-output-file",
+    "The file in which the binary database will be stored.",
+    ""
+  )
+
+  // For improved help output.
+  def scalexSpecific = Set[Settings#Setting](outputFile)
+
+  val isScalexSpecific: String => Boolean = scalexSpecific map (_.name)
 }
