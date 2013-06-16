@@ -25,6 +25,8 @@ package object scalex
 
     def asTry(error: ⇒ Exception): Try[A] =
       oa.fold[Try[A]](Failure(error))(Success(_))
+
+    def ??[B: scalaz.Monoid](f: A ⇒ B): B = oa.fold(∅[B])(f)
   }
 
   implicit final class ScalexPimpTry[A](ta: Try[A]) {

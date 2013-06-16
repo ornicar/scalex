@@ -10,6 +10,12 @@ private[index] final class Settings(
     error: String ⇒ Unit,
     pmsg: String ⇒ Unit = println(_)) extends scala.tools.nsc.doc.Settings(error, pmsg) {
 
+  val inputDir = PathSetting(
+    "-input-dir",
+    "A directory in which all scala files will be indexed.",
+    ""
+  )
+
   val outputFile = PathSetting(
     "-output-file",
     "The file in which the binary database will be stored.",
