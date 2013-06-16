@@ -18,6 +18,7 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = sys exit {
+    println(args.toList)
     (process(args) failureEffect {
       case e: IllegalArgumentException ⇒ println("! %s: %s".format("Illegal argument", e.getMessage))
       case e                           ⇒ println("! " + e)
