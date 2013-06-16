@@ -29,7 +29,7 @@ private[scalex] object Indexer {
 
     val outputFile = if (settings.outputFile.isDefault || settings.outputFile.value == ".") {
       val default = "database.scalex"
-      reporter.warning(null, "No destination set (--output-file), will output to " + default)
+      reporter.warning(null, "No destination set (-output-file), will output to " + default)
       default
     }
     else settings.outputFile.value

@@ -13,10 +13,12 @@ object Main {
     }).isSuccess.fold(0, 1)
   }
 
-  private def process(args: Array[String]): Try[Unit] =
-    Parser.parse(args) asTry badArg(args mkString " ") flatMap {
+  private def process(args: Array[String]): Try[Unit] = args.toList match {
+    case "index" :: rest ⇒ Success(index Indexer api.Index(rest))
+    case _ ⇒ Parser.parse(args) asTry badArg(args mkString " ") flatMap {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
-      case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
-      case c                            ⇒ Failure(badArg(c.toString))
+      // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
+      case c ⇒ Failure(badArg(c.toString))
     }
+  }
 }
