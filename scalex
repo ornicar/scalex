@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-sbt013 run "$@"
+args=$@
+cd `dirname $0`
+sbt013 "run $args"
