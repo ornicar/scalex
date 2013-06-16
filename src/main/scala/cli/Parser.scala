@@ -1,7 +1,7 @@
 package ornicar.scalex
 package cli
 
-object Parser {
+private[cli] object Parser {
 
   def parse(args: Array[String]) = (new scopt.OptionParser[Config]("scalex") {
     head("scalex", "3.0")

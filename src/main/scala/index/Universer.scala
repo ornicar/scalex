@@ -7,7 +7,7 @@ import scala.tools.nsc.doc.{ model ⇒ nsc }
 
 import model._
 
-object Universer {
+private[index] object Universer {
 
   def apply(universe: Universe): Database = new Database(
     extractEntities(universe.rootPackage).distinct map Mapper.docTemplate

@@ -3,7 +3,9 @@ package index
 
 import scala.tools.nsc.CompilerCommand
 
-class Command(arguments: List[String], settings: Settings) extends CompilerCommand(arguments, settings) {
+private[index] final class Command(
+  arguments: List[String], 
+  settings: Settings) extends CompilerCommand(arguments, settings) {
   override def cmdName = "scalex"
   override def usageMsg = (
     createUsageMsg("where possible scalex", shouldExplain = false, x ⇒ x.isStandard && settings.isScalexSpecific(x.name)) +

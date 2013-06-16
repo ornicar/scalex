@@ -8,8 +8,6 @@ import model._
 
 object Storage {
 
-  // def toJson(db: Database): JsValue = Format.database writes db
-
   def read(fileName: String): Database = {
     val fileIn = new FileInputStream(fileName)
     val in = new ObjectInputStream(fileIn) {

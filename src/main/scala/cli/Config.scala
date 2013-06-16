@@ -3,7 +3,7 @@ package cli
 
 import api.{ Index, Search }
 
-case class Config(
+private[cli] case class Config(
     index: Option[Index] = none,
     search: Option[Search] = none) {
 

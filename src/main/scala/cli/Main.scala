@@ -6,19 +6,7 @@ import scala.util.{ Try, Success, Failure }
 
 object Main {
 
-  final class Command(
-      args: List[String],
-      settings: nsc.doc.Settings) extends nsc.CompilerCommand(args, settings) {
-    override def cmdName = "scalex"
-    override def usageMsg = (
-      createUsageMsg("where possible scalex", shouldExplain = false, x ⇒ x.isStandard && settings.isScaladocSpecific(x.name)) +
-      "\n\nStandard scalac options also available:" +
-      createUsageMsg(x ⇒ x.isStandard && !settings.isScaladocSpecific(x.name))
-    )
-  }
-
   def main(args: Array[String]): Unit = sys exit {
-    println(args.toList)
     (process(args) failureEffect {
       case e: IllegalArgumentException ⇒ println("! %s: %s".format("Illegal argument", e.getMessage))
       case e                           ⇒ println("! " + e)
