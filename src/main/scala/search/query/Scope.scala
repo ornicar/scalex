@@ -10,10 +10,9 @@ private[search] case class Scope(
 
   def -(name: ProjectName) = copy(exclude = exclude + name)
 
-  def apply(names: Seq[ProjectName]): Option[ProjectName] =
-    names sortBy (-_.size) find { name ⇒
-      !exclude(name) && (include.isEmpty || include(name))
-    }
+  def apply(names: Seq[ProjectName]): Seq[ProjectName] = names filter apply
+
+  def apply(name: ProjectName): Boolean = !exclude(name) && (include.isEmpty || include(name))
 
   override def toString =
     (include map ("+" + _)) ++ (exclude map ("-" + _)) mkString " "

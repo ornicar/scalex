@@ -1,4 +1,4 @@
 package ornicar.scalex
 package search
 
-case class Result(entity: model.Entity)
+case class Result(doc: Any)

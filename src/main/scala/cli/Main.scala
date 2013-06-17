@@ -36,8 +36,8 @@ object Main {
             case Success(res) ⇒ Future.successful(renderResult(res))
           }
         }
+      case c ⇒ Future.failed(badArg(c.toString))
     }
-    case c ⇒ Future.failed(badArg(c.toString))
   }
 
   private def renderResult(results: List[search.Result]) {

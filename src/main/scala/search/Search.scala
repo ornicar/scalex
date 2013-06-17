@@ -8,12 +8,16 @@ import scala.util.{ Try, Success, Failure }
 
 final class Search(database: Database) {
 
-  def apply(expression: String): Try[Results] = 
+  def apply(expression: String): Try[Results] =
     apply(query.Raw(expression, 1, 10))
 
-  def apply(raw: query.Raw): Try[Results] = for {
-    query ← raw.analyze
-  } yield Nil
+  def apply(raw: query.Raw): Try[Results] = raw.analyze map {
+    case query.ScopedQuery(q, scope) ⇒ database.projects filter {
+      project ⇒ scope(project.name)
+    } flatMap (_.templates) map {
+      entity ⇒ Result(entity)
+    }
+  }
 }
 
 object Search {
