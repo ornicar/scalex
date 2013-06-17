@@ -25,7 +25,7 @@ private[index] final class Mapper {
       aliasTypes = filter(o.aliasTypes) map aliasType,
       primaryConstructor = o.primaryConstructor map constructor,
       constructors = filter(o.constructors) map constructor,
-      companion = o.companion map docTemplate,
+      companion = filter(o.companion) map docTemplate,
       conversions = o.conversions map implicitConversion,
       outgoingImplicitlyConvertedClasses = o.outgoingImplicitlyConvertedClasses map {
         case (tpl, typ, imp) ⇒ (template(tpl), typeEntity(typ), implicitConversion(imp))
@@ -138,8 +138,9 @@ private[index] final class Mapper {
     defaultValue = o.defaultValue map (_.expression),
     isImplicit = o.isImplicit)
 
-  def filter[A <: nsc.Entity](entities: List[A]): List[A] = entities filter {
-    case t: nsc.DocTemplateEntity ⇒ !seen(t)
-    case _                        ⇒ true
-  }
+  def filter[M[_]: scalaz.MonadPlus, A <: nsc.Entity](entities: M[A]): M[A] =
+    implicitly[scalaz.MonadPlus[M]].filter(entities) {
+      case t: nsc.DocTemplateEntity ⇒ !seen(t)
+      case _                        ⇒ true
+    }
 }
