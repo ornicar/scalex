@@ -6,6 +6,8 @@ import model._
 import scala.util.{ Try, Success, Failure }
 
 final class Search(database: Database) {
+
+  def apply(expression: String): Result = Result(Nil)
 }
 
 object Search {

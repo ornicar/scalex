@@ -1,6 +1,7 @@
 package ornicar.scalex
 package cli
 
+import com.typesafe.config.ConfigFactory
 import scala.tools.nsc
 import scala.util.{ Try, Success, Failure }
 
@@ -18,6 +19,10 @@ object Main {
     case _ ⇒ Parser.parse(args) asTry badArg(args mkString " ") flatMap {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
+      case Config(None, Some(searchConfig)) ⇒
+        search.Search(ConfigFactory.load) map { searcher ⇒
+          searcher(searchConfig.expression)
+        }
       case c ⇒ Failure(badArg(c.toString))
     }
   }
