@@ -21,6 +21,13 @@ object Search {
       new Search(Database merge dbs)
     }
 
-  private def configDbFiles(config: Config): List[String] =
-    (config getStringList "scalex.databases").toList
+  private def configDbFiles(config: Config): List[File] =
+    (config getStringList "scalex.databases").toList map {
+      new File(_)
+      } flatMap { file ⇒
+      if (file.isDirectory) file.listFiles filter isDbFile
+      else List(file)
+    }
+
+  private def isDbFile(file: File) = file.getName endsWith ".scalex"
 }
