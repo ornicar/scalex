@@ -16,10 +16,14 @@ object Search {
   import scala.collection.JavaConversions._
   import index.Storage
 
-  def apply(config: Config): Try[Search] =
-    (configDbFiles(config) map Storage.read).sequence map { dbs ⇒
-      new Search(Database merge dbs)
+  def apply(config: Config): Try[Search] = {
+    val files = configDbFiles(config)
+    (files map Storage.read).sequence map { dbs ⇒
+      val db = Database merge dbs
+      println("Search in %d projects from %d files".format(db.projects.size, files.size))
+      new Search(db)
     }
+  }
 
   private def configDbFiles(config: Config): List[File] =
     (config getStringList "scalex.databases").toList map {
