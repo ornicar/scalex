@@ -12,28 +12,24 @@ private[index] object Universer {
   def apply(universe: Universe): Database = new Database(entitiesOf(universe))
 
   private def entitiesOf(universe: Universe): List[DocTemplate] = {
+    new Mapper().docTemplate(universe.rootPackage).templates
+  }
+
+  private final class Mapper {
 
     var seen = scala.collection.mutable.Set[nsc.DocTemplateEntity]()
 
-    def extractEntities(tpl: nsc.DocTemplateEntity): List[nsc.DocTemplateEntity] = {
-      seen += tpl
-      tpl :: (tpl.templates collect {
-        case t: nsc.DocTemplateEntity if (!seen(t)) ⇒ t
-      } flatMap extractEntities)
-    }
-    extractEntities(universe.rootPackage).toList map Mapper.docTemplate
-  }
-
-  private object Mapper {
-
-    def docTemplate(o: nsc.DocTemplateEntity): DocTemplate = DocTemplate(
+    def docTemplate(o: nsc.DocTemplateEntity): DocTemplate = {
+      seen += o
+      DocTemplate(
       memberTemplate = memberTemplate(o),
       // inSource = o.inSource map { case (file, line) ⇒ (file.path, line) },
       sourceUrl = o.sourceUrl map (_.toString),
       members = o.members map member,
       templates = o.templates collect {
-        case t: nsc.DocTemplateEntity ⇒ docTemplate(t)
+        case t: nsc.DocTemplateEntity if (!seen(t)) ⇒ docTemplate(t)
       })
+    }
 
     def memberTemplate(o: nsc.MemberTemplateEntity) = MemberTemplate(
       template = template(o),
