@@ -8,7 +8,12 @@ import scala.util.{ Try, Success, Failure }
 
 final class Search(database: Database) {
 
-  def apply(expression: String): Result = Result(Nil)
+  def apply(expression: String): Try[Results] = 
+    apply(query.Raw(expression, 1, 10))
+
+  def apply(raw: query.Raw): Try[Results] = for {
+    query ← raw.analyze
+  } yield Nil
 }
 
 object Search {
