@@ -11,4 +11,4 @@ case class NameQuery(tokens: NonEmptyList[String]) extends Query {
   override def toString = tokens.list mkString " and "
 }
 
-case class ScopedQuery(query: Query, scope: QueryScope)
+case class ScopedQuery(query: Query, scope: Scope)

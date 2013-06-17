@@ -4,7 +4,7 @@ package object search {
 
   type Token = String
 
-  type Scope = Set[Token]
+  type ProjectName = String
 
   type Score = Int
 

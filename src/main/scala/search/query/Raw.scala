@@ -21,7 +21,7 @@ private[search] case class Raw(
   private def scopeQuery(text: String) = Success {
     if ((text contains "-") || (text contains "+")) {
       val words = text split ' ' toList
-      val parsed = words.foldLeft((List[String](), QueryScope())) {
+      val parsed = words.foldLeft((List[String](), Scope())) {
         case ((ws, scope), RawQuery.scoper(sign, pack)) ⇒ sign match {
           case "-" ⇒ (ws, scope - pack)
           case "+" ⇒ (ws, scope + pack)
@@ -31,7 +31,7 @@ private[search] case class Raw(
       }
       (parsed._1.reverse mkString " ", parsed._2)
     }
-    else (text, QueryScope())
+    else (text, Scope())
   }
 
   private def nameQuery(text: String) =

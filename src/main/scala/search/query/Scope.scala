@@ -2,23 +2,19 @@ package ornicar.scalex
 package search
 package query
 
-private[search] case class QueryScope(
-    only: Set[String] = Set.empty,
-    without: Set[String] = Set.empty) {
+private[search] case class Scope(
+    include: Set[ProjectName] = Set.empty,
+    exclude: Set[ProjectName] = Set.empty) {
 
-  def +(pack: String) = copy(only = only + pack)
+  def +(name: ProjectName) = copy(include = include + name)
 
-  def -(pack: String) = copy(without = without + pack)
+  def -(name: ProjectName) = copy(exclude = exclude + name)
 
-  def matchScope(scopes: Seq[Scope]): Option[Scope] =
-    scopes sortBy (-_.size) find { scope ⇒
-      {
-        if (only.isEmpty) true else scope forall only.contains
-      } && {
-        if (without.isEmpty) true else scope forall (s ⇒ !(without contains s))
-      }
+  def apply(names: Seq[ProjectName]): Option[ProjectName] =
+    names sortBy (-_.size) find { name ⇒
+      !exclude(name) && (include.isEmpty || include(name))
     }
 
   override def toString =
-    (only map ("+" + _)) ++ (without map ("-" + _)) mkString " "
+    (include map ("+" + _)) ++ (exclude map ("-" + _)) mkString " "
 }
