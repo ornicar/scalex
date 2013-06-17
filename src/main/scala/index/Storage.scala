@@ -3,12 +3,13 @@ package index
 
 import java.io._
 import java.io.{ FileOutputStream, ObjectOutputStream }
+import scala.util.{ Try, Success, Failure }
 
 import model._
 
-object Storage {
+private[scalex] object Storage {
 
-  def read(fileName: String): Database = {
+  def read(fileName: String): Try[Database] = {
     val fileIn = new FileInputStream(fileName)
     val in = new ObjectInputStream(fileIn) {
       override def resolveClass(desc: java.io.ObjectStreamClass): Class[_] = {
@@ -17,7 +18,10 @@ object Storage {
       }
     }
     try {
-      in.readObject().asInstanceOf[Database]
+      Success(in.readObject().asInstanceOf[Database])
+    }
+    catch {
+      case e: Exception ⇒ Failure(e)
     }
     finally {
       in.close()
