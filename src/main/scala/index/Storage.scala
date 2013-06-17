@@ -2,7 +2,6 @@ package ornicar.scalex
 package index
 
 import java.io._
-import java.io.{ FileOutputStream, ObjectOutputStream }
 import java.util.zip.{ GZIPOutputStream, GZIPInputStream }
 import scala.util.{ Try, Success, Failure }
 
@@ -10,8 +9,8 @@ import model._
 
 private[scalex] object Storage {
 
-  def read(fileName: String): Try[Database] = {
-    val fileIn = new FileInputStream(fileName)
+  def read(file: File): Try[Database] = {
+    val fileIn = new FileInputStream(file)
     val gzip = new GZIPInputStream(fileIn)
     val in = new ObjectInputStream(gzip) {
       override def resolveClass(desc: java.io.ObjectStreamClass): Class[_] = {
@@ -32,8 +31,7 @@ private[scalex] object Storage {
     }
   }
 
-  def write(fileName: String, db: Database) {
-    val file = new File(fileName)
+  def write(file: File, db: Database) {
     file.delete()
     val fileOut = new FileOutputStream(file)
     val gzip = new GZIPOutputStream(fileOut)

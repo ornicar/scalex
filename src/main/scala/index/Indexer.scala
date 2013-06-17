@@ -27,10 +27,11 @@ private[scalex] object Indexer {
     val command = new Command(args.toList, settings)
     def hasFiles = command.files.nonEmpty
 
-    val outputFile = if (settings.outputFile.isDefault || settings.outputFile.value == ".") {
-      name + "_" + version + ".scalex"
-    }
-    else settings.outputFile.value
+    val outputFile = new File(
+      if (settings.outputFile.isDefault || settings.outputFile.value == ".")
+        name + "_" + version + ".scalex"
+      else settings.outputFile.value
+    )
     if (settings.version.value)
       reporter.echo("scalex 3")
     else if (settings.Xhelp.value)
@@ -59,7 +60,7 @@ private[scalex] object Indexer {
           throw new nsc.FatalError("Database looks corrupted")
         }
         println("- Success!")
-        println("- Database saved to " + outputFile)
+        println("- Database saved to " + outputFile.getAbsolutePath)
       } getOrElse {
         reporter.error(null, "No universe found")
       }
