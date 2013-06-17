@@ -34,32 +34,32 @@ case class DocTemplate(
 
   /** All templates that are members of this template. If this template is a package, only templates for which
     * documentation is available  in the universe (`DocTemplateEntity`) are listed. */
-  templates: List[DocTemplate]
+  templates: List[DocTemplate],
 
   /** All methods that are members of this template. */
-  // def methods: List[Def]
+  methods: List[Def],
 
   /** All values, lazy values and variables that are members of this template. */
-  // def values: List[Val]
+  values: List[Val],
 
   /** All abstract types that are members of this template. */
-  // def abstractTypes: List[AbstractType]
+  abstractTypes: List[AbstractType],
 
   /** All type aliases that are members of this template. */
-  // def aliasTypes: List[AliasType]
+  aliasTypes: List[AliasType],
 
   /** The primary constructor of this class, if it has been defined. */
-  // def primaryConstructor: Option[Constructor]
+  primaryConstructor: Option[Constructor],
 
   /** All constructors of this class, including the primary constructor. */
-  // def constructors: List[Constructor]
+  constructors: List[Constructor],
 
   /** The companion of this template, or none. If a class and an object are defined as a pair of the same name, the
     * other entity of the pair is the companion. */
-  // def companion: Option[DocTemplateEntity]
+  companion: Option[DocTemplate],
 
   /** The implicit conversions this template (class or trait, objects and packages are not affected) */
-  // def conversions: List[ImplicitConversion]
+  conversions: List[ImplicitConversion],
 
   /** The shadowing information for the implicitly added members */
   // def implicitsShadowing: Map[MemberEntity, ImplicitMemberShadowing]
@@ -69,7 +69,7 @@ case class DocTemplate(
 
   /** Classes to which this class can be implicitly converted to
       NOTE: Some classes might not be included in the scaladoc run so they will be NoDocTemplateEntities */
-  // def outgoingImplicitlyConvertedClasses: List[(TemplateEntity, TypeEntity, ImplicitConversion)]
+  outgoingImplicitlyConvertedClasses: List[(Template, TypeEntity, ImplicitConversion)]
 
   /** If this template takes place in inheritance and implicit conversion relations, it will be shown in this diagram */
   // def inheritanceDiagram: Option[Diagram]

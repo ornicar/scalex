@@ -9,6 +9,9 @@ package model
  */
 case class MemberTemplate(
 
+  /** a MemberTemplate is a Member */
+  member: Member,
+
   /** a MemberTemplate is a Template */
   template: Template,
 
@@ -26,5 +29,4 @@ case class MemberTemplate(
    * e.g: {{{class A extends B[C[Int]] with D[E]}}} will have two direct parents: class B and D
    * NOTE: we are dropping the refinement here!
    */
-  parentTypes: List[TemplateAndType]
-) 
+  parentTypes: List[TemplateAndType])
