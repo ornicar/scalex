@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+args=$@
+cd `dirname $0`
+sbt013 -Dconfig.file=application.conf "run $args"

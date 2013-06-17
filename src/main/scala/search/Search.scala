@@ -14,7 +14,7 @@ final class Search(database: Database) {
   def apply(raw: query.Raw): Try[Results] = raw.analyze map {
     case query.ScopedQuery(q, scope) ⇒ database.projects filter {
       project ⇒ scope(project.name)
-    } flatMap (_.templates) map {
+    } flatMap (_.docs) map {
       entity ⇒ Result(entity)
     }
   }

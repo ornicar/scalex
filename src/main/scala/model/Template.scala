@@ -8,29 +8,43 @@ package model
  */
 case class Template(
 
-  /** a TemplateEntity is an Entity */
-  entity: Entity,
+    /** a TemplateEntity is an Entity */
+    entity: Entity,
 
-  /** Whether this template is a package (including the root package). */
-  isPackage: Boolean,
+    /** Whether this template is a package (including the root package). */
+    isPackage: Boolean,
 
-  /** Whether this template is the root package. */
-  isRootPackage: Boolean,
+    /** Whether this template is the root package. */
+    isRootPackage: Boolean,
 
-  /** Whether this template is a trait. */
-  isTrait: Boolean,
+    /** Whether this template is a trait. */
+    isTrait: Boolean,
 
-  /** Whether this template is a class. */
-  isClass: Boolean,
+    /** Whether this template is a class. */
+    isClass: Boolean,
 
-  /** Whether this template is an object. */
-  isObject: Boolean,
+    /** Whether this template is an object. */
+    isObject: Boolean,
 
-  /** Whether documentation is available for this template. */
-  isDocTemplate: Boolean,
+    /** Whether documentation is available for this template. */
+    isDocTemplate: Boolean,
 
-  /** Whether this template is a case class. */
-  isCaseClass: Boolean,
+    /** Whether this template is a case class. */
+    isCaseClass: Boolean,
 
-  /** The self-type of this template, if it differs from the template type. */
-  selfType: Option[TypeEntity])
+    /** The self-type of this template, if it differs from the template type. */
+    selfType: Option[TypeEntity]) {
+
+  override def toString = "%s %s".format(role, entity)
+
+  def role = 
+    if (isPackage) "package"
+    else if (isObject) "object"
+    else if (isTrait) "trait"
+    else if (isClass) "class"
+    else if (isCaseClass) "case class"
+}
+
+object Template {
+
+}

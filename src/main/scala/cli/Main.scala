@@ -41,6 +41,8 @@ object Main {
   }
 
   private def renderResult(results: List[search.Result]) {
-    println(results mkString "\n")
+    println(results.map(_.doc).zipWithIndex map {
+      case (doc, i) ⇒ "%d. %s".format(i + 1, doc)
+    } mkString "\n")
   }
 }
