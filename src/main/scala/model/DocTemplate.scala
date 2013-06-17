@@ -87,6 +87,8 @@ case class DocTemplate(
   // def groupName(group: String): String
 ) {
 
+  def countEntities = 1 + templates.length
+
   def template = memberTemplate.template
 
   def qualifiedName = template.entity.qualifiedName

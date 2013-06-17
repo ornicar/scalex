@@ -8,6 +8,8 @@ case class Database(projects: List[Project]) {
   def describe: String = projects map (_.describe) mkString "\n\n\n"
 
   def merge(other: Database) = Database((projects ++ other.projects).distinct)
+
+  def countEntities = projects.map(_.countEntities).sum
 }
 
 object Database {

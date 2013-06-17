@@ -6,6 +6,8 @@ case class Project(
     version: String,
     templates: List[DocTemplate]) {
 
+  def countEntities = templates.map(_.countEntities).sum
+
   def describe = name + " " + version + "\n\n" + {
     templates map (_.toString) mkString "\n"
   }

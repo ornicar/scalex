@@ -13,7 +13,7 @@ private[scalex] object Storage {
   def read(fileName: String): Try[Database] = {
     val fileIn = new FileInputStream(fileName)
     val gzip = new GZIPInputStream(fileIn)
-    val in = new ObjectInputStream(fileIn) {
+    val in = new ObjectInputStream(gzip) {
       override def resolveClass(desc: java.io.ObjectStreamClass): Class[_] = {
         try { Class.forName(desc.getName, false, getClass.getClassLoader) }
         catch { case ex: ClassNotFoundException ⇒ super.resolveClass(desc) }
@@ -33,7 +33,9 @@ private[scalex] object Storage {
   }
 
   def write(fileName: String, db: Database) {
-    val fileOut = new FileOutputStream(fileName)
+    val file = new File(fileName)
+    file.delete()
+    val fileOut = new FileOutputStream(file)
     val gzip = new GZIPOutputStream(fileOut)
     val writer = new ObjectOutputStream(gzip)
     try {
