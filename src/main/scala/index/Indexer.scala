@@ -45,12 +45,15 @@ private[scalex] object Indexer {
       reporter.echo(command.usageMsg)
     else try {
       val factory = new nsc.doc.DocFactory(reporter, settings)
+      reporter.echo("- Building scala universe")
       factory makeUniverse Left(command.files) map { universe ⇒
+        reporter.echo("- Building scalex entities")
         val entities = Universer(universe)
         val project = model.Project(name, version, entities)
         val database = new model.Database(List(project))
+        reporter.echo("- Serializing and compressing database")
         Storage.write(outputFile, database)
-        reporter.echo("Scalex database saved to " + outputFile)
+        reporter.echo("- Database saved to " + outputFile)
       } getOrElse {
         reporter.error(null, "No universe found")
       }
