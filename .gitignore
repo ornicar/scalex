@@ -2,4 +2,6 @@
 dist/*
 target/
 project/boot/
+databases
+application.conf
 sbt-launch.jar
