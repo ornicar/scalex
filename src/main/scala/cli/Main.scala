@@ -30,14 +30,17 @@ object Main {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
       case Config(None, Some(searchConfig)) ⇒
-        search.Search(ConfigFactory.load) map { searcher ⇒
-          renderResult(searcher(searchConfig.expression))
+        search.Search(ConfigFactory.load) flatMap { searcher ⇒
+          searcher(searchConfig.expression) match {
+            case Failure(e)   ⇒ Future.failed(e)
+            case Success(res) ⇒ Future.successful(renderResult(res))
+          }
         }
-      case c ⇒ Future.failed(badArg(c.toString))
     }
+    case c ⇒ Future.failed(badArg(c.toString))
   }
 
-  private def renderResult(result: search.Result) {
-    println(result)
+  private def renderResult(results: List[search.Result]) {
+    println(results mkString "\n")
   }
 }
