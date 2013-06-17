@@ -9,14 +9,20 @@ import model._
 
 private[index] object Universer {
 
-  def apply(universe: Universe): Database = new Database(
-    extractEntities(universe.rootPackage).distinct map Mapper.docTemplate
-  )
+  def apply(universe: Universe): Database = new Database(entitiesOf(universe))
 
-  private def extractEntities(tpl: nsc.DocTemplateEntity): List[nsc.DocTemplateEntity] =
-    tpl :: (tpl.templates collect {
-      case t: nsc.DocTemplateEntity ⇒ t
-    } flatMap extractEntities)
+  private def entitiesOf(universe: Universe): List[DocTemplate] = {
+
+    var seen = scala.collection.mutable.Set[nsc.DocTemplateEntity]()
+
+    def extractEntities(tpl: nsc.DocTemplateEntity): List[nsc.DocTemplateEntity] = {
+      seen += tpl
+      tpl :: (tpl.templates collect {
+        case t: nsc.DocTemplateEntity if (!seen(t)) ⇒ t
+      } flatMap extractEntities)
+    }
+    extractEntities(universe.rootPackage).toList map Mapper.docTemplate
+  }
 
   private object Mapper {
 
