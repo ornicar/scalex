@@ -55,7 +55,9 @@ private[scalex] object Indexer {
         println("- Compress database")
         Storage.write(outputFile, database)
         println("- Sanity check")
-        val restored = Storage.read(outputFile).isSuccess
+        if (Storage.read(outputFile).isFailure) {
+          throw new nsc.FatalError("Database looks corrupted")
+        }
         println("- Success!")
         println("- Database saved to " + outputFile)
       } getOrElse {
