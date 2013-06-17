@@ -28,9 +28,7 @@ private[scalex] object Indexer {
     def hasFiles = command.files.nonEmpty
 
     val outputFile = if (settings.outputFile.isDefault || settings.outputFile.value == ".") {
-      val default = "database.scalex"
-      reporter.warning(null, "No destination set (-output-file), will output to " + default)
-      default
+      name + "_" + version + ".scalex"
     }
     else settings.outputFile.value
     if (settings.version.value)
