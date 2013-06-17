@@ -14,7 +14,7 @@ object Main {
   }
 
   private def process(args: Array[String]): Try[Unit] = args.toList match {
-    case "index" :: rest ⇒ Success(index Indexer api.Index(rest))
+    case "index" :: name :: version :: rest ⇒ Success(index Indexer api.Index(name, version, rest))
     case _ ⇒ Parser.parse(args) asTry badArg(args mkString " ") flatMap {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)

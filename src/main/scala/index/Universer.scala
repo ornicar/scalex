@@ -9,9 +9,7 @@ import model._
 
 private[index] object Universer {
 
-  def apply(universe: Universe): Database = new Database(entitiesOf(universe))
-
-  private def entitiesOf(universe: Universe): List[DocTemplate] = {
+  def apply(universe: Universe): List[DocTemplate] = {
     new Mapper().docTemplate(universe.rootPackage).templates
   }
 

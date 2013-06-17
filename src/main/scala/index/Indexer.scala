@@ -11,10 +11,10 @@ import scala.util.Try
 private[scalex] object Indexer {
 
   def apply(config: api.Index) {
-    process(config.args)
+    process(config.name, config.version, config.args)
   }
 
-  private def process(args: List[String]): Boolean = {
+  private def process(name: String, version: String, args: List[String]): Boolean = {
     var reporter: nsc.reporters.ConsoleReporter = null
     val settings = new Settings(
       msg ⇒ reporter.error(FakePos("scalex"), msg + "\n  scalex index -help  gives more information"),
@@ -48,7 +48,9 @@ private[scalex] object Indexer {
     else try {
       val factory = new nsc.doc.DocFactory(reporter, settings)
       factory makeUniverse Left(command.files) map { universe ⇒
-        val database = Universer(universe)
+        val entities = Universer(universe)
+        val project = model.Project(name, version, entities)
+        val database = new model.Database(List(project))
         Storage.write(outputFile, database)
         reporter.echo("Scalex database saved to " + outputFile)
       } getOrElse {

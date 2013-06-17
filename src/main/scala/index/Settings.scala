@@ -23,7 +23,9 @@ private[index] final class Settings(
   )
 
   // For improved help output.
-  def scalexSpecific = Set[Settings#Setting](outputFile)
+  def scalexSpecific = Set[Settings#Setting](
+    inputDir,
+    outputFile)
 
   val isScalexSpecific: String ⇒ Boolean = scalexSpecific map (_.name)
 }
