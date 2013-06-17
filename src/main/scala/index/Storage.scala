@@ -3,13 +3,14 @@ package index
 
 import java.io._
 import java.util.zip.{ GZIPOutputStream, GZIPInputStream }
+import scala.concurrent.Future
 import scala.util.{ Try, Success, Failure }
 
 import model._
 
 private[scalex] object Storage {
 
-  def read(file: File): Try[Database] = {
+  def read(file: File): Future[Database] = Future {
     val fileIn = new FileInputStream(file)
     val gzip = new GZIPInputStream(fileIn)
     val in = new ObjectInputStream(gzip) {
@@ -19,10 +20,11 @@ private[scalex] object Storage {
       }
     }
     try {
-      Success(in.readObject().asInstanceOf[Database])
+      in.readObject().asInstanceOf[Database]
     }
     catch {
-      case e: Exception ⇒ Failure(e)
+      case e: java.io.InvalidClassException ⇒
+        throw new OutdatedDatabaseException("The database %s is too old and must be rebuilded" format file.getName)
     }
     finally {
       in.close()

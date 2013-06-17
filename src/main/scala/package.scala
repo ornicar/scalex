@@ -16,6 +16,8 @@ package object scalex
 
   type File = java.io.File
 
+  implicit def execontext = scala.concurrent.ExecutionContext.Implicits.global
+
   implicit final class ScalexFunctor[M[_]: Functor, A](fa: M[A]) {
 
     def map2[N[_], B, C](f: B ⇒ C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] =

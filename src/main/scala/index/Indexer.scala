@@ -1,6 +1,8 @@
 package ornicar.scalex
 package index
 
+import scala.concurrent.duration._
+import scala.concurrent.{ Future, Await }
 import scala.reflect.internal.util.FakePos
 import scala.tools.nsc
 import scala.util.Try
@@ -56,7 +58,10 @@ private[scalex] object Indexer {
         println("- Compress database")
         Storage.write(outputFile, database)
         println("- Sanity check")
-        if (Storage.read(outputFile).isFailure) {
+        val check = Await.result(
+          Storage.read(outputFile) map (_ ⇒ true) recover { case _ ⇒ false },
+          1 minute)
+        if (!check) {
           throw new nsc.FatalError("Database looks corrupted")
         }
         println("- Success!")
