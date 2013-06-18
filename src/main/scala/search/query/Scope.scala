@@ -10,8 +10,6 @@ private[search] case class Scope(
 
   def -(name: ProjectName) = copy(exclude = exclude + name)
 
-  def apply(names: Seq[ProjectName]): Seq[ProjectName] = names filter apply
-
   def apply(name: ProjectName): Boolean = !exclude(name) && (include.isEmpty || include(name))
 
   override def toString =

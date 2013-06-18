@@ -5,11 +5,13 @@ package object search {
   type Token = String
   type Tokens = Set[Token]
 
+  type Docs = List[document.Doc]
+
   type Score = Int
 
   type Fragment[A] = Map[A, Score]
 
-  type Index[A] = Map[Token, List[A]]
+  def fragmentMonoid[A] = scalaz.Monoid[Fragment[A]]
 
   type ProjectName = String
 

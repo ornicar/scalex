@@ -1,6 +1,6 @@
 package ornicar.scalex
 package search
-package engine
+package text
 
 private[search] final class TokenEngine[A](
     index: Index[A],
@@ -22,7 +22,7 @@ private[search] final class TokenEngine[A](
     heuristics: List[Heuristic],
     exclude: Set[Token] = Set.empty): List[(Tokens, Score)] = {
 
-    def filterToken(f: Filter) = indexTokens diff exclude filter f.apply
+    def filterToken(f: Filter) = index.keys diff exclude filter f.apply
 
     heuristics match {
       case Nil               ⇒ Nil
@@ -35,6 +35,4 @@ private[search] final class TokenEngine[A](
   }
 
   private type ScoredTokens = List[(Tokens, Score)]
-
-  private lazy val indexTokens: Tokens = index.keySet
 }
