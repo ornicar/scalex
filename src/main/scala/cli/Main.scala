@@ -31,6 +31,7 @@ object Main {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
       case Config(None, Some(searchConfig)) ⇒
         search.Search(ConfigFactory.load) flatMap { searcher ⇒
+          println("Searching for " + searchConfig.expression)
           searcher(searchConfig.expression) match {
             case Failure(e)   ⇒ Future.failed(e)
             case Success(res) ⇒ Future.successful(renderResult(res))
@@ -40,9 +41,11 @@ object Main {
     }
   }
 
-  private def renderResult(results: List[search.Result]) {
-    println(results.map(_.doc).zipWithIndex map {
-      case (doc, i) ⇒ "%d. %s".format(i + 1, doc)
+  private def renderResult(results: search.Results) {
+    println("Found %d results" format results.size)
+    println(results.take(8).zipWithIndex map {
+      case (search.Result(doc, score), i) ⇒
+        "%d. %s = %d".format(i + 1, doc, score)
     } mkString "\n")
   }
 }

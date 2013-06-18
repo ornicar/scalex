@@ -66,16 +66,19 @@ private[index] final class Mapper {
     entity = entity(o),
     isPackage = o.isPackage,
     isRootPackage = o.isRootPackage,
-    isTrait = o.isTrait,
-    isClass = o.isClass,
-    isObject = o.isObject,
+    role = if (o.isPackage) TemplateRole.Package
+      else if (o.isObject) TemplateRole.Object
+      else if (o.isTrait) TemplateRole.Trait
+      else if (o.isClass) TemplateRole.Class
+      else if (o.isCaseClass) TemplateRole.CaseClass
+      else TemplateRole.Unknown,
     isDocTemplate = o.isDocTemplate,
-    isCaseClass = o.isCaseClass,
     selfType = o.selfType map typeEntity)
 
   def member(o: nsc.MemberEntity): Member = Member(
     entity = entity(o),
     // comment = o.comment map comment,
+    inDefinitionTemplates = o.inDefinitionTemplates map (_.qualifiedName),
     flags = o.flags collect {
       case nscComment.Paragraph(nscComment.Text(flag)) ⇒ flag
     },
@@ -141,6 +144,14 @@ private[index] final class Mapper {
   def filter[M[_]: scalaz.MonadPlus, A <: nsc.Entity](entities: M[A]): M[A] =
     implicitly[scalaz.MonadPlus[M]].filter(entities) {
       case t: nsc.DocTemplateEntity ⇒ !seen(t)
-      case _                        ⇒ true
+      case t: nsc.MemberEntity ⇒
+        !(t.inDefinitionTemplates exists { tpl ⇒
+          ignoredTemplates contains tpl.qualifiedName
+        })
+      case _ ⇒ false
     }
+
+  private def ignoredTemplates = Set(
+    "scala.Any",
+    "scala.AnyRef")
 }

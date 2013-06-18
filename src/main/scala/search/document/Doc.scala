@@ -5,20 +5,46 @@ package document
 sealed trait Doc {
 
   /** unique name made of project name and qualified name */
-  def id = project.fullName + ":" + qualifiedName
+  def id = project.id + ":" + qualifiedName
 
   /** scalex project infos */
-  val project: Project
+  def project: Project
 
-  /** scala entity qualified name */
-  val qualifiedName: String
+  def entity: model.Entity
 
-  def tokenize: List[Token] = project.tokenize ::: qualifiedName.split(".").toList
+  def role: String
+
+  def declaration: String = qualifiedName
+
+  override def toString = "%s %s".format(role, declaration.replace("#", " "))
+
+  def tokenize: List[Token] = project.tokenize :::
+    (qualifiedName.toLowerCase split Array('.', ' ', '#')).toList map (_.trim) filterNot (_.isEmpty)
+
+  def qualifiedName = entity.qualifiedName
+}
+
+case class Template(
+    project: Project,
+    memberTemplate: model.MemberTemplate) extends Doc with Member {
+
+  def member = memberTemplate.member
+
+  def template = memberTemplate.template
+
+  def role = template.role.shows
 }
 
 case class Def(
     project: Project,
-    qualifiedName: String) extends Doc {
+    member: model.Member) extends Doc with Member {
 
-  override def toString = "def " + id
+  def role = "def"
+}
+
+case class Val(
+    project: Project,
+    member: model.Member) extends Doc with Member {
+
+  def role = "val"
 }

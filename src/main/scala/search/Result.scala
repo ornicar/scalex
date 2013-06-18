@@ -1,4 +1,6 @@
 package ornicar.scalex
 package search
 
-case class Result(doc: document.Doc, score: Score)
+import document.Doc
+
+case class Result(doc: Doc, score: Score)

@@ -54,7 +54,6 @@ private[scalex] object Indexer {
         val entities = Universer(universe)
         val project = model.Project(name, version, entities)
         val database = new model.Database(List(project))
-        println("- %d entities indexed" format database.countEntities)
         println("- Compress database")
         Storage.write(outputFile, database)
         println("- Sanity check")

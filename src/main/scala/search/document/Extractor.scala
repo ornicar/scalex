@@ -4,24 +4,37 @@ package document
 
 private[search] object Extractor {
 
-  def apply(project: model.Project): Docs = new ProjectExtractor(project).apply
+  def database(d: model.Database): ScopedDocs = d.projects map { p ⇒
+    makeProject(p).id -> project(p)
+  } toMap
 
-  private final class ProjectExtractor(project: model.Project) {
+  def project(p: model.Project): Docs = new ProjectExtractor(p).apply
 
-    lazy val projectDoc = Project(name = project.name, version = project.version)
+  private final class ProjectExtractor(p: model.Project) {
 
-    def apply = project.templates flatMap extract
+    def apply = p.templates flatMap walk
 
-    def extract(entity: Any): Docs = entity match {
+    def walk(tpl: model.DocTemplate): Docs = 
+      makeTemplate(tpl) ::
+      tpl.templates.flatMap(walk) ::: 
+      tpl.methods.map(makeDef) :::
+      tpl.values.map(makeVal)
 
-      case docTemplate: model.DocTemplate ⇒ extract(docTemplate.methods)
+    def makeTemplate(o: model.DocTemplate) = Template(
+      project = project,
+      memberTemplate = o.memberTemplate)
 
-      case method: model.Def              ⇒ makeDef(method) :: Nil
-    }
+    def makeDef(o: model.Def) = Def(
+      project = project,
+      member = o.member)
 
-    def makeDef(method: model.Def) = Def(
-      project = projectDoc,
-      qualifiedName = method.member.entity.qualifiedName
-    )
+    def makeVal(o: model.Val) = Val(
+      project = project,
+      member = o.member)
+
+    lazy val project = makeProject(p)
   }
+
+  private def makeProject(p: model.Project) =
+    Project(name = p.name, version = p.version)
 }

@@ -19,6 +19,15 @@ case class Member(
   /** The group this member is from */
   // def group: String
 
+  /** The qualified name of the member in its currently active declaration template. */
+  // definitionName: String,
+
+  /** The templates in which this member has been declared. The first element of the list is the template that contains
+    * the currently active declaration of this member, subsequent elements are declarations that have been overriden. If
+    * the first element is equal to `inTemplate`, the member is declared locally, if not, it has been inherited. All
+    * elements of this list are in the linearization of `inTemplate`. */
+  inDefinitionTemplates: List[QualifiedName],
+
   /**
    * The flags that have been set for this entity. The following flags are supported: `implicit`, `sealed`, `abstract`,
    * and `final`.

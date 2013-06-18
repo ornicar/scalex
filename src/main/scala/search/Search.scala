@@ -1,23 +1,23 @@
 package ornicar.scalex
 package search
 
-import model._
+import document.Doc
+import model.Database
 
 import scala.concurrent.Future
 import scala.util.{ Try, Success, Failure }
 
-final class Search(database: Database) {
+final class Search(engine: text.Api) {
 
   def apply(expression: String): Try[Results] =
     apply(query.Raw(expression, 1, 10))
 
-  def apply(raw: query.Raw): Try[Results] = raw.analyze map {
-    case query.ScopedQuery(q, scope) ⇒ Nil
-    // database.projects filter {
-    //   project ⇒ scope(project.name)
-    // } flatMap (_.docs) map {
-    //   entity ⇒ Result(entity)
-    // }
+  def apply(raw: query.Raw): Try[Results] = raw.analyze map apply
+
+  def apply(q: query.ScopedQuery): Results = q match {
+    case query.ScopedQuery(query.NameQuery(tokens), scope) ⇒
+      engine search tokens.list in scope
+    case _ ⇒ ???
   }
 }
 
@@ -34,10 +34,16 @@ object Search {
     Future.traverse(files)(Storage.read) map { dbs ⇒
       println("Merging databases")
       val db = Database merge dbs
-      val nbEntities = db.projects.map(_.countEntities).sum
-      println("Loaded %d entities from %d projects:".format(nbEntities, db.projects.size))
+      println("Loaded %d projects:".format(db.projects.size))
       db.projects foreach { p ⇒ println("- " + p.fullName) }
-      new Search(db)
+      println("Extracting search documents")
+      val documents = document.Extractor.database(db)
+      println("Indexing documents")
+      val index = text.Indexer.scoped(documents)
+      println("%d documents ready for search" format documents.map(_._2.size).sum)
+      val textEngine = new text.Engine(index)
+      val api = new text.Api(textEngine)
+      new Search(api)
     }
   }
 

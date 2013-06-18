@@ -4,7 +4,11 @@ package document
 
 case class Project(name: String, version: String) {
 
-  def fullName = name + "_" + version
+  def id: ProjectId = name + "_" + version
 
-  def tokenize: List[Token] = name :: version :: Nil
+  def fullName = name + " " + version
+
+  override def toString = fullName
+
+  lazy val tokenize: List[Token] = name :: version :: Nil
 }

@@ -2,11 +2,15 @@ package ornicar.scalex
 package search
 package text
 
-import document.Doc
+import document.{ Doc, Docs, ScopedDocs }
 
 private[search] object Indexer {
 
-  def apply(docs: List[Doc]): Index[Doc] = {
+  def scoped(scopedDocs: ScopedDocs) = new ScopedIndex[Doc](
+    indices = scopedDocs mapValues apply
+  )
+
+  def apply(docs: Docs): Index[Doc] = {
 
     import scala.collection.mutable
 

@@ -9,10 +9,4 @@ case class NoDocTemplate(
 
     /** NoDocTemplate is a Template */
     template: Template) {
-
-  def kind =
-    if (template.isClass) "class"
-    else if (template.isTrait) "trait"
-    else if (template.isObject) "object"
-    else ""
 }

@@ -85,13 +85,4 @@ case class DocTemplate(
 
   /** Returns the group description taken either from this template or its linearizationTypes */
   // def groupName(group: String): String
-) {
-
-  def countEntities: Int = 1 + templates.map(_.countEntities).sum
-
-  def template = memberTemplate.template
-
-  def qualifiedName = template.entity.qualifiedName
-
-  override def toString = memberTemplate.toString
-}
+) 
