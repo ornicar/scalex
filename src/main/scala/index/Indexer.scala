@@ -51,8 +51,8 @@ private[scalex] object Indexer {
       println("- Index %d scala files" format command.files.length)
       factory makeUniverse Left(command.files) map { universe ⇒
         println("- Build scalex database")
-        val entities = Universer(universe)
-        val project = model.Project(name, version, entities)
+        val root = new Mapper() docTemplate universe.rootPackage
+        val project = model.Project(name, version, root)
         val database = new model.Database(List(project))
         println("- Compress database")
         Storage.write(outputFile, database)

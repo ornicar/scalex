@@ -46,26 +46,8 @@ case class Member(
    */
   resultType: TypeEntity,
 
-  /** Whether this member is a method. */
-  isDef: Boolean,
-
-  /** Whether this member is a value (this excludes lazy values). */
-  isVal: Boolean,
-
-  /** Whether this member is a lazy value. */
-  isLazyVal: Boolean,
-
-  /** Whether this member is a variable. */
-  isVar: Boolean,
-
-  /** Whether this member is a constructor. */
-  isConstructor: Boolean,
-
-  /** Whether this member is an alias type. */
-  isAliasType: Boolean,
-
-  /** Whether this member is an abstract type. */
-  isAbstractType: Boolean,
+  /** def, val, lazy val, alias type, ... */
+  role: Role,
 
   /** Whether this member is abstract. */
   isAbstract: Boolean,
@@ -98,4 +80,4 @@ case class Member(
   isAmbiguousImplicit: Boolean,
 
   /** Indicates whether the implicitly inherited member is shadowed or ambiguous in its template */
-  isShadowedOrAmbiguousImplicit: Boolean)
+  isShadowedOrAmbiguousImplicit: Boolean) 

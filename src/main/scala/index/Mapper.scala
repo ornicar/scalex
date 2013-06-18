@@ -64,14 +64,12 @@ private[index] final class Mapper {
 
   def template(o: nsc.TemplateEntity) = Template(
     entity = entity(o),
-    isPackage = o.isPackage,
-    isRootPackage = o.isRootPackage,
-    role = if (o.isPackage) TemplateRole.Package
-      else if (o.isObject) TemplateRole.Object
-      else if (o.isTrait) TemplateRole.Trait
-      else if (o.isClass) TemplateRole.Class
-      else if (o.isCaseClass) TemplateRole.CaseClass
-      else TemplateRole.Unknown,
+    role = if (o.isPackage) Role.Package
+      else if (o.isObject) Role.Object
+      else if (o.isTrait) Role.Trait
+      else if (o.isClass) Role.Class
+      else if (o.isCaseClass) Role.CaseClass
+      else Role.Unknown,
     isDocTemplate = o.isDocTemplate,
     selfType = o.selfType map typeEntity)
 
@@ -85,13 +83,14 @@ private[index] final class Mapper {
     deprecation = o.deprecation.isDefined,
     migration = o.migration.isDefined,
     resultType = typeEntity(o.resultType),
-    isDef = o.isDef,
-    isVal = o.isVal,
-    isLazyVal = o.isLazyVal,
-    isVar = o.isVar,
-    isConstructor = o.isConstructor,
-    isAliasType = o.isAliasType,
-    isAbstractType = o.isAbstractType,
+    role = if (o.isDef) Role.Def
+      else if (o.isVal) Role.Val
+      else if (o.isLazyVal) Role.LazyVal
+      else if (o.isVar) Role.Var
+      else if (o.isConstructor) Role.Constructor
+      else if (o.isAliasType) Role.AliasType
+      else if (o.isAbstractType) Role.AbstractType
+      else Role.Unknown,
     isAbstract = o.isAbstract,
     useCaseOf = o.useCaseOf map member,
     byConversion = o.byConversion map implicitConversion,

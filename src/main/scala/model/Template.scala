@@ -11,14 +11,8 @@ case class Template(
     /** a TemplateEntity is an Entity */
     entity: Entity,
 
-    /** Whether this template is a package (including the root package). */
-    isPackage: Boolean,
-
-    /** Whether this template is the root package. */
-    isRootPackage: Boolean,
-
     /** trait, class, object, package? */
-    role: TemplateRole,
+    role: Role,
 
     /** Whether documentation is available for this template. */
     isDocTemplate: Boolean,

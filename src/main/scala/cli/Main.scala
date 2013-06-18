@@ -43,9 +43,10 @@ object Main {
 
   private def renderResult(results: search.Results) {
     println("Found %d results" format results.size)
-    println(results.take(8).zipWithIndex map {
+    println(results.take(20).zipWithIndex map {
       case (search.Result(doc, score), i) ⇒
-        "%d. %s = %d".format(i + 1, doc, score)
+      "%d. %s%s".format(i + 1, (i<9) ?? " ", doc)
+        // "%d. %s = %d".format(i + 1, doc, score)
     } mkString "\n")
   }
 }

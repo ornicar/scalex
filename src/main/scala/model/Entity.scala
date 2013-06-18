@@ -39,8 +39,7 @@ case class Entity(
     // def annotations: List[Annotation]
 
     /** The kind of the entity */
-    kind: String /** Whether or not the template was defined in a package object */ // def inPackageObject: Boolean
-    /** Indicates whether this entity lives in the types namespace (classes, traits, abstract/alias types) */ // def isType: Boolean
+    kind: String 
     ) {
 
   override def toString = qualifiedName

@@ -4,10 +4,10 @@ package model
 case class Project(
     name: String,
     version: String,
-    templates: List[DocTemplate]) {
+    root: DocTemplate) {
 
   def describe = fullName + "\n\n" + {
-    templates map (_.toString) mkString "\n"
+    root.templates map (_.toString) mkString "\n"
   }
 
   def fullName = name + " " + version

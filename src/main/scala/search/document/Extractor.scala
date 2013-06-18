@@ -2,6 +2,8 @@ package ornicar.scalex
 package search
 package document
 
+import model.DocTemplate
+
 private[search] object Extractor {
 
   def database(d: model.Database): ScopedDocs = d.projects map { p ⇒
@@ -12,24 +14,39 @@ private[search] object Extractor {
 
   private final class ProjectExtractor(p: model.Project) {
 
-    def apply = p.templates flatMap walk
+    def apply = p.root.templates flatMap walk(makeParent(p.root))
 
-    def walk(tpl: model.DocTemplate): Docs = 
-      makeTemplate(tpl) ::
-      tpl.templates.flatMap(walk) ::: 
-      tpl.methods.map(makeDef) :::
-      tpl.values.map(makeVal)
+    def walk(parent: Parent)(tpl: DocTemplate): Docs =
+      makeParent(tpl) |> { context ⇒
+        makeTemplate(parent)(tpl) ::
+          tpl.templates.flatMap(walk(context)) :::
+          tpl.methods.map(makeDef(context)) :::
+          tpl.values.map(makeVal(context))
+      }
 
-    def makeTemplate(o: model.DocTemplate) = Template(
+    def makeParent(parent: DocTemplate) = Parent(
+      entity = parent.memberTemplate.member.entity,
+      typeParams = parent.memberTemplate.higherKinded.typeParams)
+
+    def makeTemplate(parent: Parent)(o: DocTemplate) = Template(
       project = project,
-      memberTemplate = o.memberTemplate)
+      parent = parent,
+      member = o.memberTemplate.member,
+      role = o.memberTemplate.template.role,
+      typeParams = o.memberTemplate.higherKinded.typeParams)
 
-    def makeDef(o: model.Def) = Def(
+    def makeDef(parent: Parent)(o: model.Def) = Def(
       project = project,
-      member = o.member)
+      parent = parent,
+      member = o.member,
+      role = o.member.role,
+      typeParams = o.higherKinded.typeParams,
+      valueParams = o.valueParams)
 
-    def makeVal(o: model.Val) = Val(
+    def makeVal(parent: Parent)(o: model.Val) = Val(
       project = project,
+      parent = parent,
+      role = o.member.role,
       member = o.member)
 
     lazy val project = makeProject(p)

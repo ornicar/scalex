@@ -8,13 +8,14 @@ package object model {
   type Expression = String
   type QualifiedName = String
 
-  type HasTemplate = { def template: Template }
+  implicit def roleShow = new scalaz.Show[Role] {
 
-  implicit def templateRoleShow = new scalaz.Show[TemplateRole] {
-
-    override def show(role: TemplateRole) = role match {
-      case TemplateRole.CaseClass ⇒ "case class"
-      case x                      ⇒ x.toString.toLowerCase
+    override def show(role: Role) = role match {
+      case Role.CaseClass    ⇒ "case class"
+      case Role.LazyVal      ⇒ "lazy val"
+      case Role.AliasType    ⇒ "type alias"
+      case Role.AbstractType ⇒ "abstract type"
+      case x                 ⇒ x.toString.toLowerCase
     }
   }
 }
