@@ -12,11 +12,12 @@ final class Search(database: Database) {
     apply(query.Raw(expression, 1, 10))
 
   def apply(raw: query.Raw): Try[Results] = raw.analyze map {
-    case query.ScopedQuery(q, scope) ⇒ database.projects filter {
-      project ⇒ scope(project.name)
-    } flatMap (_.docs) map {
-      entity ⇒ Result(entity)
-    }
+    case query.ScopedQuery(q, scope) ⇒ Nil
+    // database.projects filter {
+    //   project ⇒ scope(project.name)
+    // } flatMap (_.docs) map {
+    //   entity ⇒ Result(entity)
+    // }
   }
 }
 

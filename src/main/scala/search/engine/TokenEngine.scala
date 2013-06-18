@@ -19,7 +19,7 @@ private[search] final class TokenEngine[A](
   } toMap
 
   private def scoredTokens(
-    heuristics: List[Heuristic], 
+    heuristics: List[Heuristic],
     exclude: Set[Token] = Set.empty): List[(Tokens, Score)] = {
 
     def filterToken(f: Filter) = indexTokens diff exclude filter f.apply
