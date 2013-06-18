@@ -5,9 +5,9 @@ package engine
 private[search] final class TextEngine[A](index: Index[A]) {
 
   private val tokenEngine = new TokenEngine[A](index, token ⇒ List(
-    ((_ == token): Filter) -> 7,
-    ((_ startsWith token): Filter) -> 3,
-    ((_ contains token): Filter) -> 2
+    Filter(_ == token) -> 7,
+    Filter(_ startsWith token) -> 3,
+    Filter(_ contains token) -> 2
   )) 
 
   def search(tokens: List[Token]): Fragment[A] = tokens match {
