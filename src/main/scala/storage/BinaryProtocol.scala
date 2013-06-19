@@ -1,11 +1,19 @@
 package org.scalex
 package storage
 
+import scala.collection.generic.CanBuildFrom
+
 import sbinary._, DefaultProtocol._, Operations._
 
 import model._
 
 object BinaryProtocol extends DefaultProtocol {
+
+  private def <<[B: Format](implicit in: Input): B = read[B](in)
+  private def >>[B: Format](b: B)(implicit out: Output) { write[B](out, b) }
+
+  private def readStr(implicit in: Input) = <<[String]
+  private def writeStr(b: String)(implicit out: Output) = >>[String](b)
 
   implicit val entityF: Format[Entity] = asProduct2(Entity)(Entity.unapply(_).get)
 
@@ -18,11 +26,37 @@ object BinaryProtocol extends DefaultProtocol {
 
   implicit val templateF = asProduct4(Template)(Template.unapply(_).get)
 
-  case class E(a: Int, b: List[E])
+  case class Ent(a: Int, b: List[Ent])
 
-  def readE(implicit in: Input) = E(<<[Int], readEs(in))
+  implicit val EntFormat = new BinaryFormat[Ent] {
+    def reader(implicit in: Input): Ent = readEnt
+    def writer(e: Ent)(implicit out: Output) {
 
-  def EsF: Format[TypeParam] = new LengthEncoded
+    }
+  }
+
+  def readEnt(implicit in: Input): Ent = Ent(a = <<[Int], b = readEntList)
+
+  def readEntList(implicit in: Input): List[Ent] = 
+    readSeq[List, Ent] { implicit in ⇒ readEnt }
+
+  def readSeq[CC[X] <: Traversable[X], T](reader: Input ⇒ T)(
+    implicit binT: Format[T],
+    cbf: CanBuildFrom[Nothing, T, CC[T]],
+    in: Input): CC[T] = {
+    val size = <<[Int]
+    val builder = cbf() ~ { _ sizeHint size }
+    var i = 0
+    while (i < size) {
+      builder += reader(in)
+      i += 1
+    }
+    builder.result
+  }
+
+  // def readE(implicit in: Input) = E(<<[Int], readEs(in))
+
+  // def EsF: Format[TypeParam] = new LengthEncoded
 
   // def readEs(implicit in: Input) = 
 
