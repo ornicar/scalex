@@ -26,28 +26,28 @@ private[search] object Extractor {
 
     def makeParent(parent: DocTemplate) = Parent(
       entity = parent.memberTemplate.member.entity,
+      role = parent.memberTemplate.template.role,
       typeParams = parent.memberTemplate.higherKinded.typeParams)
 
-    def makeTemplate(parent: Parent)(o: DocTemplate) = Template(
+    def makeMember(parent: Parent)(o: model.Member) = Member(
       project = project,
       parent = parent,
-      member = o.memberTemplate.member,
-      role = o.memberTemplate.template.role,
+      entity = o.entity,
+      role = o.role,
+      flags = o.flags,
+      resultType = o.resultType)
+
+    def makeTemplate(parent: Parent)(o: DocTemplate) = Template(
+      member = makeMember(parent)(o.memberTemplate.member) orRole o.memberTemplate.template.role,
       typeParams = o.memberTemplate.higherKinded.typeParams)
 
     def makeDef(parent: Parent)(o: model.Def) = Def(
-      project = project,
-      parent = parent,
-      member = o.member,
-      role = o.member.role,
+      member = makeMember(parent)(o.member),
       typeParams = o.higherKinded.typeParams,
       valueParams = o.valueParams)
 
     def makeVal(parent: Parent)(o: model.Val) = Val(
-      project = project,
-      parent = parent,
-      role = o.member.role,
-      member = o.member)
+      member = makeMember(parent)(o.member))
 
     lazy val project = makeProject(p)
   }

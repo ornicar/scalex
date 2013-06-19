@@ -29,16 +29,10 @@ case class Member(
   inDefinitionTemplates: List[QualifiedName],
 
   /**
-   * The flags that have been set for this entity. The following flags are supported: `implicit`, `sealed`, `abstract`,
-   * and `final`.
+   * The flags that have been set for this entity. The following flags are supported: 
+   * `implicit`, `sealed`, `abstract`, `deprecated`, `migration` and `final`.
    */
   flags: List[Flag],
-
-  /** Some deprecation message if this member is deprecated, or none otherwise. */
-  deprecation: Boolean,
-
-  /** Some migration warning if this member has a migration annotation, or none otherwise. */
-  migration: Boolean,
 
   /**
    * For members representing values: the type of the value returned by this member; for members
@@ -49,35 +43,32 @@ case class Member(
   /** def, val, lazy val, alias type, ... */
   role: Role,
 
-  /** Whether this member is abstract. */
-  isAbstract: Boolean,
-
   /**
    * If this symbol is a use case, the useCaseOf will contain the member it was derived from, containing the full
    * signature and the complete parameter descriptions.
    */
-  useCaseOf: Option[Member],
+  // useCaseOf: Option[Member],
 
   /** If this member originates from an implicit conversion, we set the implicit information to the correct origin */
   byConversion: Option[ImplicitConversion],
 
   /** The identity of this member, used for linking */
-  signature: String,
+  // signature: String,
 
   /** Compatibility signature, will be removed from future versions */
-  signatureCompat: String,
+  // signatureCompat: String,
 
   /** Indicates whether the member is inherited by implicit conversion */
-  isImplicitlyInherited: Boolean,
+  isImplicitlyInherited: Boolean)
 
   /** Indicates whether there is another member with the same name in the template that will take precendence */
-  isShadowedImplicit: Boolean,
+  // isShadowedImplicit: Boolean,
 
   /**
    * Indicates whether there are other implicitly inherited members that have similar signatures (and thus they all
    *  become ambiguous)
    */
-  isAmbiguousImplicit: Boolean,
+  // isAmbiguousImplicit: Boolean,
 
   /** Indicates whether the implicitly inherited member is shadowed or ambiguous in its template */
-  isShadowedOrAmbiguousImplicit: Boolean) 
+  // isShadowedOrAmbiguousImplicit: Boolean

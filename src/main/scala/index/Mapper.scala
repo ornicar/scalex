@@ -67,8 +67,8 @@ private[index] final class Mapper {
     role = if (o.isPackage) Role.Package
       else if (o.isObject) Role.Object
       else if (o.isTrait) Role.Trait
-      else if (o.isClass) Role.Class
       else if (o.isCaseClass) Role.CaseClass
+      else if (o.isClass) Role.Class
       else Role.Unknown,
     isDocTemplate = o.isDocTemplate,
     selfType = o.selfType map typeEntity)
@@ -77,11 +77,12 @@ private[index] final class Mapper {
     entity = entity(o),
     // comment = o.comment map comment,
     inDefinitionTemplates = o.inDefinitionTemplates map (_.qualifiedName),
-    flags = o.flags collect {
+    flags = (o.flags collect {
       case nscComment.Paragraph(nscComment.Text(flag)) ⇒ flag
-    },
-    deprecation = o.deprecation.isDefined,
-    migration = o.migration.isDefined,
+    }) ::: List(
+      o.deprecation.isDefined option "deprecated",
+      o.migration.isDefined option "migration"
+    ).flatten,
     resultType = typeEntity(o.resultType),
     role = if (o.isDef) Role.Def
       else if (o.isVal) Role.Val
@@ -91,20 +92,12 @@ private[index] final class Mapper {
       else if (o.isAliasType) Role.AliasType
       else if (o.isAbstractType) Role.AbstractType
       else Role.Unknown,
-    isAbstract = o.isAbstract,
-    useCaseOf = o.useCaseOf map member,
     byConversion = o.byConversion map implicitConversion,
-    signature = o.signature,
-    signatureCompat = o.signatureCompat,
-    isImplicitlyInherited = o.isImplicitlyInherited,
-    isShadowedImplicit = o.isShadowedImplicit,
-    isAmbiguousImplicit = o.isAmbiguousImplicit,
-    isShadowedOrAmbiguousImplicit = o.isShadowedOrAmbiguousImplicit)
+    isImplicitlyInherited = o.isImplicitlyInherited)
 
   def entity(o: nsc.Entity) = Entity(
     name = o.name,
-    qualifiedName = o.qualifiedName,
-    kind = o.kind)
+    qualifiedName = o.qualifiedName)
 
   def typeEntity(o: nsc.TypeEntity) = o.name
 
@@ -146,7 +139,7 @@ private[index] final class Mapper {
       case t: nsc.MemberEntity ⇒
         !(t.inDefinitionTemplates exists { tpl ⇒
           ignoredTemplates contains tpl.qualifiedName
-        })
+        }) && !t.isShadowedOrAmbiguousImplicit
       case _ ⇒ false
     }
 

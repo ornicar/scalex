@@ -24,23 +24,14 @@ case class Entity(
      * The qualified name of the entity. This is this entity's name preceded by the qualified name of the template
      * of which this entity is a member. The qualified name is unique to this entity.
      */
-    qualifiedName: String,
+    qualifiedName: String) {
 
-    /** The template of which this entity is a member. */
-    // def inTemplate: TemplateEntity
+  def splitQualifiedName = qualifiedName.split('.').toList
 
-    /**
-     * The list of entities such that each is a member of the entity that follows it; the first entity is always this
-     * entity, the last the root package entity.
-     */
-    // def toRoot: List[Entity]
-
-    /** The annotations attached to this entity, if any. */
-    // def annotations: List[Annotation]
-
-    /** The kind of the entity */
-    kind: String 
-    ) {
+  def shortQualifiedName = (splitQualifiedName.reverse match {
+    case Nil          ⇒ Nil
+    case head :: more ⇒ head :: more.map(_ take 1)
+  }).reverse mkString "."
 
   override def toString = qualifiedName
 }
