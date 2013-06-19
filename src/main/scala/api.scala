@@ -1,4 +1,4 @@
-package ornicar.scalex
+package org.scalex
 package api
 
 case class Index(name: String, version: String, args: List[String]) {

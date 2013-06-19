@@ -1,4 +1,4 @@
-package ornicar.scalex
+package org.scalex
 package model
 
 /** A type parameter to a class, trait, or method. */

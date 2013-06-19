@@ -1,4 +1,4 @@
-package ornicar.scalex
+package org.scalex
 package model
 
 import scala.tools.nsc.doc.base.comment.Body

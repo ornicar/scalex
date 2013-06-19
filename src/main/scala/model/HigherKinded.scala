@@ -1,4 +1,4 @@
-package ornicar.scalex
+package org.scalex
 package model
 
 /** An entity that is parameterized by types */

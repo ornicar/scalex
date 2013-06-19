@@ -1,4 +1,4 @@
-package ornicar.scalex
+package org.scalex
 package cli
 
 import api.{ Index, Search }

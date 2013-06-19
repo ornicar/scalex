@@ -1,4 +1,4 @@
-package ornicar.scalex
+package org.scalex
 package model
 
 /** A template (class, trait, object or package) for which documentation is available. Only templates for which

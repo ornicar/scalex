@@ -1,4 +1,4 @@
-package ornicar.scalex
+package org.scalex
 package model
 
 /** A value parameter to a constructor or method. */

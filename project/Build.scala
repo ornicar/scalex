@@ -1,5 +1,5 @@
 import sbt._, Keys._
-// import ornicar.scalex_sbt.ScalexSbtPlugin
+// import org.scalex_sbt.ScalexSbtPlugin
 
 trait Resolvers {
   val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
@@ -22,7 +22,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
   private val buildSettings = Defaults.defaultSettings ++ Seq(
     offline := true,
     organization := "com.github.ornicar",
-    version := "3.0",
+    version := "3.0-SNAPSHOT",
     scalaVersion := "2.11.0-M3",
     libraryDependencies := Seq(config),
     // libraryDependencies in test := Seq(specs2),

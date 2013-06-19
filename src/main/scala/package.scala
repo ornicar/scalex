@@ -1,4 +1,4 @@
-package ornicar
+package org
 
 import scala.util.{ Try, Success, Failure }
 import scalaz._

@@ -1,4 +1,4 @@
-package ornicar.scalex
+package org.scalex
 package search
 
 package object document {
