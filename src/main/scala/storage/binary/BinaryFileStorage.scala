@@ -1,5 +1,6 @@
 package org.scalex
 package storage
+package binary
 
 import java.io._
 import scala.concurrent.Future
@@ -9,7 +10,7 @@ import sbinary._, DefaultProtocol._, Operations._
 
 import model._
 
-private[storage] trait BinaryFile extends Storage {
+private[storage] trait BinaryFileStorage extends Storage {
 
   def read(file: File): Future[Database] = ???
 

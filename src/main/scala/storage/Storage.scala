@@ -12,5 +12,5 @@ trait Storage {
   def write(file: File, db: Database): Unit
 }
 
-// object Storage extends Storage with GzipFile
-object Storage extends Storage with BinaryFile
+// object Storage extends GzipFileStorage 
+object Storage extends binary.BinaryFileStorage 

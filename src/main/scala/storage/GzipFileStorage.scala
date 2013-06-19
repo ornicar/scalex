@@ -8,7 +8,7 @@ import scala.util.{ Try, Success, Failure }
 
 import model._
 
-private[storage] trait GzipFile extends Storage {
+private[storage] trait GzipFileStorage extends Storage {
 
   def read(file: File): Future[Database] = Future {
     val fileIn = new FileInputStream(file)
