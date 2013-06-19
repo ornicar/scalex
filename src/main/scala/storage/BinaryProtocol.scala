@@ -18,6 +18,18 @@ object BinaryProtocol extends DefaultProtocol {
 
   implicit val templateF = asProduct4(Template)(Template.unapply(_).get)
 
+  case class E(a: Int, b: List[E])
+
+  def readE(implicit in: Input) = E(<<[Int], readEs(in))
+
+  def EsF: Format[TypeParam] = new LengthEncoded
+
+  // def readEs(implicit in: Input) = 
+
+  // implicit lazy val EF = lazyFormat(
+  //   asProduct2(E)(E.unapply(_).get)
+  // )
+
   // implicit val typeParamsF = format[List[TypeParam]]
   // case class TypeParams(unwrap: List[TypeParam])
 
