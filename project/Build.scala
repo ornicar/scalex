@@ -15,6 +15,7 @@ trait Dependencies {
   val scalazContrib = "org.typelevel" % "scalaz-contrib-210_2.10" % "0.1.4"
   val config = "com.typesafe" % "config" % "1.0.1"
   val scopt = "com.github.scopt" % "scopt_2.10" % "3.0.0"
+  val sbinary = "org.scala-tools.sbinary" % "sbinary_2.11" % "0.4.1-THIB"
 }
 
 object ScalexBuild extends Build with Resolvers with Dependencies {
@@ -27,7 +28,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     scalaVersion := "2.11.0-M3",
     libraryDependencies := Seq(config),
     // libraryDependencies in test := Seq(specs2),
-    resolvers := Seq(typesafe, typesafeS, sonatype, sonatypeS),
+    resolvers := Seq(typesafe, typesafeS, sonatype, sonatypeS, iliaz),
     scalacOptions := Seq("-deprecation", "-unchecked", "-feature", "-language:_"),
     publishTo := Some(Resolver.sftp(
       "iliaz",
@@ -36,6 +37,6 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
   ) //++ ScalexSbtPlugin.defaultSettings
 
   lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
-    libraryDependencies ++= Seq(compiler, config, scalaz, scalazContrib, scopt)
+    libraryDependencies ++= Seq(compiler, config, scalaz, scalazContrib, scopt, sbinary)
   )
 }
