@@ -25,9 +25,9 @@ private[search] object Extractor {
       }
 
     def makeParent(parent: DocTemplate) = Parent(
-      entity = parent.memberTemplate.member.entity,
-      role = parent.memberTemplate.template.role,
-      typeParams = parent.memberTemplate.higherKinded.typeParams)
+      entity = parent.member.entity,
+      role = parent.template.role,
+      typeParams = parent.typeParams)
 
     def makeMember(parent: Parent)(o: model.Member) = Member(
       project = project,
@@ -38,12 +38,12 @@ private[search] object Extractor {
       resultType = o.resultType)
 
     def makeTemplate(parent: Parent)(o: DocTemplate) = Template(
-      member = makeMember(parent)(o.memberTemplate.member) orRole o.memberTemplate.template.role,
-      typeParams = o.memberTemplate.higherKinded.typeParams)
+      member = makeMember(parent)(o.member) orRole o.template.role,
+      typeParams = o.typeParams)
 
     def makeDef(parent: Parent)(o: model.Def) = Def(
       member = makeMember(parent)(o.member),
-      typeParams = o.higherKinded.typeParams,
+      typeParams = o.typeParams,
       valueParams = o.valueParams)
 
     def makeVal(parent: Parent)(o: model.Val) = Val(

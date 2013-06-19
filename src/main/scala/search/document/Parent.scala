@@ -2,7 +2,7 @@ package org.scalex
 package search
 package document
 
-import model.{ Entity, TypeParam, Role }
+import model.{ Entity, TypeParam, Role, typeParamsShow }
 
 case class Parent(
     entity: Entity,
@@ -11,5 +11,5 @@ case class Parent(
 
   def signature = "%s%s".format(
     entity.shortQualifiedName,
-    TypeParam show typeParams)
+    typeParams.shows)
 }

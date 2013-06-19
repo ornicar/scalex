@@ -7,6 +7,6 @@ case class Def(
   member: Member,
 
   /** a def is a higher kinded */
-  higherKinded: HigherKinded,
+  typeParams: List[TypeParam],
 
   valueParams : List[List[ValueParam]])

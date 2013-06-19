@@ -5,16 +5,27 @@ package model
   * a source file is given are documented by Scaladoc. */
 case class DocTemplate(
 
-  /** a Template is a MemberTemplate */
-  memberTemplate: MemberTemplate,
+  /** a DocTemplate is a Member */
+  member: Member,
 
-  /** The source file in which the current template is defined and the line where the definition starts, if they exist.
-    * A source file exists for all templates, except for those that are generated synthetically by Scaladoc. */
-  // inSource: Option[(String, Int)],
+  /** a DocTemplate is a Template */
+  template: Template,
 
-  /** An HTTP address at which the source of this template is available, if it is available. An address is available
-    * only if the `docsourceurl` setting has been set. */
-  sourceUrl: Option[String],
+  /** a DocTemplate is a HigherKinded */
+  typeParams: List[TypeParam],
+
+  /**
+    * The value parameters of this case class, or an empty list if this class is not a case class. As case class value
+    * parameters cannot be curried, the outer list has exactly one element.
+    */
+  valueParams: List[List[ValueParam]],
+
+  /**
+    * The direct super-type of this template
+    * e.g: {{{class A extends B[C[Int]] with D[E]}}} will have two direct parents: class B and D
+    * NOTE: we are dropping the refinement here!
+    */
+  parentTypes: List[QualifiedName],
 
   /** All class, trait and object templates which are part of this template's linearization, in lineratization order.
     * This template's linearization contains all of its direct and indirect super-classes and super-traits. */
@@ -52,14 +63,14 @@ case class DocTemplate(
   primaryConstructor: Option[Constructor],
 
   /** All constructors of this class, including the primary constructor. */
-  constructors: List[Constructor],
+  constructors: List[Constructor]
 
   /** The companion of this template, or none. If a class and an object are defined as a pair of the same name, the
     * other entity of the pair is the companion. */
-  companion: Option[DocTemplate],
+  // companion: Option[DocTemplate],
 
   /** The implicit conversions this template (class or trait, objects and packages are not affected) */
-  conversions: List[ImplicitConversion],
+  // conversions: List[ImplicitConversion],
 
   /** The shadowing information for the implicitly added members */
   // def implicitsShadowing: Map[MemberEntity, ImplicitMemberShadowing]
@@ -69,7 +80,7 @@ case class DocTemplate(
 
   /** Classes to which this class can be implicitly converted to
       NOTE: Some classes might not be included in the scaladoc run so they will be NoDocTemplateEntities */
-  outgoingImplicitlyConvertedClasses: List[(Template, TypeEntity, ImplicitConversion)]
+  // outgoingImplicitlyConvertedClasses: List[(Template, TypeEntity, ImplicitConversion)]
 
   /** If this template takes place in inheritance and implicit conversion relations, it will be shown in this diagram */
   // def inheritanceDiagram: Option[Diagram]

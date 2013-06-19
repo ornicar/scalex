@@ -7,7 +7,7 @@ case class AbstractType(
   member: Member,
 
   /** an abstract type is a higher kinded */
-  higherKinded: HigherKinded,
+  typeParams: List[TypeParam],
 
   lo: Option[TypeEntity],
 

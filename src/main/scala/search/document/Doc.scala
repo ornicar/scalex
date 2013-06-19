@@ -2,6 +2,8 @@ package org.scalex
 package search
 package document
 
+import model.typeParamsShow
+
 sealed trait Doc extends DocImpl
 
 case class Template(
@@ -12,7 +14,7 @@ case class Template(
     member.role.shows,
     member.parent.entity.shortQualifiedName,
     member.entity.name,
-    model.TypeParam show typeParams)
+    typeParams.shows)
 }
 
 trait NonTemplate { self: Doc ⇒
@@ -28,7 +30,7 @@ case class Def(
     member.parent.signature,
     member.role.shows,
     member.entity.name,
-    model.TypeParam show typeParams,
+    typeParams.shows,
     model.ValueParam showCurried valueParams,
     member.resultType)
 }

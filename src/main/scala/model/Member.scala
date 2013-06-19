@@ -50,7 +50,7 @@ case class Member(
   // useCaseOf: Option[Member],
 
   /** If this member originates from an implicit conversion, we set the implicit information to the correct origin */
-  byConversion: Option[ImplicitConversion],
+  // byConversion: Option[ImplicitConversion],
 
   /** The identity of this member, used for linking */
   // signature: String,

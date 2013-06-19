@@ -12,9 +12,13 @@ private[index] final class Mapper {
   def docTemplate(o: nsc.DocTemplateEntity): DocTemplate = {
     seen += o
     DocTemplate(
-      memberTemplate = memberTemplate(o),
+      template = template(o),
+      member = member(o),
+      typeParams = o.typeParams map typeParam,
+      valueParams = o.valueParams map (_ map valueParam),
+      parentTypes = o.parentTypes map (_._1.qualifiedName),
       // inSource = o.inSource map { case (file, line) ⇒ (file.path, line) },
-      sourceUrl = o.sourceUrl map (_.toString),
+      // sourceUrl = o.sourceUrl map (_.toString),
       members = filter(o.members) map member,
       templates = filter(o.templates) collect {
         case t: nsc.DocTemplateEntity ⇒ docTemplate(t)
@@ -24,12 +28,12 @@ private[index] final class Mapper {
       abstractTypes = filter(o.abstractTypes) map abstractType,
       aliasTypes = filter(o.aliasTypes) map aliasType,
       primaryConstructor = o.primaryConstructor map constructor,
-      constructors = filter(o.constructors) map constructor,
-      companion = filter(o.companion) map docTemplate,
-      conversions = o.conversions map implicitConversion,
-      outgoingImplicitlyConvertedClasses = o.outgoingImplicitlyConvertedClasses map {
-        case (tpl, typ, imp) ⇒ (template(tpl), typeEntity(typ), implicitConversion(imp))
-      }
+      constructors = filter(o.constructors) map constructor
+      // companion = filter(o.companion) map docTemplate,
+      // conversions = o.conversions map implicitConversion,
+      // outgoingImplicitlyConvertedClasses = o.outgoingImplicitlyConvertedClasses map {
+        // case (tpl, typ, imp) ⇒ (template(tpl), typeEntity(typ), implicitConversion(imp))
+      // }
     )
   }
 
@@ -42,7 +46,7 @@ private[index] final class Mapper {
 
   def abstractType(o: nsc.AbstractType) = AbstractType(
     member = member(o),
-    higherKinded = higherKinded(o),
+    typeParams = o.typeParams map typeParam,
     lo = o.lo map (_.name),
     hi = o.hi map (_.name))
 
@@ -50,17 +54,8 @@ private[index] final class Mapper {
 
   def method(o: nsc.Def) = Def(
     member = member(o),
-    higherKinded = higherKinded(o),
+    typeParams = o.typeParams map typeParam,
     valueParams = o.valueParams map2 valueParam)
-
-  def memberTemplate(o: nsc.MemberTemplateEntity) = MemberTemplate(
-    template = template(o),
-    member = member(o),
-    higherKinded = higherKinded(o),
-    valueParams = o.valueParams map (_ map valueParam),
-    parentTypes = o.parentTypes map {
-      case (tpl, typ) ⇒ TemplateAndType(template(tpl), typeEntity(typ))
-    })
 
   def template(o: nsc.TemplateEntity) = Template(
     entity = entity(o),
@@ -92,7 +87,7 @@ private[index] final class Mapper {
       else if (o.isAliasType) Role.AliasType
       else if (o.isAbstractType) Role.AbstractType
       else Role.Unknown,
-    byConversion = o.byConversion map implicitConversion,
+    // byConversion = o.byConversion map implicitConversion,
     isImplicitlyInherited = o.isImplicitlyInherited)
 
   def entity(o: nsc.Entity) = Entity(
@@ -106,9 +101,7 @@ private[index] final class Mapper {
   def implicitConversion(o: nsc.ImplicitConversion) = ImplicitConversion(
     source = docTemplate(o.source),
     targetType = typeEntity(o.targetType),
-    targetTypeComponents = o.targetTypeComponents map {
-      case (tpl, typ) ⇒ TemplateAndType(template(tpl), typeEntity(typ))
-    },
+    targetTypeComponents = o.targetTypeComponents map(_._1.qualifiedName),
     convertorMethod = o.convertorMethod.left map member,
     conversionShortName = o.conversionShortName,
     conversionQualifiedName = o.conversionShortName,
@@ -116,13 +109,9 @@ private[index] final class Mapper {
     members = o.members map member,
     isHiddenConversion = o.isHiddenConversion)
 
-  def higherKinded(o: nsc.HigherKinded): HigherKinded = HigherKinded(
-    typeParams = o.typeParams map typeParam
-  )
-
   def typeParam(o: nsc.TypeParam): TypeParam = TypeParam(
     name = o.name,
-    higherKinded = higherKinded(o),
+    typeParams = o.typeParams map typeParam,
     variance = o.variance,
     lo = o.lo map typeEntity,
     hi = o.lo map typeEntity)

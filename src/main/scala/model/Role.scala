@@ -18,4 +18,10 @@ object Role {
   case object AliasType extends Role
   case object AbstractType extends Role
   case object Unknown extends Role
+
+  private def all: List[Role] = List(Trait, Class, CaseClass, Object, Package, Constructor, Def, Val, LazyVal, Var, AliasType, AbstractType, Unknown)
+
+  private[scalex] def fromString(str: String): Role = all.find(_.toString == str) | Unknown
+
+  private[scalex] def toString(role: Role): String = role.toString
 }
