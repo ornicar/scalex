@@ -22,13 +22,3 @@ case class ValueParam(
       case None     ⇒ ""
     })
 }
-
-object ValueParam {
-
-  def show(vps: List[ValueParam]): String =
-    if (vps.size > 0) vps map (_.toString) mkString ("(", ", ", ")")
-    else ""
-
-  def showCurried(vps: List[List[ValueParam]]): String =
-    vps map show mkString ""
-}

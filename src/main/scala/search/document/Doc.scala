@@ -2,7 +2,7 @@ package org.scalex
 package search
 package document
 
-import model.typeParamsShow
+import model.instances._
 
 sealed trait Doc extends DocImpl
 
@@ -31,7 +31,7 @@ case class Def(
     member.role.shows,
     member.entity.name,
     typeParams.shows,
-    model.ValueParam showCurried valueParams,
+    valueParams.shows,
     member.resultType)
 }
 

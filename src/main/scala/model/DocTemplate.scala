@@ -51,13 +51,13 @@ case class DocTemplate(
   methods: List[Def],
 
   /** All values, lazy values and variables that are members of this template. */
-  values: List[Val],
+  values: List[Member],
 
   /** All abstract types that are members of this template. */
   abstractTypes: List[AbstractType],
 
   /** All type aliases that are members of this template. */
-  aliasTypes: List[AliasType],
+  aliasTypes: List[TypeEntity],
 
   /** The primary constructor of this class, if it has been defined. */
   primaryConstructor: Option[Constructor],

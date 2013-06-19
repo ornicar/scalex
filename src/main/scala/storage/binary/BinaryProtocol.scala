@@ -23,6 +23,8 @@ object BinaryProtocol extends DefaultProtocol with RichProtocol {
 
   implicit val templateF = asProduct4(Template)(Template.unapply(_).get)
 
+  implicit val valueParamF = asProduct4(ValueParam)(ValueParam.unapply(_).get)
+
   implicit val typeParamF = new BinaryFormat[TypeParam] {
 
     def reader(implicit in: Input): TypeParam = TypeParam(
@@ -41,26 +43,43 @@ object BinaryProtocol extends DefaultProtocol with RichProtocol {
     }
   }
 
-  // implicit val docTemplateFormat = new BinaryFormat[DocTemplate] {
+  implicit val defF = asProduct3(Def)(Def.unapply(_).get)
 
-  //   def reader(implicit in: Input) = DocTemplate(
-  //     member = <<[Member],
-  //     template = <<[Template],
-  //     typeParams = <<[List[TypeParam]],
-  //     valueParams = <<[List[List[ValueParam]]],
-  //     parentTypes = <<[List[QualifiedName]],
-  //     members = <<[List[Member]],
-  //     templates = <<[List[DocTemplate]],
-  //     methods = <<[List[Def]],
-  //     values = <<[List[Val]],
-  //     abstractTypes = <<[List[AbstractType]],
-  //     aliasTypes = <<[List[AliasType]],
-  //     primaryConstructor = <<[Option[Constructor]],
-  //     constructors = <<[List[Constructor]])
+  implicit val constructorF = asProduct2(Constructor)(Constructor.unapply(_).get)
 
-  //   def writer(a: DocTemplate)(implicit out: Output) {
-  //   }
-  // }
+  implicit val abstractTypeF = asProduct4(AbstractType)(AbstractType.unapply(_).get)
 
-  // private def 
+  implicit val docTemplateFormat = new BinaryFormat[DocTemplate] {
+
+    def reader(implicit in: Input) = DocTemplate(
+      member = <<[Member],
+      template = <<[Template],
+      typeParams = <<[List[TypeParam]],
+      valueParams = <<[List[List[ValueParam]]],
+      parentTypes = <<[List[QualifiedName]],
+      members = <<[List[Member]],
+      templates = readMany,
+      methods = <<[List[Def]],
+      values = <<[List[Member]],
+      abstractTypes = <<[List[AbstractType]],
+      aliasTypes = <<[List[TypeEntity]],
+      primaryConstructor = <<[Option[Constructor]],
+      constructors = <<[List[Constructor]])
+
+    def writer(a: DocTemplate)(implicit out: Output) {
+      >>(a.member)
+      >>(a.template)
+      >>(a.typeParams)
+      >>(a.valueParams)
+      >>(a.parentTypes)
+      >>(a.members)
+      writeMany(a.templates)
+      >>(a.methods)
+      >>(a.values)
+      >>(a.abstractTypes)
+      >>(a.aliasTypes)
+      >>(a.primaryConstructor)
+      >>(a.constructors)
+    }
+  }
 }

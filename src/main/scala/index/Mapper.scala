@@ -1,9 +1,10 @@
 package org.scalex
 package index
 
-import model._
 import scala.tools.nsc.doc.base.{ comment ⇒ nscComment }
 import scala.tools.nsc.doc.{ model ⇒ nsc }
+
+import model._
 
 private[index] final class Mapper {
 
@@ -24,16 +25,16 @@ private[index] final class Mapper {
         case t: nsc.DocTemplateEntity ⇒ docTemplate(t)
       },
       methods = filter(o.methods) map method,
-      values = filter(o.values) map value,
+      values = filter(o.values) map member,
       abstractTypes = filter(o.abstractTypes) map abstractType,
-      aliasTypes = filter(o.aliasTypes) map aliasType,
+      aliasTypes = filter(o.aliasTypes) map { a ⇒ typeEntity(a.alias) },
       primaryConstructor = o.primaryConstructor map constructor,
       constructors = filter(o.constructors) map constructor
-      // companion = filter(o.companion) map docTemplate,
-      // conversions = o.conversions map implicitConversion,
-      // outgoingImplicitlyConvertedClasses = o.outgoingImplicitlyConvertedClasses map {
-        // case (tpl, typ, imp) ⇒ (template(tpl), typeEntity(typ), implicitConversion(imp))
-      // }
+    // companion = filter(o.companion) map docTemplate,
+    // conversions = o.conversions map implicitConversion,
+    // outgoingImplicitlyConvertedClasses = o.outgoingImplicitlyConvertedClasses map {
+    // case (tpl, typ, imp) ⇒ (template(tpl), typeEntity(typ), implicitConversion(imp))
+    // }
     )
   }
 
@@ -41,16 +42,11 @@ private[index] final class Mapper {
     member = member(o),
     valueParams = o.valueParams map2 valueParam)
 
-  def aliasType(o: nsc.AliasType) = AliasType(
-    alias = typeEntity(o.alias))
-
   def abstractType(o: nsc.AbstractType) = AbstractType(
     member = member(o),
     typeParams = o.typeParams map typeParam,
     lo = o.lo map (_.name),
     hi = o.hi map (_.name))
-
-  def value(o: nsc.Val) = Val(member = member(o))
 
   def method(o: nsc.Def) = Def(
     member = member(o),
@@ -60,11 +56,11 @@ private[index] final class Mapper {
   def template(o: nsc.TemplateEntity) = Template(
     entity = entity(o),
     role = if (o.isPackage) Role.Package
-      else if (o.isObject) Role.Object
-      else if (o.isTrait) Role.Trait
-      else if (o.isCaseClass) Role.CaseClass
-      else if (o.isClass) Role.Class
-      else Role.Unknown,
+    else if (o.isObject) Role.Object
+    else if (o.isTrait) Role.Trait
+    else if (o.isCaseClass) Role.CaseClass
+    else if (o.isClass) Role.Class
+    else Role.Unknown,
     isDocTemplate = o.isDocTemplate,
     selfType = o.selfType map typeEntity)
 
@@ -80,13 +76,13 @@ private[index] final class Mapper {
     ).flatten,
     resultType = typeEntity(o.resultType),
     role = if (o.isDef) Role.Def
-      else if (o.isVal) Role.Val
-      else if (o.isLazyVal) Role.LazyVal
-      else if (o.isVar) Role.Var
-      else if (o.isConstructor) Role.Constructor
-      else if (o.isAliasType) Role.AliasType
-      else if (o.isAbstractType) Role.AbstractType
-      else Role.Unknown,
+    else if (o.isVal) Role.Val
+    else if (o.isLazyVal) Role.LazyVal
+    else if (o.isVar) Role.Var
+    else if (o.isConstructor) Role.Constructor
+    else if (o.isAliasType) Role.AliasType
+    else if (o.isAbstractType) Role.AbstractType
+    else Role.Unknown,
     // byConversion = o.byConversion map implicitConversion,
     isImplicitlyInherited = o.isImplicitlyInherited)
 
@@ -101,7 +97,7 @@ private[index] final class Mapper {
   def implicitConversion(o: nsc.ImplicitConversion) = ImplicitConversion(
     source = docTemplate(o.source),
     targetType = typeEntity(o.targetType),
-    targetTypeComponents = o.targetTypeComponents map(_._1.qualifiedName),
+    targetTypeComponents = o.targetTypeComponents map (_._1.qualifiedName),
     convertorMethod = o.convertorMethod.left map member,
     conversionShortName = o.conversionShortName,
     conversionQualifiedName = o.conversionShortName,

@@ -46,8 +46,8 @@ private[search] object Extractor {
       typeParams = o.typeParams,
       valueParams = o.valueParams)
 
-    def makeVal(parent: Parent)(o: model.Val) = Val(
-      member = makeMember(parent)(o.member))
+    def makeVal(parent: Parent)(o: model.Member) = Val(
+      member = makeMember(parent)(o))
 
     lazy val project = makeProject(p)
   }
