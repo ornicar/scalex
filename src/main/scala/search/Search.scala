@@ -25,13 +25,12 @@ object Search {
 
   import com.typesafe.config.Config
   import scala.collection.JavaConversions._
-  import index.Storage
 
   def apply(config: Config): Future[Search] = {
     val files = configDbFiles(config)
     println("Loading databases from %d files:" format files.size)
     files foreach { f ⇒ println("- " + f.getAbsolutePath) }
-    Future.traverse(files)(Storage.read) map { dbs ⇒
+    Future.traverse(files)(storage.Storage.read) map { dbs ⇒
       println("Merging databases")
       val db = Database merge dbs
       println("Loaded %d projects:".format(db.projects.size))

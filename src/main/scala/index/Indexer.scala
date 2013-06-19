@@ -55,10 +55,10 @@ private[scalex] object Indexer {
         val project = model.Project(name, version, root)
         val database = new model.Database(List(project))
         println("- Compress database")
-        Storage.write(outputFile, database)
+        storage.Storage.write(outputFile, database)
         println("- Sanity check")
         val check = Await.result(
-          Storage.read(outputFile) map (_ ⇒ true) recover { case _ ⇒ false },
+          storage.Storage.read(outputFile) map (_ ⇒ true) recover { case _ ⇒ false },
           1 minute)
         if (!check) {
           throw new nsc.FatalError("Database looks corrupted")

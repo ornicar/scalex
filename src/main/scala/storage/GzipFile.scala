@@ -1,5 +1,5 @@
 package org.scalex
-package index
+package storage
 
 import java.io._
 import java.util.zip.{ GZIPOutputStream, GZIPInputStream }
@@ -8,7 +8,7 @@ import scala.util.{ Try, Success, Failure }
 
 import model._
 
-private[scalex] object Storage {
+private[storage] trait GzipFile extends Storage {
 
   def read(file: File): Future[Database] = Future {
     val fileIn = new FileInputStream(file)
