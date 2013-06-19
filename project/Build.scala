@@ -21,13 +21,18 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Defaults.defaultSettings ++ Seq(
     offline := true,
-    organization := "com.github.ornicar",
+    organization := "org.scalex",
+    name := "scalex",
     version := "3.0-SNAPSHOT",
     scalaVersion := "2.11.0-M3",
     libraryDependencies := Seq(config),
     // libraryDependencies in test := Seq(specs2),
     resolvers := Seq(typesafe, typesafeS, sonatype, sonatypeS),
-    scalacOptions := Seq("-deprecation", "-unchecked", "-feature", "-language:_")
+    scalacOptions := Seq("-deprecation", "-unchecked", "-feature", "-language:_"),
+    publishTo := Some(Resolver.sftp(
+      "iliaz",
+      "scala.iliaz.com"
+    ) as ("scala_iliaz_com", Path.userHome / ".ssh" / "id_rsa"))
   ) //++ ScalexSbtPlugin.defaultSettings
 
   lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
