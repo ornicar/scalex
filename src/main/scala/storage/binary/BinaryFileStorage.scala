@@ -12,7 +12,13 @@ private[storage] trait BinaryFileStorage extends Storage[Database] with Gzip[Dat
 
   def read(file: File): Future[Database] =
     inputStream(file) { gzip ⇒
-      sbinary.Operations.read[Database](gzip)
+      try {
+        sbinary.Operations.read[Database](gzip)
+      }
+      catch {
+        case e: RuntimeException ⇒
+          throw new OutdatedDatabaseException("The database %s is too old and must be rebuilded" format file.getName)
+      }
     }
 
   def write(file: File, db: Database) {
