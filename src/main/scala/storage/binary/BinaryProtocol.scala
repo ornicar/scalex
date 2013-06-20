@@ -82,4 +82,8 @@ object BinaryProtocol extends DefaultProtocol with RichProtocol {
       >>(a.constructors)
     }
   }
+
+  implicit val projectF = asProduct3(Project)(Project.unapply(_).get)
+
+  implicit val databaseF = wrap[Database, List[Project]](_.projects, Database.apply)
 }

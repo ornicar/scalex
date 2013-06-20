@@ -12,10 +12,13 @@ import model._
 
 private[storage] trait BinaryFileStorage extends Storage {
 
-  def read(file: File): Future[Database] = ???
+  import BinaryProtocol._
 
-  def write(file: File, db: Database) {
-    ???
+  def read(file: File): Future[Database] = Future {
+    fromFile[Database](file)
   }
 
+  def write(file: File, db: Database) {
+    toFile(db)(file)
+  }
 }
