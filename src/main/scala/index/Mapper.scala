@@ -87,7 +87,6 @@ private[index] final class Mapper {
     isImplicitlyInherited = o.isImplicitlyInherited)
 
   def entity(o: nsc.Entity) = Entity(
-    name = o.name,
     qualifiedName = o.qualifiedName)
 
   def typeEntity(o: nsc.TypeEntity) = o.name

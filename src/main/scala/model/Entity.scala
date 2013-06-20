@@ -15,20 +15,16 @@ package model
  */
 case class Entity(
     /**
-     * The name of the entity. Note that the name does not qualify this entity uniquely; use its `qualifiedName`
-     * instead.
-     */
-    name: String,
-
-    /**
      * The qualified name of the entity. This is this entity's name preceded by the qualified name of the template
      * of which this entity is a member. The qualified name is unique to this entity.
      */
     qualifiedName: String) {
 
-  def splitQualifiedName = qualifiedName.split('.').toList
+  def name = ~namePile.headOption
 
-  def shortQualifiedName = (splitQualifiedName.reverse match {
+  lazy val namePile = qualifiedName.split('.').toList.reverse
+
+  def shortQualifiedName = (namePile match {
     case Nil          ⇒ Nil
     case head :: more ⇒ head :: more.map(_ take 1)
   }).reverse mkString "."

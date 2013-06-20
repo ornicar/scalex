@@ -12,7 +12,7 @@ object BinaryProtocol extends DefaultProtocol with RichProtocol {
 
   import Sugar._
 
-  implicit val entityF: Format[Entity] = asProduct2(Entity)(Entity.unapply(_).get)
+  implicit val entityF = wrap[Entity, String](_.qualifiedName, Entity.apply)
 
   implicit val roleF = new BinaryFormat[Role] {
     def reader(implicit in: Input) = Role fromString <<[String]
