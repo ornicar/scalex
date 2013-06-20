@@ -12,6 +12,9 @@ private[search] case class Scope(
 
   def apply(name: ProjectName): Boolean = !exclude(name) && (include.isEmpty || include(name))
 
-  override def toString =
-    (include map ("+" + _)) ++ (exclude map ("-" + _)) mkString " "
+  def isEmpty = include.isEmpty && exclude.isEmpty
+
+  override def toString = 
+    if (isEmpty) "*"
+    else (include map ("+" + _)) ++ (exclude map ("-" + _)) mkString " "
 }

@@ -6,7 +6,7 @@ import scala.concurrent.Future
 
 import model.Database
 
-private[storage] trait BinaryFileStorage extends Storage[Database] with Gzip[Database] {
+private[storage] object BinaryFileStorage extends Storage[Database] with Gzip[Database] {
 
   import BinaryProtocol._
 

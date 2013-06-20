@@ -31,7 +31,6 @@ object Main {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
       case Config(None, Some(searchConfig)) ⇒
         search.Search(ConfigFactory.load) flatMap { searcher ⇒
-          println("Searching for " + searchConfig.expression)
           searcher(searchConfig.expression) match {
             case Failure(e)   ⇒ Future.failed(e)
             case Success(res) ⇒ Future.successful(renderResult(res))

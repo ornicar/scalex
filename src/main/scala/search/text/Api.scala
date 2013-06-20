@@ -2,6 +2,8 @@ package org.scalex
 package search
 package text
 
+import util.Timer._
+
 final class Api(engine: Engine[document.Doc]) {
 
   def search(tokens: List[Token]) = new {
@@ -10,11 +12,13 @@ final class Api(engine: Engine[document.Doc]) {
 
       import Filters._
 
-      sort(
-        boost(
-          results(
-            engine(scope)(tokens)
-          )))
+      printAndMonitor("Searching for %s in %s".format(tokens mkString " ", scope)) {
+        sort(
+          boost(
+            results(
+              engine(scope)(tokens)
+            )))
+      }
     }
   }
 }
