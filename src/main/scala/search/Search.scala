@@ -47,6 +47,7 @@ object Search {
       val index = printAndMonitor("Indexing documents") {
         text.Indexer.scoped(documents)
       }
+      println(index.describe)
       println("%d documents ready for search" format documents.map(_._2.size).sum)
       val textEngine = new text.Engine(index)
       val api = new text.Api(textEngine)
