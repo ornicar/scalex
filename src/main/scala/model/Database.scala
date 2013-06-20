@@ -15,5 +15,7 @@ object Database {
   def empty = new Database(Nil)
 
   def merge(dbs: List[Database]): Database = 
-    dbs.foldLeft(Database.empty)(_ merge _)
+    dbs.toNel.fold(Database.empty) { 
+      _ foldLeft1 { _ merge _ }
+    }
 }

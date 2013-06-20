@@ -15,23 +15,9 @@ trait Storage[A] {
 
 object Storage extends Storage[Database] {
 
-  import util.IO._
-  import util.Timer._
-
   private def impl = binary.BinaryFileStorage
 
-  def read(file: File) = {
-    printAndMonitorFuture("<< %s (%s)".format(
-      file.getName,
-      humanReadableFileSize(file) | "?"
-    )) {
-      impl.read(file)
-    }
-  }
+  def read(file: File) = impl read file
 
-  def write(file: File, db: Database) {
-    printAndMonitor(">> " + file.getName) {
-      impl.write(file, db)
-    }
-  }
+  def write(file: File, db: Database) = impl.write(file, db)
 }

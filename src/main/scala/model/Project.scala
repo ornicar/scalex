@@ -12,6 +12,8 @@ case class Project(
 
   def fullName = name + " " + version
 
+  override def toString = fullName
+
   override def equals(other: Any) = other match {
     case p: Project ⇒ name == p.name && version == p.version
     case _       ⇒ false

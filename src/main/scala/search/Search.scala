@@ -27,11 +27,15 @@ object Search {
   import com.typesafe.config.Config
   import scala.collection.JavaConversions._
   import util.Timer._
+  import util.IO._
 
   def apply(config: Config): Future[Search] = {
     val files = configDbFiles(config)
-    println("Loading databases from %d files:" format files.size)
-    Future.traverse(files)(storage.Storage.read) map { dbs ⇒
+    println("Found %d scalex database files" format files.size)
+    files foreach { f ⇒ println("- %s (%s)".format(f.getName, ~humanReadableFileSize(f))) }
+    printAndMonitorFuture("Extracting databases") {
+      Future.traverse(files)(storage.Storage.read)
+    } map { dbs ⇒
       val db = printAndMonitor("Merging databases") {
         Database merge dbs
       }
@@ -56,7 +60,7 @@ object Search {
     } flatMap { file ⇒
       if (file.isDirectory) file.listFiles filter isDbFile
       else List(file)
-    } filter (_.exists)
+    } filter (_.exists) sortBy (-_.length)
 
   private def isDbFile(file: File) = file.getName endsWith ".scalex"
 }
