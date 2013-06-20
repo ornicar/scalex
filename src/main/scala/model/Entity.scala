@@ -22,7 +22,8 @@ case class Entity(
 
   def name = ~namePile.headOption
 
-  lazy val namePile = qualifiedName.split('.').toList.reverse
+  // names composing the qualified name, in reverse order
+  lazy val namePile = qualifiedName.split(Array('.', ' ', '#')).toList.reverse map (_.trim) filterNot (_.isEmpty)
 
   def shortQualifiedName = (namePile match {
     case Nil          ⇒ Nil

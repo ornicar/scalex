@@ -10,11 +10,16 @@ private[text] final class Index[A](hash: Map[Token, List[A]]) {
 
   def apply(token: Token): List[A] = ~(hash get token)
 
-  def describe = "%s\nBest tokens:\n%s".format(
+  def describe = describeShort
+
+  def describeShort = 
     "%d tokens, %d documents, %d unique documents".format(
       keys.size,
       countDocuments,
-      countUniqueDocuments),
+      countUniqueDocuments)
+
+  def describeLong = "%s\nBest tokens:\n%s".format(
+    describeShort,
     bestTokens take 5 map {
       case (token, nb) ⇒ "- %s -> %d".format(token, nb)
     } mkString "\n"

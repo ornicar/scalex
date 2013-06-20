@@ -44,10 +44,11 @@ object Search {
       val documents = printAndMonitor("Extracting search documents") {
         document.Extractor.database(db)
       }
-      val index = printAndMonitor("Indexing documents") {
-        text.Indexer.scoped(documents)
+      val index = wrapAndMonitor("Indexing documents") {
+        val i = text.Indexer.scoped(documents)
+        println(i.describe)
+        i
       }
-      println(index.describe)
       println("%d documents ready for search" format documents.map(_._2.size).sum)
       val textEngine = new text.Engine(index)
       val api = new text.Api(textEngine)

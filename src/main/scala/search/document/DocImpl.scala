@@ -16,8 +16,9 @@ private[document] trait DocImpl {
 
   override def toString = declaration
 
-  def tokenize: List[Token] = member.project.tokenize :::
-    (qualifiedName.toLowerCase split Array('.', ' ', '#')).toList map (_.trim) filterNot (_.isEmpty)
+  def tokenize = namePile map (_.toLowerCase)
 
   def qualifiedName = member.entity.qualifiedName
+
+  def namePile = member.entity.namePile
 }

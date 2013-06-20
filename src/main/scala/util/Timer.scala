@@ -39,6 +39,20 @@ private[scalex] object Timer {
     }
   }
 
+  private var indent = 0
+
+  def wrapAndMonitor[A](msg: ⇒ String)(op: ⇒ A): A = {
+    println("%sStart %s".format(" " * indent, msg))
+    indent = indent + 2
+    monitor(op) match {
+      case (res, time) ⇒ {
+        indent = indent - 2
+        println("%sCompleted %s in %s".format(" " * indent, msg, show(time)))
+        res
+      }
+    }
+  }
+
   def monitor[A](op: ⇒ A): (A, Long) = {
     val timer = new Timer
     val result = op

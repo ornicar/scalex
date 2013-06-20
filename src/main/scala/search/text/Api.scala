@@ -12,13 +12,18 @@ final class Api(engine: Engine[document.Doc]) {
 
       import Filters._
 
-      printAndMonitor("Searching for %s in %s".format(tokens mkString " ", scope)) {
+      println("Searching for %s in %s".format(tokens mkString " ", scope))
+
+      val (res, time) = monitor {
         sort(
           boost(
             results(
-              engine(scope)(tokens)
+              engine(scope, tokens)
             )))
       }
+
+      println("Found %d results in %d ms".format(res.size, time))
+      res
     }
   }
 }

@@ -2,25 +2,35 @@ package org.scalex
 package search
 package text
 
+import util.Timer._
+
 private[search] final class TokenEngine[A](
     index: Index[A],
     heuristicBuilder: HeuristicBuilder) {
 
-  def apply(token: Token): Fragment[A] =
-    scoredTokensToFragment(scoredTokens(heuristicBuilder(token)))
+  private type ScoredTokens = List[(Tokens, Score)]
 
-  private def scoredTokensToFragment(scoredTokens: ScoredTokens): Fragment[A] = {
-    for {
-      keysAndScore ← scoredTokens
-      (keys, score) = keysAndScore
-      key ← keys.toList
-      value ← index(key)
-    } yield value -> score
-  } toMap
+  def apply(token: Token): Fragment[A] =
+    buildFragment(scoreTokens(heuristicBuilder(token)))
+
+  private def buildFragment(scoredTokens: ScoredTokens): Fragment[A] =
+    // wrapAndMonitor("TokenEngine build fragment") {
+    (for {
+      tokensAndScore ← scoredTokens
+      (tokens, score) = tokensAndScore
+      token ← tokens
+      value ← index(token)
+    } yield value -> score).toMap
+  // }
+
+  private def scoreTokens(heuristics: List[Heuristic]) =
+    // wrapAndMonitor("TokenEngine score tokens") {
+    scoredTokens(heuristics, Set.empty)
+  // }
 
   private def scoredTokens(
     heuristics: List[Heuristic],
-    exclude: Set[Token] = Set.empty): List[(Tokens, Score)] = {
+    exclude: Set[Token]): List[(Tokens, Score)] = {
 
     def filterToken(f: Filter) = index.keys diff exclude filter f.apply
 
@@ -33,6 +43,4 @@ private[search] final class TokenEngine[A](
       }
     }
   }
-
-  private type ScoredTokens = List[(Tokens, Score)]
 }
