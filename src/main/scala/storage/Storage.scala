@@ -5,12 +5,12 @@ import java.io.File
 import model.Database
 import scala.concurrent.Future
 
-trait Storage {
+trait Storage[A] {
 
-  def read(file: File): Future[Database]
+  def read(file: File): Future[A]
 
-  def write(file: File, db: Database): Unit
+  def write(file: File, a: A): Unit
 }
 
 // object Storage extends GzipFileStorage 
-object Storage extends binary.BinaryFileStorage 
+object Storage extends binary.BinaryFileStorage

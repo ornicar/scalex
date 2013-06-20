@@ -2,23 +2,22 @@ package org.scalex
 package storage
 package binary
 
-import java.io._
 import scala.concurrent.Future
-import scala.util.{ Try, Success, Failure }
 
-import sbinary._, DefaultProtocol._, Operations._
+import model.Database
 
-import model._
-
-private[storage] trait BinaryFileStorage extends Storage {
+private[storage] trait BinaryFileStorage extends Storage[Database] with Gzip[Database] {
 
   import BinaryProtocol._
 
-  def read(file: File): Future[Database] = Future {
-    fromFile[Database](file)
-  }
+  def read(file: File): Future[Database] =
+    inputStream(file) { gzip ⇒
+      sbinary.Operations.read[Database](gzip)
+    }
 
   def write(file: File, db: Database) {
-    toFile(db)(file)
+    outputStream(file, db) { gzip ⇒
+      gzip write sbinary.Operations.toByteArray(db)
+    }
   }
 }
