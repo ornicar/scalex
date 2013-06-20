@@ -7,11 +7,11 @@ import scala.concurrent.{ Future, Await }
 import scala.util.{ Try, Success, Failure }
 
 import akka.actor._
-import akka.pattern.pipe
-import makeTimeout.veryLarge
-import scalastic.elasticsearch
+import akka.pattern.{ ask, pipe }
 import com.typesafe.config.Config
+import org.elasticsearch.action.search.SearchResponse
 
+import makeTimeout.veryLarge
 import model.Database
 
 private[search] final class TextActor(database: Database, config: Config) extends Actor {
@@ -26,6 +26,9 @@ private[search] final class TextActor(database: Database, config: Config) extend
 
   def receive = {
 
-    case TextQuery(tokens, scope) ⇒ ???
+    case q: query.TextQuery ⇒
+      indexer ? (Query search q) mapTo manifest[SearchResponse] map toResults pipeTo sender
   }
+
+  private def toResults(response: SearchResponse): Results = Nil
 }

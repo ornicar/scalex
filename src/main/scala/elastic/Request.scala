@@ -1,5 +1,4 @@
 package org.scalex
-package search
 package elastic
 
 import org.elasticsearch.action.ActionRequest
@@ -11,7 +10,7 @@ import org.elasticsearch.search._, facet._, terms._, sort._, SortBuilders._, bui
 import scalastic.elasticsearch.Indexer
 import scalastic.elasticsearch.SearchParameterTypes
 
-object Request {
+private[scalex] object Request {
 
   case class Search(
       query: QueryBuilder,
@@ -43,7 +42,4 @@ object Request {
       )
     }.getHits.totalHits.toInt
   }
-
-  def decomposeTextQuery(text: String): List[String] =
-    text.trim.toLowerCase.replace("+", " ").split(" ").toList
 }

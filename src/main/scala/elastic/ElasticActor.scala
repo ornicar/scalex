@@ -1,5 +1,4 @@
 package org.scalex
-package search
 package elastic
 
 import scala.concurrent.duration._
@@ -9,10 +8,11 @@ import scala.util.{ Try, Success, Failure }
 import akka.actor._
 import com.typesafe.config.Config
 import scalastic.elasticsearch.Indexer
+import org.elasticsearch.action.search.SearchResponse
 
 import api._
 
-private[search] final class ElasticActor(config: Config) extends Actor {
+private[scalex] final class ElasticActor(config: Config) extends Actor {
 
   var indexer: Indexer = _
 
@@ -23,8 +23,8 @@ private[search] final class ElasticActor(config: Config) extends Actor {
 
   def receive = {
 
-    case Search(request) ⇒
-      sender ! SearchResponse(request.in(indexName, typeName)(indexer))
+    case req: Request.Search ⇒
+      sender ! req.in(indexName, typeName)(indexer)
 
     // case Count(request) ⇒ withIndexer { es ⇒
     //   CountResponse(request.in(indexName, typeName)(es))

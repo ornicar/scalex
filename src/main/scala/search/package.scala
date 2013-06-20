@@ -9,7 +9,4 @@ package object search {
   def fragmentMonoid[A] = scalaz.Monoid[Fragment[A]]
 
   type Results = List[Result]
-
-  type Heuristic = Filter Pair Score
-  type HeuristicBuilder = Token ⇒ List[Heuristic]
 }

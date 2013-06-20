@@ -10,17 +10,15 @@ private[search] case class Raw(
   currentPage: Int, 
   maxPerPage: Int) {
 
-  def analyze: Try[ScopedQuery] = for {
+  def analyze: Try[Query] = for {
     queryAndScope ← scopeQuery(string)
     (queryString, scope) = queryAndScope
-    query ← queryString match {
-      case text                         ⇒ nameQuery(text)
-    }
-  } yield ScopedQuery(query, scope)
+    tokens ← tokenize(queryString).toNel asTry badArg("The query is empty")
+  } yield TextQuery(tokens, scope, Pagination(currentPage, maxPerPage))
 
-  private def scopeQuery(text: String) = Success {
-    if ((text contains "-") || (text contains "+")) {
-      val words = text split ' ' toList
+  private def scopeQuery(t: String) = Success {
+    if ((t contains "-") || (t contains "+")) {
+      val words = t split ' ' toList
       val parsed = words.foldLeft((List[String](), Scope())) {
         case ((ws, scope), RawQuery.scoper(sign, pack)) ⇒ sign match {
           case "-" ⇒ (ws, scope - pack)
@@ -31,14 +29,11 @@ private[search] case class Raw(
       }
       (parsed._1.reverse mkString " ", parsed._2)
     }
-    else (text, Scope())
+    else (t, Scope())
   }
 
-  private def nameQuery(text: String) =
-    tokenize(text).toNel map NameQuery asTry badArg("The query is empty")
-
-  private def tokenize(text: String): List[String] =
-    (text.toLowerCase split Array('.', ' ', '#')).toList map (_.trim) filterNot (_.isEmpty) 
+  private def tokenize(t: String): List[String] =
+    (t.toLowerCase split Array('.', ' ', '#')).toList map (_.trim) filterNot (_.isEmpty) 
 }
 
 object RawQuery {

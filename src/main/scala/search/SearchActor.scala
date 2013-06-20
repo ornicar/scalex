@@ -38,9 +38,9 @@ private[search] final class SearchActor(config: Config) extends Actor {
       case Failure(err)   ⇒ Future successful Failure(err)
     }
 
-  private def apply(q: query.ScopedQuery): Future[Try[Results]] = q match {
-    case query.ScopedQuery(query.NameQuery(tokens), scope) ⇒
-      textualEngine ? TextQuery(tokens.list, scope) mapTo manifest[Try[Results]]
+  private def apply(q: query.Query): Future[Try[Results]] = q match {
+    case q: query.TextQuery ⇒
+      textualEngine ? q mapTo manifest[Try[Results]]
     case _ ⇒ ???
   }
 
