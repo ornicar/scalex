@@ -1,7 +1,7 @@
 package org.scalex
 package storage
 
-import java.io._
+import java.io.{ File ⇒ _, _ }
 import java.util.zip.{ GZIPOutputStream, GZIPInputStream }
 import scala.concurrent.Future
 

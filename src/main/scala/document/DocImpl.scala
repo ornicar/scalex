@@ -1,5 +1,4 @@
 package org.scalex
-package search
 package document
 
 private[document] trait DocImpl {

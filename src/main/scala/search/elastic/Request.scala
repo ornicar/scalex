@@ -1,3 +1,5 @@
+package org.scalex
+package search
 package elastic
 
 import org.elasticsearch.action.ActionRequest
@@ -6,8 +8,8 @@ import org.elasticsearch.action.search.SearchType
 import org.elasticsearch.index.query._, FilterBuilders._, QueryBuilders._
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.search._, facet._, terms._, sort._, SortBuilders._, builder._
-import scalastic.elasticsearch.SearchParameterTypes
 import scalastic.elasticsearch.Indexer
+import scalastic.elasticsearch.SearchParameterTypes
 
 object Request {
 

@@ -29,13 +29,10 @@ object Main {
     case _ ⇒ Parser.parse(args).fold(Future.failed[Unit](badArg(args mkString " "))) {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
-      case Config(None, Some(searchConfig)) ⇒
-        search.Search(ConfigFactory.load) flatMap { searcher ⇒
-          searcher(searchConfig.expression) match {
-            case Failure(e)   ⇒ Future.failed(e)
-            case Success(res) ⇒ Future.successful(renderResult(res))
-          }
-        }
+      // case Config(None, Some(searchConfig)) ⇒
+      //   search.Search(ConfigFactory.load) flatMap { searcher ⇒
+      //     searcher(searchConfig.expression) 
+      //   }
       case c ⇒ Future.failed(badArg(c.toString))
     }
   }

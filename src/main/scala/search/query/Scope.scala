@@ -2,6 +2,8 @@ package org.scalex
 package search
 package query
 
+import document.ProjectName
+
 private[search] case class Scope(
     include: Set[ProjectName] = Set.empty,
     exclude: Set[ProjectName] = Set.empty) {

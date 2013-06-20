@@ -1,5 +1,4 @@
 package org.scalex
-package search
 package document
 
 case class Project(name: String, version: String) {

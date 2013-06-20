@@ -1,7 +1,6 @@
 package org.scalex
 package storage
 
-import java.io.File
 import scala.concurrent.Future
 
 import model.Database

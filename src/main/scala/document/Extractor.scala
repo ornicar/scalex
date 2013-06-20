@@ -1,10 +1,9 @@
 package org.scalex
-package search
 package document
 
 import model.DocTemplate
 
-private[search] object Extractor {
+private[scalex] object Extractor {
 
   def database(d: model.Database): ScopedDocs = d.projects map { p ⇒
     makeProject(p).id -> project(p)

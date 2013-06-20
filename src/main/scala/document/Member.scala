@@ -1,5 +1,4 @@
 package org.scalex
-package search
 package document
 
 import model.Role

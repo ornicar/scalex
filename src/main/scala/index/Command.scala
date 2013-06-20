@@ -1,7 +1,6 @@
 package org.scalex
 package index
 
-import java.io.File
 import scala.tools.nsc.CompilerCommand
 
 private[index] final class Command(

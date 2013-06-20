@@ -2,17 +2,19 @@ package org.scalex
 package search
 package elastic
 
-import akka.actor._
-import akka.pattern.pipe
-import play.api.libs.json._
-import scalastic.elasticsearch.Indexer
-import com.typesafe.config.Config
+import scala.concurrent.duration._
+import scala.concurrent.{ Future, Await }
+import scala.util.{ Try, Success, Failure }
 
-import actorApi._
+import akka.actor._
+import com.typesafe.config.Config
+import scalastic.elasticsearch.Indexer
+
+import api._
 
 private[search] final class ElasticActor(config: Config) extends Actor {
 
-  var indexer: elasticsearch.Indexer = _
+  var indexer: Indexer = _
 
   override def preStart {
     println("[search] Instanciate indexer")
@@ -21,11 +23,10 @@ private[search] final class ElasticActor(config: Config) extends Actor {
 
   def receive = {
 
-    case Search(request) ⇒ withEs { es ⇒
-      SearchResponse(request.in(indexName, typeName)(es))
-    } pipeTo sender
+    case Search(request) ⇒
+      sender ! SearchResponse(request.in(indexName, typeName)(indexer))
 
-    // case Count(request) ⇒ withEs { es ⇒
+    // case Count(request) ⇒ withIndexer { es ⇒
     //   CountResponse(request.in(indexName, typeName)(es))
     // } pipeTo sender
 
@@ -34,15 +35,15 @@ private[search] final class ElasticActor(config: Config) extends Actor {
     //   indexQuery(Json.obj()) pipeTo sender
     // }
 
-    // case Optimize ⇒ withEs {
+    // case Optimize ⇒ withIndexer {
     //   _.optimize(Seq(indexName))
     // }
 
-    // case InsertOne(id, doc) ⇒ withEs {
+    // case InsertOne(id, doc) ⇒ withIndexer {
     //   _.index(indexName, typeName, id, Json stringify doc)
     // }
 
-    // case InsertMany(list) ⇒ withEs { es ⇒
+    // case InsertMany(list) ⇒ withIndexer { es ⇒
     //   es bulk {
     //     list map {
     //       case (id, doc) ⇒ es.index_prepare(indexName, typeName, id, Json stringify doc).request
@@ -50,15 +51,15 @@ private[search] final class ElasticActor(config: Config) extends Actor {
     //   }
     // }
 
-    // case RemoveOne(id) ⇒ withEs {
+    // case RemoveOne(id) ⇒ withIndexer {
     //   _.delete(indexName, typeName, id)
     // }
 
-    // case RemoveQuery(query) ⇒ withEs {
+    // case RemoveQuery(query) ⇒ withIndexer {
     //   _.deleteByQuery(Seq(indexName), Seq(typeName), query)
     // }
 
-    // case Clear ⇒ withEs { es ⇒
+    // case Clear ⇒ withIndexer { es ⇒
     //   try {
     //     es.createIndex(indexName, settings = Map())
     //   }
@@ -78,18 +79,18 @@ private[search] final class ElasticActor(config: Config) extends Actor {
     // }
   }
 
+  private val indexName = config getString "index"
+  private val typeName = config getString "type"
+
   private def instanciateIndexer = Future {
-    elasticsearch.Indexer.transport(
+    Indexer.transport(
       settings = Map("cluster.name" -> config.getString("cluster")),
       host = config getString "host",
-      ports = Seq(config getString "port"))
+      ports = Seq(config getInt "port"))
   } andThen {
     case Success(indexer) ⇒
       println("[search] Start indexer")
       indexer.start
       println("[search] Indexer is running")
   }
-
-  private def withEs[A](f: Indexer ⇒ A): Fu[A] = indexer map f
 }
-
