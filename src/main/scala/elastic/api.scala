@@ -21,12 +21,19 @@ private[scalex] object api {
 
   case object AwaitReady
 
+  sealed trait Request[A] {
+
+    def in(indexName: String, typeName: String)(indexer: Indexer): A
+  }
+
+
   case class Search(
       query: QueryBuilder,
       filter: Option[FilterBuilder] = None,
       size: Int = 10,
       from: Int = 0,
-      sortings: Iterable[SearchParameterTypes.Sorting] = Nil) {
+      sortings: Iterable[SearchParameterTypes.Sorting] = Nil
+    ) extends Request[SearchResponse] {
 
     val explain = none[Boolean]
 
@@ -42,7 +49,8 @@ private[scalex] object api {
 
   case class Count(
       query: QueryBuilder,
-      filter: Option[FilterBuilder] = None) {
+      filter: Option[FilterBuilder] = None
+    ) extends Request[Int] {
 
     def in(indexName: String, typeName: String)(es: Indexer): Int = {
       es.search(Seq(indexName), Seq(typeName), query,

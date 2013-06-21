@@ -62,7 +62,7 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
       // }
     }
 
-    case req: api.Search ⇒
+    case req: api.Request[_] ⇒
       sender ! req.in(indexName, typeName)(indexer)
 
     // case Count(request) ⇒ withIndexer { es ⇒

@@ -20,6 +20,7 @@ private[text] final class Populator(indexer: ActorRef) extends scalaz.NonEmptyLi
 
   private def isIndexed(project: Project): Boolean = {
     import makeTimeout.large
+    println("populator count")
     Await.result(indexer ? Query.count(query.TextQuery(
       tokens = nel(project.name, Nil),
       scope = query.Scope(include = Set(project.name)),
