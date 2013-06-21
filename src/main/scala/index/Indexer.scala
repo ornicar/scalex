@@ -47,13 +47,16 @@ private[scalex] object Indexer {
     else if (settings.help.value || !hasFiles)
       reporter.echo(command.usageMsg)
     else try {
+      val project = model.Project(name, version) getOrElse {
+        throw new nsc.FatalError("Invalid format, should be name_version")
+      }
       val factory = new nsc.doc.DocFactory(reporter, settings)
       println("- Index %d scala files" format command.files.length)
       factory makeUniverse Left(command.files) map { universe ⇒
         println("- Build scalex database")
         val root = new Mapper() docTemplate universe.rootPackage
-        val project = model.Project(name, version, root)
-        val database = new model.Database(List(project))
+        val seed = model.Seed(project, root)
+        val database = new model.Database(List(seed))
         println("- Compress database")
         storage.Storage.write(outputFile, database)
         println("- Sanity check")

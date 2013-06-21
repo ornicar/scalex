@@ -17,4 +17,8 @@ package object scalex
 
   type Token = String
   type Tokens = Set[Token]
+
+  type ProjectName = String
+  type ProjectVersion = semverfi.Valid
+  type ProjectId = String
 }

@@ -1,7 +1,7 @@
 package org.scalex
 package document
 
-import model.Role
+import model.{ Project, Role }
 
 case class Member(
     project: Project,

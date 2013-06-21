@@ -13,22 +13,22 @@ import scalastic.elasticsearch.SearchParameterTypes
 
 private[scalex] object api {
 
-  case class Clear(mapping: JsObject)
+  case class Clear(typeName: Type, mapping: JsObject)
 
-  case object Optimize
+  case class Optimize(typeName: Type)
 
-  case class IndexMany(docs: List[(String, JsObject)])
+  case class IndexMany(typeName: Type, docs: List[(String, JsObject)])
 
   case object AwaitReady
 
   sealed trait Request[A] {
 
-    def in(indexName: String, typeName: String)(indexer: Indexer): A
+    def in(indexName: String)(indexer: Indexer): A
   }
 
   case class Search(
       query: QueryBuilder,
-      filter: Option[FilterBuilder] = None,
+      typeNames: Types,
       size: Int = 10,
       from: Int = 0,
       sortings: Iterable[SearchParameterTypes.Sorting] = Nil
@@ -36,9 +36,9 @@ private[scalex] object api {
 
     val explain = none[Boolean]
 
-    def in(indexName: String, typeName: String)(es: Indexer): SearchResponse =
-      es.search(Seq(indexName), Seq(typeName), query,
-        filter = filter,
+    def in(indexName: String)(es: Indexer): SearchResponse =
+      es.search(Seq(indexName), typeNames, query,
+        filter = none,
         sortings = sortings,
         from = from.some,
         size = size.some,
@@ -48,12 +48,12 @@ private[scalex] object api {
 
   case class Count(
       query: QueryBuilder,
-      filter: Option[FilterBuilder] = None
+      typeNames: Types
     ) extends Request[Int] {
 
-    def in(indexName: String, typeName: String)(es: Indexer): Int = {
-      es.search(Seq(indexName), Seq(typeName), query.pp,
-        filter = filter.pp,
+    def in(indexName: String)(es: Indexer): Int = {
+      es.search(Seq(indexName), typeNames, query,
+        filter = none,
         searchType = SearchType.COUNT.some
       )
     }.getHits.totalHits.toInt

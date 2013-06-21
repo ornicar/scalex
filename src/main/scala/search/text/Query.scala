@@ -13,12 +13,12 @@ private[text] final class Query(q: TextQuery) {
   def search = q match {
     case TextQuery(tokens, scope, Pagination(page, perPage)) ⇒ elastic.api.Search(
       query = makeQuery,
-      filter = makeFilters,
+      typeNames = ???,//ScopeResolver(scope),
       from = (page - 1) * perPage,
       size = perPage)
   }
 
-  def count = elastic.api.Count(makeQuery, makeFilters)
+  def count = ??? // elastic.api.Count(makeQuery, Selector(q.scope)
 
   // private def tokens = tokens
 
@@ -30,9 +30,9 @@ private[text] final class Query(q: TextQuery) {
     }
   }
 
-  private def makeFilters = {
-    (q.scope.include.toList map { termFilter(fields.project, _) })
-  }.toNel map { fs ⇒ andFilter(fs.list: _*) }
+  // private def makeFilters = {
+  //   (q.scope.include.toList map { termFilter(fields.project, _) })
+  // }.toNel map { fs ⇒ andFilter(fs.list: _*) }
 }
 
 private[text] object Query {

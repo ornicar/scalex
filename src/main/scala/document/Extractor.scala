@@ -1,19 +1,15 @@
 package org.scalex
 package document
 
-import model.DocTemplate
+import model.{ Project, Seed, DocTemplate }
 
 private[scalex] object Extractor {
 
-  def apply(d: model.Database): ScopedDocs = d.projects map { p ⇒
-    makeProject(p).id -> apply(p)
-  } toMap
+  def apply(d: model.Database): ScopedDocs = (d.seeds map { 
+    case seed @ Seed(project, _) ⇒ project.id -> fromSeed(seed)
+  }).toMap
 
-  def apply(p: model.Project): Docs = new ProjectExtractor(p).apply
-
-  private final class ProjectExtractor(p: model.Project) {
-
-    def apply = p.root.templates flatMap walk(makeParent(p.root))
+  def fromSeed(seed: Seed) = {
 
     def walk(parent: Parent)(tpl: DocTemplate): Docs =
       makeParent(tpl) |> { context ⇒
@@ -29,7 +25,7 @@ private[scalex] object Extractor {
       typeParams = parent.typeParams)
 
     def makeMember(parent: Parent)(o: model.Member) = Member(
-      project = project,
+      project = seed.project,
       parent = parent,
       entity = o.entity,
       role = o.role,
@@ -48,9 +44,6 @@ private[scalex] object Extractor {
     def makeVal(parent: Parent)(o: model.Member) = Val(
       member = makeMember(parent)(o))
 
-    lazy val project = makeProject(p)
+    seed.root.templates flatMap walk(makeParent(seed.root))
   }
-
-  private def makeProject(p: model.Project) =
-    Project(name = p.name, version = p.version)
 }

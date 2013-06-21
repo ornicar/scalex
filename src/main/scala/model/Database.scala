@@ -3,11 +3,13 @@ package model
 
 import scala.tools.nsc.doc.model._
 
-case class Database(projects: List[Project]) {
+case class Database(seeds: List[Seed]) {
 
-  def describe: String = projects map (_.describe) mkString "\n\n\n"
+  def projects = seeds map (_.project)
 
-  def merge(other: Database) = Database((projects ++ other.projects).distinct)
+  def describe: String = seeds map (_.describe) mkString "\n\n\n"
+
+  def merge(other: Database) = Database((seeds ++ other.seeds).distinct)
 }
 
 object Database {

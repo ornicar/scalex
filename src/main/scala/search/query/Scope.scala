@@ -2,7 +2,7 @@ package org.scalex
 package search
 package query
 
-import document.ProjectName
+import model.Project
 
 private[search] case class Scope(
     include: Set[ProjectName] = Set.empty,
@@ -12,11 +12,9 @@ private[search] case class Scope(
 
   def -(name: ProjectName) = copy(exclude = exclude + name)
 
-  def apply(name: ProjectName): Boolean = !exclude(name) && (include.isEmpty || include(name))
-
   def isEmpty = include.isEmpty && exclude.isEmpty
 
-  override def toString = 
+  override def toString =
     if (isEmpty) "*"
     else (include map ("+" + _)) ++ (exclude map ("-" + _)) mkString " "
 }

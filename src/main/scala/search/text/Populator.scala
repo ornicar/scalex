@@ -9,35 +9,36 @@ import akka.actor.ActorRef
 import akka.pattern.{ ask, pipe }
 
 import document.Extractor
-import model.{ Database, Project }
+import model.{ Database, Project, Seed }
 
 private[text] final class Populator(indexer: ActorRef) extends scalaz.NonEmptyListFunctions {
 
   def apply(database: Database) {
 
-    database.projects filterNot isIndexed foreach populateProject 
+    database.seeds filterNot isIndexed foreach fromSeed 
   }
 
-  private def isIndexed(project: Project): Boolean = {
+  def fromSeed(seed: Seed) {
+    println("[%s] Generate documents".format(seed))
+    val documents = Extractor fromSeed seed
+    println("[%s] Index %d documents".format(seed, documents.size))
+    indexer ! elastic.api.Clear(seed.project.id, Mapping.jsonMapping)
+    documents grouped 1000 foreach { docs ⇒
+      indexer ! elastic.api.IndexMany(seed.project.id) docs map {
+        Mapping.from(seed.project.id, _)
+      }
+    }
+
+    indexer ! elastic.api.Optimize
+  }
+
+  private def isIndexed(seed: Seed): Boolean = {
     import makeTimeout.large
     println("populator count")
     Await.result(indexer ? Query.count(query.TextQuery(
       tokens = Nil,
-      scope = query.Scope(include = Set(project.name)),
+      scope = query.Scope(include = Set(seed.project.name)),
       pagination = query.Pagination(1, Int.MaxValue)
     )) mapTo manifest[Int], 5 second).pp > 0
-  }
-
-  private def populateProject(project: Project) {
-    println("[%s] Generate documents".format(project))
-    val documents = Extractor(project)
-    println("[%s] Index %d documents".format(project, documents.size))
-    documents grouped 1000 foreach { docs ⇒
-      indexer ! elastic.api.IndexMany(docs map {
-        Mapping.from(project.name, _)
-      })
-    }
-
-    indexer ! elastic.api.Optimize
   }
 }
