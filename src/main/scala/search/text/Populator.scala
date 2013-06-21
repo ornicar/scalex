@@ -2,23 +2,39 @@ package org.scalex
 package search
 package text
 
+import scala.concurrent.duration._
+import scala.concurrent.{ Future, Await }
+
 import akka.actor.ActorRef
+import akka.pattern.{ ask, pipe }
 
 import document.Extractor
-import model.Database
+import model.{ Database, Project }
 
-private[text] object Populator {
+private[text] final class Populator(indexer: ActorRef) extends scalaz.NonEmptyListFunctions {
 
-  def apply(indexer: ActorRef, database: Database) {
+  def apply(database: Database) {
 
-    println("Start populator")
+    database.projects filterNot isIndexed foreach populateProject 
+  }
 
-    indexer ! elastic.api.Clear(Mapping.jsonMapping)
+  private def isIndexed(project: Project): Boolean = {
+    import makeTimeout.large
+    Await.result(indexer ? Query.count(query.TextQuery(
+      tokens = nel(project.name, Nil),
+      scope = query.Scope(include = Set(project.name)),
+      pagination = query.Pagination(1, Int.MaxValue)
+    )) mapTo manifest[Int], 5 second).pp > 0
+  }
 
-    Extractor flat database grouped 1000 foreach { docs ⇒
+  private def populateProject(project: Project) {
+
+    Extractor(project) grouped 1000 foreach { docs ⇒
       indexer ! elastic.api.IndexMany(docs map {
-        case (project, doc) ⇒ Mapping.from(project, doc)
+        Mapping.from(project.name, _)
       })
     }
+
+    indexer ! elastic.api.Optimize
   }
 }

@@ -22,9 +22,10 @@ private[search] final class TextActor(database: Database, config: Config) extend
   override def preStart {
     indexer = context.actorOf(Props(
       new elastic.ElasticActor(config getConfig "elasticsearch")
-    ))
-    Populator(indexer, database)
-    indexer ! elastic.api.Optimize
+    ), name = "elastic")
+    // indexer ! elastic.api.Clear(Mapping.jsonMapping)
+    val populator = new Populator(indexer)
+    populator(database)
     Await.ready(indexer ? elastic.api.AwaitReady , 10 minutes)
     println("Text search ready!")
   }
@@ -35,5 +36,8 @@ private[search] final class TextActor(database: Database, config: Config) extend
       indexer ? (Query search q) mapTo manifest[SearchResponse] map toResults pipeTo sender
   }
 
-  private def toResults(response: SearchResponse): Results = Nil
+  private def toResults(response: SearchResponse): Results = {
+    println(response)
+    Nil
+  }
 }

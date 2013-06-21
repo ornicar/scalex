@@ -5,11 +5,6 @@ import model.DocTemplate
 
 private[scalex] object Extractor {
 
-  def flat(d: model.Database): List[(ProjectId, Doc)] = 
-    d.projects flatMap { p ⇒
-      apply(p) map { p.name -> _ }
-    }
-
   def apply(d: model.Database): ScopedDocs = d.projects map { p ⇒
     makeProject(p).id -> apply(p)
   } toMap

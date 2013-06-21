@@ -41,4 +41,6 @@ private[text] final class Query(q: TextQuery) {
 private[text] object Query {
 
   def search(q: TextQuery) = new Query(q).search
+
+  def count(q: TextQuery) = new Query(q).count
 }

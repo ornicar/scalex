@@ -7,10 +7,11 @@ import scala.concurrent.{ Future, Await }
 import scala.util.{ Try, Success, Failure }
 
 import akka.actor._
+import akka.actor.SupervisorStrategy._
 import akka.pattern.{ ask, pipe }
 import com.typesafe.config.Config
-import makeTimeout.veryLarge
 
+import makeTimeout.veryLarge
 import model.Database
 import util.IO._
 import util.Timer._
@@ -20,11 +21,17 @@ private[search] final class SearchActor(config: Config) extends Actor {
   private var database: Database = _
   private var textualEngine: ActorRef = _
 
+  override val supervisorStrategy =
+    OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
+      case _: ActorInitializationException ⇒ Escalate
+      case _: Exception                    ⇒ Restart
+    }
+
   override def preStart {
     database = Await.result(buildDatabase, 10 minutes)
     textualEngine = context.actorOf(Props(
       new text.TextActor(database, config getConfig "text")
-    ))
+    ), name = "text")
   }
 
   def receive = {
@@ -40,7 +47,7 @@ private[search] final class SearchActor(config: Config) extends Actor {
 
   private def apply(q: query.Query): Future[Results] = q match {
     case q: query.TextQuery ⇒ textualEngine ? q mapTo manifest[Results]
-    case _ ⇒ ???
+    case _                  ⇒ ???
   }
 
   private def buildDatabase: Future[Database] = {

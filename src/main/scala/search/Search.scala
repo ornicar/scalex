@@ -13,7 +13,7 @@ final class Search(env: Env) {
 
   private val actor: ActorRef = env.system.actorOf(Props(
     new SearchActor(env.config)
-  ))
+  ), name = "search")
 
   def apply(expression: String): Future[Try[Results]] =
     actor ? expression mapTo manifest[Try[Results]]
