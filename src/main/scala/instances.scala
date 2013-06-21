@@ -1,5 +1,6 @@
 package org.scalex
 
+import scala.concurrent.Future
 import scala.util.{ Try, Success, Failure }
 
 import scalaz._
@@ -12,6 +13,18 @@ private[scalex] trait instances {
 
     def map2[N[_], B, C](f: B ⇒ C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] =
       f1.map(fa) { k ⇒ f2.map(k: N[B])(f) }
+  }
+
+  implicit final class ScalexFuture[A](fua: Future[A]) {
+
+    def void: Future[Unit] = fua map (_ ⇒ ())
+
+    def addEffects(failure: Exception ⇒ Unit)(success: A ⇒ Unit): Future[A] =
+      fua ~ {
+        _ onFailure {
+          case e: Exception ⇒ failure(e)
+        }
+      } ~ { _ foreach success }
   }
 
   implicit final class ScalexPimpAny[A](any: A) {

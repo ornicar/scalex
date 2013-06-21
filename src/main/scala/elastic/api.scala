@@ -7,10 +7,19 @@ import org.elasticsearch.action.search.SearchType
 import org.elasticsearch.index.query._, FilterBuilders._, QueryBuilders._
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.search._, facet._, terms._, sort._, SortBuilders._, builder._
+import play.api.libs.json._
 import scalastic.elasticsearch.Indexer
 import scalastic.elasticsearch.SearchParameterTypes
 
-private[scalex] object Request {
+private[scalex] object api {
+
+  case class Clear(mapping: JsObject)
+
+  case object Optimize
+
+  case class IndexMany(docs: List[(String, JsObject)])
+
+  case object AwaitReady
 
   case class Search(
       query: QueryBuilder,

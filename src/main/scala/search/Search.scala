@@ -18,8 +18,3 @@ final class Search(env: Env) {
   def apply(expression: String): Future[Try[Results]] =
     actor ? expression mapTo manifest[Try[Results]]
 }
-
-object Search {
-
-  def default = new Search(Env.default)
-}

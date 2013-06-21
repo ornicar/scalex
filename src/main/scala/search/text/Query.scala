@@ -2,7 +2,6 @@ package org.scalex
 package search
 package text
 
-import elastic.Request
 import org.elasticsearch.index.query._, QueryBuilders._, FilterBuilders._
 
 import query.{ TextQuery, Pagination }
@@ -12,14 +11,14 @@ private[text] final class Query(q: TextQuery) {
   import Mapping.fields
 
   def search = q match {
-    case TextQuery(tokens, scope, Pagination(page, perPage)) ⇒ Request.Search(
+    case TextQuery(tokens, scope, Pagination(page, perPage)) ⇒ elastic.api.Search(
       query = makeQuery,
       filter = makeFilters,
       from = (page - 1) * perPage,
       size = perPage)
   }
 
-  def count = Request.Count(makeQuery, makeFilters)
+  def count = elastic.api.Count(makeQuery, makeFilters)
 
   // private def tokens = tokens
 

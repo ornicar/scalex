@@ -2,29 +2,30 @@ package org.scalex
 package search
 package text
 
+import elastic.Mapping._
 import play.api.libs.json._
 
-import elastic.Mapping._
+import document._
 
 private[text] object Mapping {
 
   object fields {
-    val name = "na"
     val project = "pro"
+    val name = "na"
   }
+
   import fields._
 
   def jsonMapping = Json.obj(
     "properties" -> Json.toJson(List(
+      field(project, "string", false),
       boost(name, "string", 3)
     ).toMap),
     "analyzer" -> "snowball"
   )
 
-  // def from(team: TeamModel): JsObject = Json.obj(
-  //   name -> team.name,
-  //   description -> team.description,
-  //   location -> ~team.location,
-  //   nbMembers -> team.nbMembers
-  // )
+  def from(projectId: ProjectId, doc: Doc): (String, JsObject) =
+    doc.qualifiedName -> Json.obj(
+      project -> projectId,
+      name -> doc.member.entity.name)
 }

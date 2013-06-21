@@ -7,23 +7,62 @@ import scala.util.{ Try, Success, Failure }
 
 import akka.actor._
 import com.typesafe.config.Config
-import scalastic.elasticsearch.Indexer
 import org.elasticsearch.action.search.SearchResponse
+import play.api.libs.json.{ Json, JsObject }
+import scalastic.elasticsearch.Indexer
 
 import api._
+import util.Timer._
 
 private[scalex] final class ElasticActor(config: Config) extends Actor {
 
   var indexer: Indexer = _
 
   override def preStart {
-    println("[search] Instanciate indexer")
-    indexer = Await.result(instanciateIndexer, 1 minute)
+    indexer = instanciateIndexer
+  }
+
+  override def postStop {
+    Option(indexer) foreach (_.stop)
+    println("[search] Indexer is stopped")
   }
 
   def receive = {
 
-    case req: Request.Search ⇒
+    case api.Clear(mapping) ⇒ {
+      Await.ready(Future {
+        indexer.deleteByQuery(Seq(indexName), Seq(typeName))
+        indexer.deleteMapping(indexName :: Nil, typeName.some)
+        indexer.putMapping(indexName, typeName, Json stringify mapping)
+        indexer.refresh()
+      }, 3 second)
+    }
+
+    case api.Optimize ⇒ {
+      // wrapAndMonitor("ES optimize") {
+        indexer.refresh(Seq(indexName))
+        indexer.optimize(Seq(indexName))
+      // }
+    }
+
+    case api.AwaitReady ⇒ sender ! indexer.waitTillActive(Seq(indexName))
+
+    case api.IndexMany(docs) ⇒ 
+    // wrapAndMonitor("ES index %d docs" format docs.size) {
+      indexer bulk {
+        docs map {
+          case (id, doc) ⇒
+            indexer.index_prepare(
+              indexName,
+              typeName,
+              id,
+              Json stringify doc
+            ).request
+        }
+      // }
+    }
+
+    case req: api.Search ⇒
       sender ! req.in(indexName, typeName)(indexer)
 
     // case Count(request) ⇒ withIndexer { es ⇒
@@ -82,15 +121,22 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
   private val indexName = config getString "index"
   private val typeName = config getString "type"
 
-  private def instanciateIndexer = Future {
-    Indexer.transport(
+  private def instanciateIndexer = {
+    val i = Indexer.transport(
       settings = Map("cluster.name" -> config.getString("cluster")),
       host = config getString "host",
       ports = Seq(config getInt "port"))
-  } andThen {
-    case Success(indexer) ⇒
-      println("[search] Start indexer")
-      indexer.start
-      println("[search] Indexer is running")
+    println("[search] Start indexer")
+    i.start
+    i.waitTillActive(Seq(indexName))
+    // i.waitForYellowStatus(Seq(indexName))
+    try {
+      i.createIndex(indexName, settings = Map.empty)
+    }
+    catch {
+      case e: org.elasticsearch.indices.IndexAlreadyExistsException ⇒
+    }
+    println("[search] Indexer is running")
+    i
   }
 }

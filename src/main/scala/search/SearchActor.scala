@@ -23,7 +23,7 @@ private[search] final class SearchActor(config: Config) extends Actor {
   override def preStart {
     database = Await.result(buildDatabase, 10 minutes)
     textualEngine = context.actorOf(Props(
-      new text.TextActor(database, config)
+      new text.TextActor(database, config getConfig "text")
     ))
   }
 
@@ -34,13 +34,12 @@ private[search] final class SearchActor(config: Config) extends Actor {
 
   private def apply(expression: String): Future[Try[Results]] =
     query.Raw(expression, 1, 10).analyze match {
-      case Success(query) ⇒ apply(query)
+      case Success(query) ⇒ apply(query) map { Success(_) }
       case Failure(err)   ⇒ Future successful Failure(err)
     }
 
-  private def apply(q: query.Query): Future[Try[Results]] = q match {
-    case q: query.TextQuery ⇒
-      textualEngine ? q mapTo manifest[Try[Results]]
+  private def apply(q: query.Query): Future[Results] = q match {
+    case q: query.TextQuery ⇒ textualEngine ? q mapTo manifest[Results]
     case _ ⇒ ???
   }
 
@@ -60,7 +59,7 @@ private[search] final class SearchActor(config: Config) extends Actor {
   }
 
   private def configDbFiles(config: Config): List[File] =
-    (config getStringList "scalex.databases").toList map {
+    (config getStringList "databases").toList map {
       new File(_)
     } flatMap { file ⇒
       if (file.isDirectory) file.listFiles filter isDbFile
