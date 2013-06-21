@@ -2,19 +2,22 @@ package org.scalex
 package search
 package query
 
-import scala.util.{Try, Success, Failure}
+import scala.util.{ Try, Success, Failure }
+
 import scalaz.NonEmptyList
 
 private[search] case class Raw(
-  string: String, 
-  currentPage: Int, 
-  maxPerPage: Int) {
+    string: String,
+    currentPage: Int,
+    maxPerPage: Int) {
 
   def analyze: Try[Query] = for {
     queryAndScope ← scopeQuery(string)
     (queryString, scope) = queryAndScope
-    tokens ← tokenize(queryString).toNel asTry badArg("The query is empty")
-  } yield TextQuery(tokens, scope, Pagination(currentPage, maxPerPage))
+  } yield TextQuery(
+    tokens = tokenize(queryString),
+    scope = scope,
+    pagination = Pagination(currentPage, maxPerPage))
 
   private def scopeQuery(t: String) = Success {
     if ((t contains "-") || (t contains "+")) {
@@ -33,7 +36,7 @@ private[search] case class Raw(
   }
 
   private def tokenize(t: String): List[String] =
-    (t.toLowerCase split Array('.', ' ', '#')).toList map (_.trim) filterNot (_.isEmpty) 
+    (t.toLowerCase split Array('.', ' ', '#')).toList map (_.trim) filterNot (_.isEmpty)
 }
 
 object RawQuery {

@@ -37,7 +37,7 @@ private[search] final class TextActor(database: Database, config: Config) extend
   }
 
   private def toResults(response: SearchResponse): Results = {
-    println(response)
+    // println(response)
     Nil
   }
 }

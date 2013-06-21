@@ -12,11 +12,11 @@ private[search] sealed trait Query {
 }
 
 private[search] case class TextQuery(
-    tokens: NonEmptyList[String],
+    tokens: List[String],
     scope: Scope,
     pagination: Pagination) extends Query {
 
-  override def toString = tokens.list mkString " and "
+  override def toString = "%s in %s".format(tokens mkString " and ", scope)
 }
 
 private[search] case class SigQuery(

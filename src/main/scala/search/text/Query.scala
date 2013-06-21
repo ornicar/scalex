@@ -22,20 +22,17 @@ private[text] final class Query(q: TextQuery) {
 
   // private def tokens = tokens
 
-  private def makeQuery = q.tokens.list.foldLeft(boolQuery) {
-    case (query, token) ⇒ query must {
-      multiMatchQuery(token, fields.name)
+  private def makeQuery = q.tokens.toNel.fold[BaseQueryBuilder](matchAllQuery) {
+    _.foldLeft(boolQuery) {
+      case (query, token) ⇒ query must {
+        multiMatchQuery(token, fields.name)
+      }
     }
   }
 
-  private def makeFilters = List(
-    q.scope.include.nonEmpty option q.scope.include map { 
-      termFilter(fields.project, _)
-    }
-    // userSearch map { termFilter(fields.author, _) },
-    // !staff option termFilter(fields.staff, false),
-    // !troll option termFilter(fields.troll, false)
-  ).flatten.toNel map { fs ⇒ andFilter(fs.list: _*) }
+  private def makeFilters = {
+    (q.scope.include.toList map { termFilter(fields.project, _) })
+  }.toNel map { fs ⇒ andFilter(fs.list: _*) }
 }
 
 private[text] object Query {

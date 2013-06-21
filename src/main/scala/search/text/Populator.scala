@@ -22,15 +22,17 @@ private[text] final class Populator(indexer: ActorRef) extends scalaz.NonEmptyLi
     import makeTimeout.large
     println("populator count")
     Await.result(indexer ? Query.count(query.TextQuery(
-      tokens = nel(project.name, Nil),
+      tokens = Nil,
       scope = query.Scope(include = Set(project.name)),
       pagination = query.Pagination(1, Int.MaxValue)
     )) mapTo manifest[Int], 5 second).pp > 0
   }
 
   private def populateProject(project: Project) {
-
-    Extractor(project) grouped 1000 foreach { docs ⇒
+    println("[%s] Generate documents".format(project))
+    val documents = Extractor(project)
+    println("[%s] Index %d documents".format(project, documents.size))
+    documents grouped 1000 foreach { docs ⇒
       indexer ! elastic.api.IndexMany(docs map {
         Mapping.from(project.name, _)
       })

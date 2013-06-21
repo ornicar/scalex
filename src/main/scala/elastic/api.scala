@@ -26,7 +26,6 @@ private[scalex] object api {
     def in(indexName: String, typeName: String)(indexer: Indexer): A
   }
 
-
   case class Search(
       query: QueryBuilder,
       filter: Option[FilterBuilder] = None,
@@ -53,8 +52,8 @@ private[scalex] object api {
     ) extends Request[Int] {
 
     def in(indexName: String, typeName: String)(es: Indexer): Int = {
-      es.search(Seq(indexName), Seq(typeName), query,
-        filter = filter,
+      es.search(Seq(indexName), Seq(typeName), query.pp,
+        filter = filter.pp,
         searchType = SearchType.COUNT.some
       )
     }.getHits.totalHits.toInt
