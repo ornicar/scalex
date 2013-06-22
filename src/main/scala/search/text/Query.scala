@@ -10,15 +10,21 @@ private[text] final class Query(q: TextQuery) {
 
   import Mapping.fields
 
-  def search = q match {
-    case TextQuery(tokens, scope, Pagination(page, perPage)) ⇒ elastic.api.Search(
-      query = makeQuery,
-      typeNames = ???,//ScopeResolver(scope),
-      from = (page - 1) * perPage,
-      size = perPage)
+  def search = new {
+    def in(selector: Selector) = q match {
+      case TextQuery(tokens, scope, Pagination(page, perPage)) ⇒ elastic.api.Search(
+        query = makeQuery,
+        typeNames = selector(scope) map (_.id),
+        from = (page - 1) * perPage,
+        size = perPage)
+    }
   }
 
-  def count = ??? // elastic.api.Count(makeQuery, Selector(q.scope)
+  def count = new {
+    def in(selector: Selector) = elastic.api.Count(
+      makeQuery, 
+      selector(q.scope) map (_.id))
+  }
 
   // private def tokens = tokens
 
