@@ -4,7 +4,7 @@ import scalaz._
 
 package object scalex
     extends instances
-    with utilities
+    with util.utilities
     with StateFunctions // Functions related to the state monad
     with syntax.ToTypeClassOps // syntax associated with type classes
     with syntax.ToDataOps // syntax associated with Scalaz data structures

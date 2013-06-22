@@ -18,17 +18,16 @@ private[search] case class Selector(all: List[Project]) {
   private lazy val defaultSelection: Projects = dropLowerVersions(all)
 
   private def dropLowerVersions(projects: Projects): Projects = {
-    projects.sortBy(_.semVersion).foldLeft(Map[ProjectId, Project]()) {
+    projects.distinct.sortBy(_.semVersion).foldLeft(Map[ProjectId, Project]()) {
       case (selection, project) ⇒ selection + (project.name -> project)
     }
   }.values.toList
 
-  private def select(scope: Scope): Projects = 
-    if (scope.include.nonEmpty) {
-      scope.include map {
-        case Area(name, version) => all filter { p =>
-          p.name == name && (version.fold(true)(
-
-    }
-    }
+  private def select(scope: Scope): Projects = dropLowerVersions {
+    if (scope.include.nonEmpty)
+      scope.include.toList flatMap { area ⇒ all filter area.covers }
+    else if (scope.exclude.nonEmpty)
+      scope.exclude.toList flatMap { area ⇒ all filterNot area.covers }
+    else defaultSelection
+  }
 }

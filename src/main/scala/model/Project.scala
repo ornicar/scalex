@@ -3,7 +3,7 @@ package model
 
 import scala.util.{ Try, Success, Failure }
 
-import semverfi.{ Version, Valid }
+import semverfi.{ Version, Valid, SemVersion, NormalVersion }
 
 case class Project(name: ProjectId, version: Valid) {
 
@@ -11,10 +11,10 @@ case class Project(name: ProjectId, version: Valid) {
 
   def fullName = name + " " + version.shows
 
-  // def versionMatch(v: Valid) = (version, v) match {
+  def versionMatch(v: NormalVersion) = (version, v) match {
 
-  //   case (a, b) ⇒ a == b
-  // }
+    case (a, b) ⇒ a == b
+  }
 
   def semVersion: SemVersion = version
 
@@ -30,7 +30,7 @@ case class Project(name: ProjectId, version: Valid) {
 
 object Project extends Function2[ProjectId, Valid, Project] {
 
-  private val regex = """^([^_]+)_(.+)$""".r
+  val nameVersionRegex = """^([^_]+)_(.+)$""".r
 
   def apply(name: String, version: String): Try[Project] =
     Version(version) match {
@@ -39,7 +39,7 @@ object Project extends Function2[ProjectId, Valid, Project] {
     }
 
   def apply(str: String): Try[Project] = str match {
-    case regex(name, version) ⇒ apply(name, version)
+    case nameVersionRegex(name, version) ⇒ apply(name, version)
     case _                    ⇒ Failure(new InvalidProjectNameException(str))
   }
 }

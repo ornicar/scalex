@@ -5,7 +5,7 @@ package binary
 import scala.collection.generic.CanBuildFrom
 
 import sbinary._, DefaultProtocol._, Operations._
-import semverfi.{ SemVersion, Version, Show }
+import semverfi.{ Valid, Version }
 
 import model._
 
@@ -84,9 +84,9 @@ object BinaryProtocol extends DefaultProtocol with RichProtocol {
     }
   }
 
-  implicit val versionF = new BinaryFormat[SemVersion] {
-    def reader(implicit in: Input) = Version(<<[String])
-    def writer(v: SemVersion)(implicit out: Output) { >>(Show(v)) }
+  implicit val versionF = new BinaryFormat[Valid] {
+    def reader(implicit in: Input) = Version(<<[String]).opt err "Invalid binary version"
+    def writer(v: Valid)(implicit out: Output) { >>(v.shows) }
   }
 
   implicit val projectF = asProduct2(Project)(Project.unapply(_).get)

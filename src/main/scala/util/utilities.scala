@@ -1,4 +1,5 @@
 package org.scalex
+package util
 
 import scala.concurrent.duration._
 
@@ -13,6 +14,8 @@ private[scalex] trait utilities {
   implicit def execontext = scala.concurrent.ExecutionContext.Implicits.global
 
   def badArg(msg: String) = new BadArgumentException(msg)
+
+  def parseIntOption(str: String): Option[Int] = str.parseInt.toOption
 
   object makeTimeout {
 

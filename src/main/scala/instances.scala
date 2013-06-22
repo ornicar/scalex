@@ -27,6 +27,11 @@ private[scalex] trait instances {
       } ~ { _ foreach success }
   }
 
+  implicit final class ScalexVersion(v: semverfi.Valid) {
+
+    def normal = semverfi.NormalVersion(v.major, v.minor, v.patch)
+  }
+
   implicit def ScalexShowSemVersion: Show[semverfi.Valid] = Show.shows {
     version ⇒ semverfi.Show(version: semverfi.SemVersion)
   }
