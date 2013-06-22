@@ -1,6 +1,8 @@
 package org.scalex
 package model
 
+import scala.util.{ Try, Success, Failure }
+
 import semverfi.{ Version, SemVersion, Valid, Show }
 
 case class Project(name: ProjectId, version: SemVersion) {
@@ -25,20 +27,14 @@ object Project extends Function2[ProjectId, SemVersion, Project] {
 
   private val regex = """^([^_]+)_(.+)$""".r
 
-  def apply(name: String, version: String): Option[Project] =
+  def apply(name: String, version: String): Try[Project] =
     Version(version) match {
-      case semverfi.Invalid(raw) ⇒ {
-        println("Invalid project version: " + raw)
-        none
-      }
-      case v: Valid ⇒ Project(name, v).some
+      case semverfi.Invalid(raw) ⇒ Failure(new InvalidProjectVersionException(raw))
+      case v: Valid              ⇒ Success(Project(name, v))
     }
 
-  def apply(str: String): Option[Project] = str match {
+  def apply(str: String): Try[Project] = str match {
     case regex(name, version) ⇒ apply(name, version)
-    case _ ⇒ {
-      println("Invalid project name: " + str)
-      none
-    }
+    case _                    ⇒ Failure(new InvalidProjectNameException(str))
   }
 }

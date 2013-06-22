@@ -2,15 +2,15 @@ package org.scalex
 package search
 package query
 
-import model.Project
-
 private[search] case class Scope(
-    include: Set[ProjectName] = Set.empty,
-    exclude: Set[ProjectName] = Set.empty) {
+    include: Set[Area] = Set.empty,
+    exclude: Set[Area] = Set.empty) {
 
-  def +(name: ProjectName) = copy(include = include + name)
+  def +(str: String): Scope = Area(str).fold(this)(this.+)
+  def +(area: Area): Scope = copy(include = include + area)
 
-  def -(name: ProjectName) = copy(exclude = exclude + name)
+  def -(str: String): Scope = Area(str).fold(this)(this.-)
+  def -(area: Area): Scope = copy(exclude = exclude + area)
 
   def isEmpty = include.isEmpty && exclude.isEmpty
 
