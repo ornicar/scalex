@@ -14,7 +14,7 @@ case class Area(
 
   def versionString: Option[String] = version.toNel map (_.list mkString ".")
 
-  def covers(p: Project): Boolean = covers(p.version)
+  def covers(p: Project): Boolean = name == p.name && covers(p.version)
 
   def covers(v: semverfi.Valid): Boolean =
     List(v.major, v.minor, v.patch).zipWithIndex forall {

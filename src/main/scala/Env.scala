@@ -20,7 +20,7 @@ object Env {
 
   def apply(config: Config): Env = Env(
     config = config,
-    system = ActorSystem("ccalex", config))
+    system = ActorSystem("scalex", config))
 
   def defaultConfig = ConfigFactory.load.getConfig("scalex")
 

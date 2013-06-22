@@ -8,7 +8,7 @@ import query.{ TextQuery, Pagination }
 
 private[text] final class Query(q: TextQuery) {
 
-  import Mapping.fields
+  import Mapping.f
 
   def search = new {
     def in(selector: Selector) = q match {
@@ -26,19 +26,13 @@ private[text] final class Query(q: TextQuery) {
       selector(q.scope) map (_.id))
   }
 
-  // private def tokens = tokens
-
   private def makeQuery = q.tokens.toNel.fold[BaseQueryBuilder](matchAllQuery) {
     _.foldLeft(boolQuery) {
       case (query, token) ⇒ query must {
-        multiMatchQuery(token, fields.name)
+        multiMatchQuery(token, f.name)
       }
     }
   }
-
-  // private def makeFilters = {
-  //   (q.scope.include.toList map { termFilter(fields.project, _) })
-  // }.toNel map { fs ⇒ andFilter(fs.list: _*) }
 }
 
 private[text] object Query {

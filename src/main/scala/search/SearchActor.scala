@@ -61,6 +61,7 @@ private[search] final class SearchActor(config: Config) extends Actor {
         Database merge dbs
       }
       println("Loaded %d projects:".format(db.projects.size))
+      db.projects foreach println
       db
     }
   }

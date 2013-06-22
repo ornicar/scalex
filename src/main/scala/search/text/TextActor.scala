@@ -26,7 +26,6 @@ private[search] final class TextActor(database: Database, config: Config) extend
     indexer = context.actorOf(Props(
       new elastic.ElasticActor(config getConfig "elasticsearch")
     ), name = "elastic")
-    Await.ready(indexer ? elastic.api.AwaitReady, 1 minute)
     Await.ready(Populator(database)(indexer), 10 minutes)
     println("Text search ready!")
   }
@@ -39,12 +38,11 @@ private[search] final class TextActor(database: Database, config: Config) extend
 
   private def toResults(response: SearchResponse): Results = {
     response.getHits.hits.toList map { hit ⇒
-      println(hit.getType)
-      println(math round hit.score)
-      println(hit.id)
-      println(Json parse hit.sourceAsString)
-      // Result(???, math round hit)
-    }
-    Nil
+      Mapping.read(
+        projectName = hit.getType,
+        id = hit.id,
+        json = Json parse hit.sourceAsString
+      ) map { Result(_, math round hit.score) }
+    } flatten
   }
 }

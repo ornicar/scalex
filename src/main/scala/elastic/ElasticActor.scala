@@ -72,8 +72,6 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
       host = config getString "host",
       ports = Seq(config getInt "port"))
     i.start
-    i.waitTillActive(Seq(indexName))
-    // i.waitForYellowStatus(Seq(indexName))
     try {
       i.createIndex(indexName, settings = Map.empty)
     }
