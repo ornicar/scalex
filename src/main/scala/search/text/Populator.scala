@@ -22,9 +22,7 @@ private[text] object Populator extends scalaz.NonEmptyListFunctions {
       println("[%s] Index %d documents".format(seed, documents.size))
       indexer ! elastic.api.Clear(seed.project.id, Mapping.jsonMapping)
       documents grouped 1000 foreach { docs ⇒
-        indexer ! elastic.api.IndexMany(seed.project.id, docs map {
-          Mapping.from(seed.project.id, _)
-        })
+        indexer ! elastic.api.IndexMany(seed.project.id, docs map Mapping.toJson)
       }
 
       (indexer ? elastic.api.Optimize).void

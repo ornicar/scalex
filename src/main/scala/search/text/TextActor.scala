@@ -11,6 +11,7 @@ import akka.actor.SupervisorStrategy._
 import akka.pattern.{ ask, pipe }
 import com.typesafe.config.Config
 import org.elasticsearch.action.search.SearchResponse
+import play.api.libs.json._
 
 import makeTimeout.veryLarge
 import model.Database
@@ -25,7 +26,7 @@ private[search] final class TextActor(database: Database, config: Config) extend
     indexer = context.actorOf(Props(
       new elastic.ElasticActor(config getConfig "elasticsearch")
     ), name = "elastic")
-    Await.ready(indexer ? elastic.api.AwaitReady , 1 minute)
+    Await.ready(indexer ? elastic.api.AwaitReady, 1 minute)
     Await.ready(Populator(database)(indexer), 10 minutes)
     println("Text search ready!")
   }
@@ -37,7 +38,13 @@ private[search] final class TextActor(database: Database, config: Config) extend
   }
 
   private def toResults(response: SearchResponse): Results = {
-    // println(response)
+    response.getHits.hits.toList map { hit ⇒
+      println(hit.getType)
+      println(math round hit.score)
+      println(hit.id)
+      println(Json parse hit.sourceAsString)
+      // Result(???, math round hit)
+    }
     Nil
   }
 }
