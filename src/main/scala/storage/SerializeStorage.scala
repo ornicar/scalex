@@ -21,8 +21,7 @@ private[storage] trait SerializeStorage extends Storage[Database] with Gzip[Data
         in.readObject().asInstanceOf[Database]
       }
       catch {
-        case e: java.io.InvalidClassException ⇒
-          throw new OutdatedDatabaseException("The database %s is too old and must be rebuilded" format file.getName)
+        case e: java.io.InvalidClassException ⇒ throw new OutdatedDatabaseException(file.getName)
       }
       finally {
         in.close()

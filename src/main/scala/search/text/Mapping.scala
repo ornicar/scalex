@@ -18,6 +18,9 @@ private[text] object Mapping {
 
   def jsonMapping = Json.obj(
     "properties" -> Json.toJson(List(
+      // don't analyse the project field
+      // it makes filters containgin hyphens fail
+      // http://stackoverflow.com/questions/11566838/elastic-search-hyphen-issue-with-term-filter
       field(project, "string", false),
       boost(name, "string", 3)
     ).toMap),

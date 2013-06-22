@@ -12,7 +12,7 @@ private[scalex] trait utilities {
 
   implicit def execontext = scala.concurrent.ExecutionContext.Implicits.global
 
-  def badArg(msg: String) = new IllegalArgumentException(msg)
+  def badArg(msg: String) = new BadArgumentException(msg)
 
   object makeTimeout {
 

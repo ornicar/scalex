@@ -24,9 +24,9 @@ private[text] final class Populator(indexer: ActorRef) extends scalaz.NonEmptyLi
     println("[%s] Index %d documents".format(seed, documents.size))
     indexer ! elastic.api.Clear(seed.project.id, Mapping.jsonMapping)
     documents grouped 1000 foreach { docs ⇒
-      indexer ! elastic.api.IndexMany(seed.project.id) docs map {
+      indexer ! elastic.api.IndexMany(seed.project.id, docs map {
         Mapping.from(seed.project.id, _)
-      }
+      })
     }
 
     indexer ! elastic.api.Optimize
