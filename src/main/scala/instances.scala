@@ -9,20 +9,6 @@ private[scalex] object instances extends instances
 
 private[scalex] trait instances {
 
-  /**
-   * K combinator implementation
-   * Provides oneliner side effects
-   * See http://hacking-scala.posterous.com/side-effecting-without-braces
-   */
-  implicit def ornicarAddKcombinator[A](any: A) = new {
-    def kCombinator(sideEffect: A ⇒ Unit): A = {
-      sideEffect(any)
-      any
-    }
-    def ~(sideEffect: A ⇒ Unit): A = kCombinator(sideEffect)
-    def pp: A = kCombinator(println)
-  }
-
   implicit final class ScalexFunctor[M[_]: Functor, A](fa: M[A]) {
 
     def map2[N[_], B, C](f: B ⇒ C)(implicit m: A <:< N[B], f1: Functor[M], f2: Functor[N]): M[N[C]] =
@@ -41,10 +27,17 @@ private[scalex] trait instances {
       } ~ { _ foreach success }
   }
 
+  implicit def ScalexShowSemVersion: Show[semverfi.SemVersion] = Show.shows {
+    version ⇒ semverfi.Show(version)
+  }
+
   implicit final class ScalexAny[A](any: A) {
 
     def asTry(cond: Boolean, error: ⇒ Exception): Try[A] =
       if (cond) Success(any) else Failure(error)
+
+    def ~(sideEffect: A ⇒ Unit): A = { sideEffect(any); any }
+    def pp: A = this ~ println
   }
 
   implicit final class ScalexOption[A](oa: Option[A]) {
