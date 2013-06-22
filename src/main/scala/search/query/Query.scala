@@ -16,7 +16,7 @@ private[search] case class TextQuery(
     scope: Scope,
     pagination: Pagination) extends Query {
 
-  override def toString = "%s in %s".format(tokens mkString " and ", scope)
+  override def toString = "\"%s\" in %s".format(tokens mkString " and ", scope)
 }
 
 private[search] case class SigQuery(

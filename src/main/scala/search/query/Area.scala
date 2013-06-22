@@ -28,9 +28,9 @@ case class Area(
 
 object Area {
 
-  def apply(str: String): Option[Area] = str match {
+  def apply(str: String): Area = str match {
     case Project.nameVersionRegex(name, version) ⇒
-      Area(name, version.split('.').toList.map(parseIntOption).flatten).some
-    case _ ⇒ none
+      Area(name, version.split('.').toList.map(parseIntOption).flatten)
+    case name ⇒ Area(name, Nil)
   }
 }

@@ -16,6 +16,8 @@ import util.Timer._
 
 private[scalex] final class ElasticActor(config: Config) extends Actor {
 
+  private val indexName = config getString "index"
+
   var indexer: Indexer = _
 
   override def preStart {
@@ -27,7 +29,7 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
     println("[search] Indexer is stopped")
   }
 
-  def receive = {
+  def receive = akka.event.LoggingReceive {
 
     case api.Clear(typeName, mapping) ⇒ Await.ready(Future {
       indexer.deleteByQuery(Seq(indexName), Seq(typeName))
@@ -36,7 +38,7 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
       indexer.refresh()
     }, 3 second)
 
-    case api.Optimize ⇒ {
+    case api.Optimize ⇒ sender ! {
       // wrapAndMonitor("ES optimize") {
       indexer.refresh(Seq(indexName))
       indexer.optimize(Seq(indexName))
@@ -60,18 +62,15 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
         // }
       }
 
-    case req: api.Request[_] ⇒
-      sender ! req.in(indexName)(indexer)
+    case req: api.Request[_] ⇒ sender ! req.in(indexName)(indexer)
   }
 
-  private val indexName = config getString "type"
-
   private def instanciateIndexer = {
+    println("[search] Start indexer")
     val i = Indexer.transport(
       settings = Map("cluster.name" -> config.getString("cluster")),
       host = config getString "host",
       ports = Seq(config getInt "port"))
-    println("[search] Start indexer")
     i.start
     i.waitTillActive(Seq(indexName))
     // i.waitForYellowStatus(Seq(indexName))

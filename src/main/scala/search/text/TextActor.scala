@@ -25,10 +25,8 @@ private[search] final class TextActor(database: Database, config: Config) extend
     indexer = context.actorOf(Props(
       new elastic.ElasticActor(config getConfig "elasticsearch")
     ), name = "elastic")
-    // indexer ! elastic.api.Clear(Mapping.jsonMapping)
-    val populator = new Populator(indexer)
-    populator(database)
-    Await.ready(indexer ? elastic.api.AwaitReady , 10 minutes)
+    Await.ready(indexer ? elastic.api.AwaitReady , 1 minute)
+    Await.ready(Populator(database)(indexer), 10 minutes)
     println("Text search ready!")
   }
 

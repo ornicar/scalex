@@ -1,6 +1,9 @@
 package org.scalex
 package elastic
 
+import scala.concurrent.Future
+
+import akka.actor.ActorRef
 import org.elasticsearch.action.ActionRequest
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.action.search.SearchType
@@ -19,6 +22,8 @@ private[scalex] object api {
 
   case class IndexMany(typeName: Type, docs: List[(String, JsObject)])
 
+  case class ThenDo(f: ActorRef ⇒ Future[_])
+
   case object AwaitReady
 
   sealed trait Request[A] {
@@ -31,8 +36,7 @@ private[scalex] object api {
       typeNames: Types,
       size: Int = 10,
       from: Int = 0,
-      sortings: Iterable[SearchParameterTypes.Sorting] = Nil
-    ) extends Request[SearchResponse] {
+      sortings: Iterable[SearchParameterTypes.Sorting] = Nil) extends Request[SearchResponse] {
 
     val explain = none[Boolean]
 
@@ -48,8 +52,7 @@ private[scalex] object api {
 
   case class Count(
       query: QueryBuilder,
-      typeNames: Types
-    ) extends Request[Int] {
+      typeNames: Types) extends Request[Int] {
 
     def in(indexName: String)(es: Indexer): Int = {
       es.search(Seq(indexName), typeNames, query,

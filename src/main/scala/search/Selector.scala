@@ -12,11 +12,11 @@ private[search] case class Selector(all: List[Project]) {
 
   def apply(scope: Scope): Projects =
     if (scope.isEmpty) defaultSelection
-    else defaultSelection // select(scope)
+    else select(scope)
 
-  // picks the greatest version of each project
   private lazy val defaultSelection: Projects = dropLowerVersions(all)
 
+  // picks the greatest version of each project
   private def dropLowerVersions(projects: Projects): Projects = {
     projects.distinct.sortBy(_.semVersion).foldLeft(Map[ProjectId, Project]()) {
       case (selection, project) ⇒ selection + (project.name -> project)

@@ -9,36 +9,42 @@ import akka.actor.ActorRef
 import akka.pattern.{ ask, pipe }
 
 import document.Extractor
+import makeTimeout.large
 import model.{ Database, Project, Seed }
 
-private[text] final class Populator(indexer: ActorRef) extends scalaz.NonEmptyListFunctions {
+private[text] object Populator extends scalaz.NonEmptyListFunctions {
 
-  def apply(database: Database) {
+  def apply(database: Database)(indexer: ActorRef): Future[Unit] = {
 
-    database.seeds filterNot isIndexed foreach fromSeed 
-  }
+    def fromSeed(seed: Seed): Future[Unit] = {
+      println("[%s] Generate documents".format(seed))
+      val documents = Extractor fromSeed seed
+      println("[%s] Index %d documents".format(seed, documents.size))
+      indexer ! elastic.api.Clear(seed.project.id, Mapping.jsonMapping)
+      documents grouped 1000 foreach { docs ⇒
+        indexer ! elastic.api.IndexMany(seed.project.id, docs map {
+          Mapping.from(seed.project.id, _)
+        })
+      }
 
-  def fromSeed(seed: Seed) {
-    println("[%s] Generate documents".format(seed))
-    val documents = Extractor fromSeed seed
-    println("[%s] Index %d documents".format(seed, documents.size))
-    indexer ! elastic.api.Clear(seed.project.id, Mapping.jsonMapping)
-    documents grouped 1000 foreach { docs ⇒
-      indexer ! elastic.api.IndexMany(seed.project.id, docs map {
-        Mapping.from(seed.project.id, _)
-      })
+      (indexer ? elastic.api.Optimize).void
     }
 
-    indexer ! elastic.api.Optimize
-  }
+    def isIndexed(seed: Seed): Future[Boolean] = {
+      indexer ? Query.count(query.TextQuery(
+        tokens = Nil,
+        scope = query.Scope() + seed.project.name,
+        pagination = query.Pagination(1, Int.MaxValue)
+      )).in(selector)
+    } mapTo manifest[Int] map (0!=)
 
-  private def isIndexed(seed: Seed): Boolean = {
-    import makeTimeout.large
-    println("populator count")
-    Await.result(indexer ? Query.count(query.TextQuery(
-      tokens = Nil,
-      scope = query.Scope() + seed.project.name,
-      pagination = query.Pagination(1, Int.MaxValue)
-    )) mapTo manifest[Int], 5 second).pp > 0
+    def selector = Selector(database.projects)
+
+    (Future.traverse(database.seeds) { s ⇒
+      isIndexed(s) flatMap { indexed ⇒
+        if (indexed) Future successful ()
+        else fromSeed(s)
+      }
+    }).void
   }
 }

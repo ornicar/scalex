@@ -19,12 +19,23 @@ private[scalex] trait instances {
 
     def void: Future[Unit] = fua map (_ ⇒ ())
 
-    def addEffects(failure: Exception ⇒ Unit)(success: A ⇒ Unit): Future[A] =
-      fua ~ {
-        _ onFailure {
-          case e: Exception ⇒ failure(e)
-        }
-      } ~ { _ foreach success }
+    def addEffects(fail: Exception ⇒ Unit)(succ: A ⇒ Unit): Future[A] =
+      fua ~ { _.effectFold(fail, succ) }
+
+    def effectFold(fail: Exception ⇒ Unit, succ: A ⇒ Unit) {
+      fua onComplete {
+        case scala.util.Failure(e: Exception) ⇒ fail(e)
+        case scala.util.Failure(e)            ⇒ throw e // Throwables
+        case scala.util.Success(e)            ⇒ succ(e)
+      }
+    }
+
+    def thenPp: Future[A] = fua ~ {
+      _.effectFold(
+        e ⇒ println("[failure] " + e),
+        a ⇒ println("[success] " + a)
+      )
+    }
   }
 
   implicit final class ScalexVersion(v: semverfi.Valid) {
