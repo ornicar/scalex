@@ -27,8 +27,8 @@ private[scalex] trait instances {
       } ~ { _ foreach success }
   }
 
-  implicit def ScalexShowSemVersion: Show[semverfi.SemVersion] = Show.shows {
-    version ⇒ semverfi.Show(version)
+  implicit def ScalexShowSemVersion: Show[semverfi.Valid] = Show.shows {
+    version ⇒ semverfi.Show(version: semverfi.SemVersion)
   }
 
   implicit final class ScalexAny[A](any: A) {

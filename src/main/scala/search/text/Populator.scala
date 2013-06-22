@@ -37,7 +37,7 @@ private[text] final class Populator(indexer: ActorRef) extends scalaz.NonEmptyLi
     println("populator count")
     Await.result(indexer ? Query.count(query.TextQuery(
       tokens = Nil,
-      scope = query.Scope(include = Set(seed.project.name)),
+      scope = query.Scope() + seed.project.name,
       pagination = query.Pagination(1, Int.MaxValue)
     )) mapTo manifest[Int], 5 second).pp > 0
   }

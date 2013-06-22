@@ -15,13 +15,20 @@ private[search] case class Selector(all: List[Project]) {
     else defaultSelection // select(scope)
 
   // picks the greatest version of each project
-  private lazy val defaultSelection: Projects = filterLowerVersions(all)
+  private lazy val defaultSelection: Projects = dropLowerVersions(all)
 
-  private def filterLowerVersions(projects: Projects): Projects = {
-    projects.sortBy(_.version).foldLeft(Map[ProjectId, Project]()) {
+  private def dropLowerVersions(projects: Projects): Projects = {
+    projects.sortBy(_.semVersion).foldLeft(Map[ProjectId, Project]()) {
       case (selection, project) ⇒ selection + (project.name -> project)
     }
   }.values.toList
 
-  // private def select(scope: Scope) = 
+  private def select(scope: Scope): Projects = 
+    if (scope.include.nonEmpty) {
+      scope.include map {
+        case Area(name, version) => all filter { p =>
+          p.name == name && (version.fold(true)(
+
+    }
+    }
 }
