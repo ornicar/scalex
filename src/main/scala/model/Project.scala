@@ -21,7 +21,7 @@ case class Project(name: ProjectId, version: SemVersion) {
   lazy val tokenize: List[Token] = name :: showVersion :: Nil
 }
 
-object Project {
+object Project extends Function2[ProjectId, SemVersion, Project] {
 
   private val regex = """^([^_]+)_(.+)$""".r
 
