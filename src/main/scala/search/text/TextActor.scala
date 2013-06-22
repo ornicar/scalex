@@ -17,7 +17,9 @@ import model.Database
 
 private[search] final class TextActor(database: Database, config: Config) extends Actor {
 
-  var indexer: ActorRef = _
+  private val selector = Selector(database.projects)
+
+  private var indexer: ActorRef = _
 
   override def preStart {
     indexer = context.actorOf(Props(
@@ -33,7 +35,7 @@ private[search] final class TextActor(database: Database, config: Config) extend
   def receive = {
 
     case q: query.TextQuery ⇒
-      indexer ? (Query search q) mapTo manifest[SearchResponse] map toResults pipeTo sender
+      indexer ? (Query search q in selector) mapTo manifest[SearchResponse] map toResults pipeTo sender
   }
 
   private def toResults(response: SearchResponse): Results = {
