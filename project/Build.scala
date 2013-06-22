@@ -11,7 +11,7 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val compiler = "org.scala-lang" % "scala-compiler" % "2.11.0-M3"
+  val compiler = "org.scala-lang" % "scala-compiler" % "2.11.0-SNAPSHOT"
   val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0.0"
   val scalazContrib = "org.typelevel" % "scalaz-contrib-210_2.10" % "0.1.4"
   val config = "com.typesafe" % "config" % "1.0.1"
@@ -21,8 +21,7 @@ trait Dependencies {
   val semver = "me.lessis" % "semverfi_2.10" % "0.1.3"
   object akka {
     val version = "2.2.0-RC1"
-    val actor = "com.typesafe.akka" %% "akka-actor" % version
-    val agent = "com.typesafe.akka" %% "akka-agent" % version
+    val actor = "com.typesafe.akka" % "akka-actor_2.11.0-M3" % version
   }
   object play {
     val version = "2.2-SNAPSHOT"
@@ -37,7 +36,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     organization := "org.scalex",
     name := "scalex",
     version := "3.0-SNAPSHOT",
-    scalaVersion := "2.11.0-M3",
+    scalaVersion := "2.11.0-SNAPSHOT",
     libraryDependencies := Seq(config),
     // libraryDependencies in test := Seq(specs2),
     resolvers := Seq(typesafe, typesafeS, sonatype, sonatypeS, iliaz, mandubian),
