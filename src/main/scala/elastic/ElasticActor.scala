@@ -39,16 +39,13 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
     }, 3 second)
 
     case api.Optimize ⇒ sender ! {
-      // wrapAndMonitor("ES optimize") {
       indexer.refresh(Seq(indexName))
       indexer.optimize(Seq(indexName))
-      // }
     }
 
     case api.AwaitReady ⇒ sender ! indexer.waitTillActive(Seq(indexName))
 
     case api.IndexMany(typeName, docs) ⇒
-      // wrapAndMonitor("ES index %d docs" format docs.size) {
       indexer bulk {
         docs map {
           case (id, doc) ⇒
@@ -59,7 +56,6 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
               Json stringify doc
             ).request
         }
-        // }
       }
 
     case req: api.Request[_] ⇒ sender ! req.in(indexName)(indexer)

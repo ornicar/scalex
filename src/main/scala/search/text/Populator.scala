@@ -14,17 +14,16 @@ import model.{ Database, Project, Seed }
 
 private[text] object Populator extends scalaz.NonEmptyListFunctions {
 
+  private val bulkSize = 2000
+
   def apply(database: Database)(indexer: ActorRef): Future[Unit] = {
 
     def fromSeed(seed: Seed): Future[Unit] = {
-      println("[%s] Generate documents".format(seed))
-      val documents = Extractor fromSeed seed
-      println("[%s] Index %d documents".format(seed, documents.size))
+      println("[%s] Indexing documents".format(seed))
       indexer ! elastic.api.Clear(seed.project.id, Mapping.jsonMapping)
-      documents grouped 1000 foreach { docs ⇒
+      Extractor fromSeed seed grouped bulkSize foreach { docs ⇒
         indexer ! elastic.api.IndexMany(seed.project.id, docs map Mapping.write)
       }
-
       (indexer ? elastic.api.Optimize).void
     }
 
