@@ -9,7 +9,7 @@ import akka.actor.ActorRef
 import akka.pattern.{ ask, pipe }
 
 import document.Extractor
-import makeTimeout.large
+import makeTimeout.veryLarge
 import model.{ Database, Project, Seed }
 
 private[text] object Populator extends scalaz.NonEmptyListFunctions {
