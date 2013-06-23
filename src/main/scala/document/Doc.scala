@@ -16,14 +16,10 @@ case class Template(
     typeParams.shows)
 }
 
-trait NonTemplate { self: Doc ⇒
-
-}
-
 case class Def(
     member: Member,
     typeParams: List[model.TypeParam],
-    valueParams: List[List[model.ValueParam]]) extends Doc with NonTemplate {
+    valueParams: List[List[model.ValueParam]]) extends Doc {
 
   def declaration = "%s %s %s%s%s: %s".format(
     member.parent.signature,
@@ -35,7 +31,7 @@ case class Def(
 }
 
 case class Val(
-    member: Member) extends Doc with NonTemplate {
+    member: Member) extends Doc {
 
   def declaration = "%s %s %s: %s".format(
     member.parent.signature,
