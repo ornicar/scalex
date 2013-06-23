@@ -2,4 +2,6 @@
 
 args=$@
 cd `dirname $0`
-sbt013 -Dconfig.file=application.conf "run $args"
+
+jar=target/scala-2.11/scalex_2.11-3.0-SNAPSHOT-one-jar.jar
+java -Dconfig.file=application.conf -jar $jar $args
