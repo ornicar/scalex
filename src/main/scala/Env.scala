@@ -28,12 +28,6 @@ object Env {
     println("Scalex env starting")
     val env = apply(config)
     val res = f(env)
-    res onComplete {
-      case _ ⇒ {
-        env.shutdown
-        println("Scalex env shut down.")
-      }
-    }
-    res
+    res andThen { case _ ⇒ env.shutdown }
   }
 }
