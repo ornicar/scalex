@@ -41,8 +41,8 @@ private[scalex] final class Repository(config: Config) extends Actor {
   private lazy val buildFileHeaders: Future[List[(File, Header)]] = {
     val files = configDbFiles(config)
     println {
-      ("Found %d scalex database files:" format files.size) :: {
-      files map { f ⇒ "- %s (%s)".format(f.getName, ~humanReadableFileSize(f)) }
+      ("Found %d scalex database files" format files.size) :: {
+      Nil // files map { f ⇒ "- %s (%s)".format(f.getName, ~humanReadableFileSize(f)) }
       } mkString "\n"
     }
     Future.traverse(files) { file ⇒
