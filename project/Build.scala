@@ -1,5 +1,7 @@
+import akka.sbt.AkkaKernelPlugin
+import akka.sbt.AkkaKernelPlugin.{ Dist, outputDirectory, distJvmOptions }
+import org.scalex.sbt_plugin.ScalexSbtPlugin
 import sbt._, Keys._
-
 
 trait Resolvers {
   val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
@@ -19,9 +21,12 @@ trait Dependencies {
   val sbinary = "org.scala-tools.sbinary" % "sbinary_2.11" % "0.4.1-THIB3"
   val scalastic = "scalastic" % "scalastic_2.11" % "0.90.0-THIB2"
   val semver = "me.lessis" % "semverfi_2.10" % "0.1.3"
+  val logback = "ch.qos.logback" % "logback-classic" % "1.0.0"
   object akka {
     val version = "2.2.0-RC1"
     val actor = "com.typesafe.akka" % "akka-actor_2.11.0-M3" % version
+    val kernel = "com.typesafe.akka" % "akka-kernel_2.11.0-M3" % version
+    val slf4j = "com.typesafe.akka" % "akka-slf4j_2.11.0-M3" % version
   }
   object play {
     val version = "2.2-SNAPSHOT"
@@ -41,16 +46,21 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     // libraryDependencies in test := Seq(specs2),
     sources in doc in Compile := List(),
     resolvers := Seq(typesafe, typesafeS, sonatype, sonatypeS, iliaz, mandubian),
-    scalacOptions := Seq("-deprecation", "-unchecked", "-feature", "-language:_"),
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:_"),
+    javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation"),
     publishTo := Some(Resolver.sftp(
       "iliaz",
       "scala.iliaz.com"
     ) as ("scala_iliaz_com", Path.userHome / ".ssh" / "id_rsa"))
-  ) //++ ScalexSbtPlugin.defaultSettings
+  ) ++ ScalexSbtPlugin.defaultSettings ++ AkkaKernelPlugin.distSettings ++ Seq(
+      distJvmOptions in Dist := "-Xms64M -Xmx1024M",
+      outputDirectory in Dist := file("target/dist")
+    )
 
   lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
     libraryDependencies ++= Seq(
       compiler, config, scalaz, scalazContrib, semver,
-      scopt, sbinary, scalastic, akka.actor, play.json)
+      scopt, sbinary, scalastic, logback, play.json,
+      akka.actor, akka.kernel, akka.slf4j)
   )
 }
