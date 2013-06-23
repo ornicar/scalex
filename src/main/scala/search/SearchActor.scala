@@ -12,8 +12,6 @@ import akka.pattern.{ ask, pipe }
 import com.typesafe.config.Config
 
 import makeTimeout.veryLarge
-import util.IO._
-import util.Timer._
 
 private[search] final class SearchActor(config: Config) extends Actor {
 
