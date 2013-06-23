@@ -31,14 +31,11 @@ object Main {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
       case Config(None, Some(searchConfig)) ⇒
-        Env.using(Env.defaultConfig) { env ⇒
-          val searcher = new search.Search(env)
-          (searcher(searchConfig.expression).addEffects(
-            e ⇒ println("There was an error while searching: " + e)
-          ) {
-              case Success(results) ⇒ renderResults(results)
-              case Failure(e)       ⇒ println("Is the request valid? " + e)
-            }).void
+        (Env.using(Env.defaultConfig) { env ⇒
+          new search.Search(env) apply searchConfig.expression
+        }) map {
+          case Success(results) ⇒ renderResults(results)
+          case Failure(e)       ⇒ println("Is the request valid? " + e)
         }
       case c ⇒ Future.failed(badArg(c.toString))
     }
