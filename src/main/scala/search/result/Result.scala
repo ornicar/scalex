@@ -1,5 +1,6 @@
 package org.scalex
 package search
+package result
 
 import play.api.libs.json._
 
@@ -7,6 +8,10 @@ import document._
 import model.instances._
 
 case class Result(doc: Doc, score: Score) {
+
+  override def toString =
+    """%s
+%s""".format(doc.name, doc) 
 
   def toJson: JsObject = Json.obj(
     "docUrl" -> "TODO",
@@ -36,8 +41,4 @@ case class Result(doc: Doc, score: Score) {
     ),
     "comment" -> "???"
   )
-
-  override def toString =
-    """%s
-%s""".format(doc.name, doc) + "\n" + toJson
 }

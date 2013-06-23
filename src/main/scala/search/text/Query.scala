@@ -5,31 +5,31 @@ package text
 import org.elasticsearch.index.query._, QueryBuilders._, FilterBuilders._
 
 import query.{ TextQuery, Pagination }
+import model.Project
 
 private[text] final class Query(q: TextQuery) {
 
   import Mapping.f
 
   def search = new {
-    def in(selector: Selector) = q match {
+    def in(projects: List[Project]) = q match {
       case TextQuery(tokens, scope, Pagination(page, perPage)) ⇒ elastic.api.Search(
         query = makeQuery,
-        typeNames = selector(scope) map (_.id),
+        typeNames = projects map (_.id),
         from = (page - 1) * perPage,
         size = perPage).pp
     }
   }
 
   def count = new {
-    def in(selector: Selector) = elastic.api.Count(
-      makeQuery, 
-      selector(q.scope) map (_.id))
+    def in(projects: List[Project]) = 
+      elastic.api.Count(makeQuery, projects map (_.id))
   }
 
   private def makeQuery = q.tokens.toNel.fold[BaseQueryBuilder](matchAllQuery) {
     _.foldLeft(boolQuery) {
       case (query, token) ⇒ query must {
-        multiMatchQuery(token, f.name, f.memberEntity)
+        multiMatchQuery(token, f.memberEntity)
       }
     }
   }

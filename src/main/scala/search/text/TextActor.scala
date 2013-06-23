@@ -33,23 +33,31 @@ private[search] final class TextActor(config: Config) extends Actor {
       repository ? storage.api.GetProjects mapTo manifest[List[Project]] map Selector,
       1 minute)
     Await.result(
-      Populator(repository, selector)(indexer), 
+      Populator(repository, selector)(indexer),
       10 minutes)
   }
 
   def receive = {
 
-    case q: query.TextQuery ⇒
-      indexer ? (Query search q in selector) mapTo manifest[SearchResponse] map toResults pipeTo sender
+    case q: query.TextQuery ⇒ {
+      val area = selector(q.scope)
+      indexer ? (Query search q in area) mapTo
+        manifest[SearchResponse] map
+        toResults(q, area) pipeTo sender
+    }
   }
 
-  private def toResults(response: SearchResponse): Results = {
-    response.getHits.hits.toList map { hit ⇒
-      Mapping.read(
-        projectName = hit.getType,
-        id = hit.id,
-        json = Json parse hit.sourceAsString
-      ) map { Result(_, math round hit.score) }
-    } flatten
-  }
+  private def toResults(q: query.Query, area: List[Project])(response: SearchResponse) =
+    result.Results(
+      query = q,
+      area = area,
+      millis = response.getTookInMillis.toInt,
+      rs = response.getHits.hits.toList map { hit ⇒
+        Mapping.read(
+          projectName = hit.getType,
+          id = hit.id,
+          json = Json parse hit.sourceAsString
+        ) map { result.Result(_, math round hit.score) }
+      } flatten,
+      nbRs = response.getHits.totalHits.toInt)
 }

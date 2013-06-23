@@ -32,16 +32,17 @@ private[text] object Populator extends scalaz.NonEmptyListFunctions {
     } void
 
     def isIndexed(project: Project): Future[Boolean] = {
-      indexer ? Query.count(query.TextQuery(
+      val q = query.TextQuery(
         tokens = Nil,
         scope = query.Scope() + project.name,
         pagination = query.Pagination(1, Int.MaxValue)
-      )).in(selector)
+      )
+      indexer ? Query.count(q).in(selector(q.scope))
     } mapTo manifest[Int] map (0!=)
 
     (Future.traverse(selector.all) { p ⇒
       isIndexed(p) flatMap { indexed ⇒
-        if (indexed && !(p.name startsWith "org.lichess")) Future successful ()
+        if (indexed) Future successful ()
         else index(p)
       }
     }).void

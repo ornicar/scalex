@@ -31,8 +31,12 @@ private[text] object Mapping extends org.scalex.util.ScalexJson {
 
   def jsonMapping = Json.obj(
     "properties" -> Json.obj(
-      f.name -> boost("string", 3),
-      f.memberEntity -> field("string", true)
+      f.name -> boost("string", 10),
+      f.member -> Json.obj(
+        "properties" -> Json.obj(
+          f.entity -> boost("string", 2)
+        )
+      )
     ),
     "analyzer" -> "snowball"
   )

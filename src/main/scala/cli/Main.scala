@@ -33,17 +33,11 @@ object Main {
       case Config(None, Some(searchConfig)) ⇒
         Env.using(Env.defaultConfig) { env ⇒
           (new search.Search(env) apply searchConfig.expression) andThen {
-            case Success(results) ⇒ results.fold(println)(renderResults)
+            case Success(results) ⇒ results.fold(println)(println)
             case Failure(e)       ⇒ println("Is the request valid? " + e)
           }
         }
       case c ⇒ Future.failed(badArg(c.toString))
     }
   }).void
-
-  private def renderResults(results: search.Results) {
-    println(results.take(8).zipWithIndex map {
-      case (result, i) ⇒ "%d. %s\n".format(i + 1, result)
-    } mkString "\n")
-  }
 }

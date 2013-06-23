@@ -32,11 +32,16 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
   def receive = akka.event.LoggingReceive {
 
     case api.Clear(typeName, mapping) ⇒ Await.ready((Future {
-      indexer.deleteByQuery(Seq(indexName), Seq(typeName))
-      indexer.deleteMapping(indexName :: Nil, typeName.some)
+      try {
+        indexer.deleteByQuery(Seq(indexName), Seq(typeName))
+        indexer.deleteMapping(indexName :: Nil, typeName.some)
+      }
+      catch {
+        case e: org.elasticsearch.indices.TypeMissingException ⇒
+      }
       indexer.putMapping(indexName, typeName, Json stringify Json.obj(typeName -> mapping))
       indexer.refresh()
-    }) recover { case e ⇒ println(e) }, 3 second)
+    }) recover { case e ⇒ println("[elastic] clear: " + e) }, 3 second)
 
     case api.Optimize ⇒ sender ! {
       indexer.refresh(Seq(indexName))
