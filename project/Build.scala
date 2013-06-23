@@ -11,12 +11,12 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val compiler = "org.scala-lang" % "scala-compiler" % "2.11.0-SNAPSHOT"
+  val compiler = "org.scala-lang" % "scala-compiler" % "2.11.0-M3"
   val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0.0"
   val scalazContrib = "org.typelevel" % "scalaz-contrib-210_2.10" % "0.1.4"
   val config = "com.typesafe" % "config" % "1.0.1"
   val scopt = "com.github.scopt" % "scopt_2.10" % "3.0.0"
-  val sbinary = "org.scala-tools.sbinary" % "sbinary_2.11" % "0.4.1-THIB"
+  val sbinary = "org.scala-tools.sbinary" % "sbinary_2.11" % "0.4.1-THIB3"
   val scalastic = "scalastic" % "scalastic_2.11" % "0.90.0-THIB2"
   val semver = "me.lessis" % "semverfi_2.10" % "0.1.3"
   object akka {
@@ -36,9 +36,10 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     organization := "org.scalex",
     name := "scalex",
     version := "3.0-SNAPSHOT",
-    scalaVersion := "2.11.0-SNAPSHOT",
+    scalaVersion := "2.11.0-M3",
     libraryDependencies := Seq(config),
     // libraryDependencies in test := Seq(specs2),
+    sources in doc in Compile := List(),
     resolvers := Seq(typesafe, typesafeS, sonatype, sonatypeS, iliaz, mandubian),
     scalacOptions := Seq("-deprecation", "-unchecked", "-feature", "-language:_"),
     publishTo := Some(Resolver.sftp(
