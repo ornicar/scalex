@@ -29,7 +29,7 @@ private[scalex] final class Repository(config: Config) extends Actor {
       }).fold(Future successful none[Seed]) {
         case (file, _) ⇒ Storage read file map (_ seedOf project)
       }
-    }
+    } pipeTo sender
   }
 
   private lazy val projects: Future[List[Project]] = 
@@ -40,8 +40,11 @@ private[scalex] final class Repository(config: Config) extends Actor {
 
   private lazy val buildFileHeaders: Future[List[(File, Header)]] = {
     val files = configDbFiles(config)
-    println("Found %d scalex database files" format files.size)
-    files foreach { f ⇒ println("- %s (%s)".format(f.getName, ~humanReadableFileSize(f))) }
+    println {
+      ("Found %d scalex database files:" format files.size) :: {
+      files map { f ⇒ "- %s (%s)".format(f.getName, ~humanReadableFileSize(f)) }
+      } mkString "\n"
+    }
     Future.traverse(files) { file ⇒
       (Storage header file) map (file -> _)
     }

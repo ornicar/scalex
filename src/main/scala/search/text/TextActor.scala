@@ -32,8 +32,9 @@ private[search] final class TextActor(config: Config) extends Actor {
     selector = Await.result(
       repository ? storage.api.GetProjects mapTo manifest[List[Project]] map Selector,
       1 minute)
-    Await.ready(Populator(repository, selector)(indexer), 10 minutes)
-    println("Text search ready!")
+    Await.result(
+      Populator(repository, selector)(indexer), 
+      10 minutes)
   }
 
   def receive = {

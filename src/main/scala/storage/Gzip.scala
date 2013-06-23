@@ -5,30 +5,29 @@ import java.io.{ File ⇒ _, _ }
 import java.util.zip.{ GZIPOutputStream, GZIPInputStream }
 import scala.concurrent.Future
 
-private[storage] trait Gzip[A] {
-  
-  private val encoding = "UTF-8"
+private[storage] trait Gzip[H, A] {
 
-  def bufferedInputStream(file: File): Future[String] = Future {
+  protected val encoding = "UTF-8"
+
+  def bufferedInputStream(file: File)(f: BufferedReader ⇒ H): Future[H] = Future {
     val fileIn = new FileInputStream(file)
-    val gzip = new GZIPInputStream(fileIn)
-    val decoder = new InputStreamReader(gzip, encoding)
+    val decoder = new InputStreamReader(fileIn, encoding)
     val buffered = new BufferedReader(decoder)
     try {
-      buffered.readLine
-    } finally {
+      f(buffered)
+    }
+    finally {
       buffered.close()
       decoder.close()
-      gzip.close()
       fileIn.close()
     }
   }
 
-  def inputStream(file: File)(f: InputStream ⇒ A): Future[A] = Future {
+  def inputStream(file: File)(f: InputStream ⇒ InputStream ⇒ A): Future[A] = Future {
     val fileIn = new FileInputStream(file)
     val gzip = new GZIPInputStream(fileIn)
     try {
-      f(gzip)
+      f(fileIn)(gzip)
     }
     finally {
       gzip.close()
@@ -36,7 +35,7 @@ private[storage] trait Gzip[A] {
     }
   }
 
-  def outputStream(file: File, a: A)(f: OutputStream => OutputStream ⇒ Unit) {
+  def outputStream(file: File, a: A)(f: OutputStream ⇒ OutputStream ⇒ Unit) {
     file.delete()
     val fileOut = new FileOutputStream(file)
     val gzip = new GZIPOutputStream(fileOut)
