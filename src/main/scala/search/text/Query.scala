@@ -16,7 +16,7 @@ private[text] final class Query(q: TextQuery) {
         query = makeQuery,
         typeNames = selector(scope) map (_.id),
         from = (page - 1) * perPage,
-        size = perPage)
+        size = perPage).pp
     }
   }
 
@@ -29,7 +29,7 @@ private[text] final class Query(q: TextQuery) {
   private def makeQuery = q.tokens.toNel.fold[BaseQueryBuilder](matchAllQuery) {
     _.foldLeft(boolQuery) {
       case (query, token) ⇒ query must {
-        multiMatchQuery(token, f.name)
+        multiMatchQuery(token, f.name, f.memberEntity)
       }
     }
   }

@@ -20,7 +20,7 @@ private[scalex] object Mapping {
     ) ++ attrs
 
   def boost( typ: String, b: Int = 1, attrs: JsObject = Json.obj()) =
-    field( typ, true, Json.obj("boost" -> b) ++ attrs)
+    field(typ, true, Json.obj("boost" -> b) ++ attrs)
 
   def obj( properties: JsObject) =
     Json.obj("type" -> "object", "properties" -> properties)

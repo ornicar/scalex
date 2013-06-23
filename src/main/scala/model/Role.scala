@@ -1,7 +1,10 @@
 package org.scalex
 package model
 
-sealed trait Role
+sealed trait Role {
+
+  def name = toString.toLowerCase
+}
 
 object Role {
 
@@ -21,7 +24,10 @@ object Role {
 
   private def all: List[Role] = List(Trait, Class, CaseClass, Object, Package, Constructor, Def, Val, LazyVal, Var, AliasType, AbstractType, Unknown)
 
-  private[scalex] def fromString(str: String): Role = all.find(_.toString == str) | Unknown
+  private[scalex] def fromName(str: String): Role = {
+    val lc = str.toLowerCase
+    all.find(_.name == lc) | Unknown
+  }
 
-  private[scalex] def toString(role: Role): String = role.toString
+  private[scalex] def toName(role: Role): String = role.name
 }

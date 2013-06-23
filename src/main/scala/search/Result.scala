@@ -39,5 +39,5 @@ case class Result(doc: Doc, score: Score) {
 
   override def toString =
     """%s
-%s""".format(doc.name, doc)
+%s""".format(doc.name, doc) + "\n" + toJson
 }

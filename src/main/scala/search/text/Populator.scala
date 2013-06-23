@@ -39,10 +39,10 @@ private[text] object Populator extends scalaz.NonEmptyListFunctions {
       )).in(selector)
     } mapTo manifest[Int] map (0!=)
 
-    (Future.traverse(selector.all) { s ⇒
-      isIndexed(s) flatMap { indexed ⇒
-        if (indexed) Future successful ()
-        else index(s)
+    (Future.traverse(selector.all) { p ⇒
+      isIndexed(p) flatMap { indexed ⇒
+        if (indexed && !(p.name startsWith "org.lichess")) Future successful ()
+        else index(p)
       }
     }).void
   }

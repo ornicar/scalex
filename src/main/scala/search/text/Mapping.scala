@@ -25,11 +25,14 @@ private[text] object Mapping extends org.scalex.util.ScalexJson {
     val resultType = "rt"
     val defaultValue = "dv"
     val isImplicit = "ii"
+
+    val memberEntity = member + "." + entity
   }
 
   def jsonMapping = Json.obj(
     "properties" -> Json.obj(
-      f.name -> boost("string", 3)
+      f.name -> boost("string", 3),
+      f.memberEntity -> field("string", true)
     ),
     "analyzer" -> "snowball"
   )
@@ -54,11 +57,11 @@ private[text] object Mapping extends org.scalex.util.ScalexJson {
       f.member -> Json.obj(
         f.parent -> Json.obj(
           f.entity -> doc.member.parent.entity.qualifiedName,
-          f.role -> doc.member.parent.role.toString,
+          f.role -> doc.member.parent.role.name,
           f.typeParams -> JsArray(doc.member.parent.typeParams map writeTypeParam)
         ),
         f.entity -> doc.member.entity.qualifiedName,
-        f.role -> doc.member.role.toString,
+        f.role -> doc.member.role.name,
         f.flags -> JsArray(doc.member.flags map JsString),
         f.resultType -> doc.member.resultType
       ),
@@ -110,12 +113,12 @@ private[text] object Mapping extends org.scalex.util.ScalexJson {
           parent ← m obj f.parent flatMap { parent ⇒
             for {
               entity ← parent str f.entity map Entity
-              role ← parent str f.role map Role.fromString
+              role ← parent str f.role map Role.fromName
               typeParams = readTypeParams(parent)
             } yield Parent(entity, role, typeParams)
           }
           entity = Entity(id)
-          role ← m str f.role map Role.fromString
+          role ← m str f.role map Role.fromName
           flags = (m arr f.flags) ?? { ~_.asOpt[List[String]] }
           resultType ← m str f.resultType
         } yield Member(project, parent, entity, role, flags, resultType)

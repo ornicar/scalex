@@ -16,8 +16,8 @@ object BinaryProtocol extends DefaultProtocol with RichProtocol {
   implicit val entityF = wrap[Entity, String](_.qualifiedName, Entity.apply)
 
   implicit val roleF = new BinaryFormat[Role] {
-    def reader(implicit in: Input) = Role fromString <<[String]
-    def writer(a: Role)(implicit out: Output) { >>(Role toString a) }
+    def reader(implicit in: Input) = Role fromName <<[String]
+    def writer(a: Role)(implicit out: Output) { >>(Role toName a) }
   }
 
   implicit val memberF: Format[Member] = asProduct6(Member)(Member.unapply(_).get)

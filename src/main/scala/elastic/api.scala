@@ -24,8 +24,6 @@ private[scalex] object api {
 
   case class ThenDo(f: ActorRef ⇒ Future[_])
 
-  case object AwaitReady
-
   sealed trait Request[A] {
 
     def in(indexName: String)(indexer: Indexer): A

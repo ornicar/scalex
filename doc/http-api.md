@@ -42,6 +42,7 @@ Here is an output example for `http://api.scalex.org/?q=list+map&page=2`
           typeParams: "[C]"           // Function type params
           resultType: "Map[A, C]"     // Type of the returned value
           valueParams: "f: (B => C)"  // Params the function accepts
+          declaration: "akka.pattern def ask(actorRef: ActorRef): AskableActorRef" // Readable representation of the function
           signature: "ListMap[A, +B] => (f: (B => C)) => Map[A, C]" // Normalized signature of the function
           package: "scala"            // Name of the package containing the function
           deprecation: {              // Deprecation message if the function is deprecated, otherwise nothing
