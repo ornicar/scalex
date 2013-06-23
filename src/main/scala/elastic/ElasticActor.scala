@@ -25,8 +25,8 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
   }
 
   override def postStop {
-    Option(indexer) foreach (_.stop)
-    println("[search] Indexer is stopped")
+    println("[search] Stopping indexer")
+    Option(indexer) foreach { _.stop() }
   }
 
   def receive = akka.event.LoggingReceive {

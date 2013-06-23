@@ -27,7 +27,6 @@ object Env {
   def using[A](config: ⇒ Config)(f: Env ⇒ Future[A]): Future[A] = {
     println("Scalex env starting")
     val env = apply(config)
-    val res = f(env)
-    res andThen { case _ ⇒ env.shutdown }
+    f(env) andThen { case _ ⇒ env.shutdown }
   }
 }

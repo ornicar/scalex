@@ -66,6 +66,11 @@ private[scalex] trait instances {
 
   implicit final class ScalexTry[A](ta: Try[A]) {
 
+    def fold[B](fail: Throwable ⇒ B)(succ: A ⇒ B): B = ta match {
+      case Failure(e) ⇒ fail(e)
+      case Success(a) ⇒ succ(a)
+    }
+
     def failureEffect(f: PartialFunction[Throwable, Unit]): Try[A] = {
       ta recover f
       ta

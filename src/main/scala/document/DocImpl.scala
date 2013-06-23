@@ -5,6 +5,8 @@ private[document] trait DocImpl {
 
   def member: Member
 
+  def signature: String
+
   def declaration: String
 
   // Implementation
@@ -16,6 +18,8 @@ private[document] trait DocImpl {
   override def toString = declaration
 
   def tokenize = namePile map (_.toLowerCase)
+
+  def name = member.entity.name
 
   def qualifiedName = member.entity.qualifiedName
 

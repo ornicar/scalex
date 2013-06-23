@@ -23,29 +23,27 @@ object Main {
     }, 1 hour)
   }
 
-  private def process(args: Array[String]): Future[Unit] = args.toList match {
+  private def process(args: Array[String]): Future[Unit] = (args.toList match {
     case "index" :: name :: version :: rest ⇒ Future {
       index Indexer api.Index(name, version, rest)
     }
-    case _ ⇒ Parser.parse(args).fold(Future.failed[Unit](badArg(args mkString " "))) {
+    case _ ⇒ Parser.parse(args).fold(Future.failed[Any](badArg(args mkString " "))) {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
       case Config(None, Some(searchConfig)) ⇒
-        (Env.using(Env.defaultConfig) { env ⇒
-          new search.Search(env) apply searchConfig.expression
-        }) map {
-          case Success(results) ⇒ renderResults(results)
-          case Failure(e)       ⇒ println("Is the request valid? " + e)
+        Env.using(Env.defaultConfig) { env ⇒
+          (new search.Search(env) apply searchConfig.expression) andThen {
+            case Success(results) ⇒ results.fold(println)(renderResults)
+            case Failure(e)       ⇒ println("Is the request valid? " + e)
+          }
         }
       case c ⇒ Future.failed(badArg(c.toString))
     }
-  }
+  }).void
 
   private def renderResults(results: search.Results) {
     println(results.take(8).zipWithIndex map {
-      case (search.Result(doc, score), i) ⇒
-        "%d. %s%s".format(i + 1, (i < 9) ?? " ", doc)
-      // "%d. %s = %d".format(i + 1, doc, score)
+      case (result, i) ⇒ "%d. %s\n".format(i + 1, result)
     } mkString "\n")
   }
 }
