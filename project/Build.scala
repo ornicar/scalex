@@ -1,6 +1,7 @@
 import sbt._, Keys._
 
 import com.github.retronym.SbtOneJar
+import org.scalex.sbt_plugin.ScalexSbtPlugin
 
 trait Resolvers {
   val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
@@ -47,7 +48,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
       "iliaz",
       "scala.iliaz.com"
     ) as ("scala_iliaz_com", Path.userHome / ".ssh" / "id_rsa"))
-  ) ++ SbtOneJar.oneJarSettings //++ ScalexSbtPlugin.defaultSettings
+  ) ++ SbtOneJar.oneJarSettings ++ ScalexSbtPlugin.defaultSettings
 
   lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
     libraryDependencies ++= Seq(
