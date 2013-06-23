@@ -12,13 +12,11 @@ import akka.pattern.{ ask, pipe }
 import com.typesafe.config.Config
 
 import makeTimeout.veryLarge
-import model.Database
 import util.IO._
 import util.Timer._
 
 private[search] final class SearchActor(config: Config) extends Actor {
 
-  private var database: Database = _
   private var textualEngine: ActorRef = _
 
   override val supervisorStrategy =
@@ -28,9 +26,8 @@ private[search] final class SearchActor(config: Config) extends Actor {
     }
 
   override def preStart {
-    database = Await.result(buildDatabase, 10 minutes)
     textualEngine = context.actorOf(Props(
-      new text.TextActor(database, config getConfig "text")
+      new text.TextActor(config)
     ), name = "text")
   }
 
@@ -49,30 +46,4 @@ private[search] final class SearchActor(config: Config) extends Actor {
     case q: query.TextQuery ⇒ textualEngine ? q mapTo manifest[Results]
     case _                  ⇒ ???
   }
-
-  private def buildDatabase: Future[Database] = {
-    val files = configDbFiles(config)
-    println("Found %d scalex database files" format files.size)
-    files foreach { f ⇒ println("- %s (%s)".format(f.getName, ~humanReadableFileSize(f))) }
-    printAndMonitorFuture("Extracting databases") {
-      Future.traverse(files)(storage.Storage.read)
-    } map { dbs ⇒
-      val db = printAndMonitor("Merging databases") {
-        Database merge dbs
-      }
-      println("Loaded %d projects:".format(db.projects.size))
-      db.projects foreach println
-      db
-    }
-  }
-
-  private def configDbFiles(config: Config): List[File] =
-    (config getStringList "databases").toList map {
-      new File(_)
-    } flatMap { file ⇒
-      if (file.isDirectory) file.listFiles filter isDbFile
-      else List(file)
-    } filter (_.exists) sortBy (-_.length)
-
-  private def isDbFile(file: File) = file.getName endsWith ".scalex"
 }

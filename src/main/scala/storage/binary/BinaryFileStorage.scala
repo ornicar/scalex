@@ -4,11 +4,14 @@ package binary
 
 import scala.concurrent.Future
 
-import model.Database
+import model.{ Database, Header }
 
-private[storage] object BinaryFileStorage extends Storage[Database] with Gzip[Database] {
+private[storage] object BinaryFileStorage extends Storage[Header, Database] with Gzip[Database] {
 
   import BinaryProtocol._
+
+  def header(file: File): Future[Header] = 
+    bufferedInputStream(file) map Header.apply
 
   def read(file: File): Future[Database] =
     inputStream(file) { gzip ⇒
@@ -21,8 +24,10 @@ private[storage] object BinaryFileStorage extends Storage[Database] with Gzip[Da
     }
 
   def write(file: File, db: Database) {
-    outputStream(file, db) { gzip ⇒
-      gzip write sbinary.Operations.toByteArray(db)
+    outputStream(file, db) { raw ⇒
+      gzip ⇒
+        raw write (db.header.toString + "\n").getBytes
+        gzip write sbinary.Operations.toByteArray(db)
     }
   }
 }

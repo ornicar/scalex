@@ -3,18 +3,22 @@ package storage
 
 import scala.concurrent.Future
 
-import model.Database
+import model.{ Header, Database }
 
-trait Storage[A] {
+trait Storage[H, D] {
 
-  def read(file: File): Future[A]
+  def header(file: File): Future[H] 
 
-  def write(file: File, a: A): Unit
+  def read(file: File): Future[D]
+
+  def write(file: File, a: D): Unit
 }
 
-object Storage extends Storage[Database] {
+object Storage extends Storage[Header, Database] {
 
   private def impl = binary.BinaryFileStorage
+
+  def header(file: File) = impl header file
 
   def read(file: File) = impl read file
 

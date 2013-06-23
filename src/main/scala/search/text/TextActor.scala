@@ -14,19 +14,25 @@ import org.elasticsearch.action.search.SearchResponse
 import play.api.libs.json._
 
 import makeTimeout.veryLarge
-import model.Database
+import model.{ Database, Project }
 
-private[search] final class TextActor(database: Database, config: Config) extends Actor {
-
-  private val selector = Selector(database.projects)
+private[search] final class TextActor(config: Config) extends Actor {
 
   private var indexer: ActorRef = _
+  private var repository: ActorRef = _
+  private var selector: Selector = _
 
   override def preStart {
+    repository = context.actorOf(Props(
+      new storage.Repository(config getConfig "repository")
+    ), name = "repository")
     indexer = context.actorOf(Props(
-      new elastic.ElasticActor(config getConfig "elasticsearch")
+      new elastic.ElasticActor(config getConfig "elastic")
     ), name = "elastic")
-    Await.ready(Populator(database)(indexer), 10 minutes)
+    selector = Await.result(
+      repository ? storage.api.GetProjects mapTo manifest[List[Project]] map Selector,
+      1 minute)
+    Await.ready(Populator(repository, selector)(indexer), 10 minutes)
     println("Text search ready!")
   }
 

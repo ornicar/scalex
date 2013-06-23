@@ -7,6 +7,12 @@ case class Database(seeds: List[Seed]) {
 
   def projects = seeds map (_.project)
 
+  def seedOf(project: Project): Option[Seed] = seeds find {
+    _.project == project
+  }
+
+  def header = Header(projects)
+
   def describe: String = seeds map (_.describe) mkString "\n\n\n"
 
   def merge(other: Database) = Database((seeds ++ other.seeds).distinct)
@@ -14,10 +20,6 @@ case class Database(seeds: List[Seed]) {
 
 object Database {
 
-  def empty = new Database(Nil)
-
   def merge(dbs: List[Database]): Database = 
-    dbs.toNel.fold(Database.empty) { 
-      _ foldLeft1 { _ merge _ }
-    }
+    dbs.toNel.fold(Database(Nil)) { _ foldLeft1 { _ merge _ } }
 }

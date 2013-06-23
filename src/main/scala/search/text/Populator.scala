@@ -16,31 +16,33 @@ private[text] object Populator extends scalaz.NonEmptyListFunctions {
 
   private val bulkSize = 2000
 
-  def apply(database: Database)(indexer: ActorRef): Future[Unit] = {
+  def apply(repository: ActorRef, selector: Selector)(indexer: ActorRef): Future[Unit] = {
 
-    def fromSeed(seed: Seed): Future[Unit] = {
-      println("[%s] Indexing documents".format(seed))
-      indexer ! elastic.api.Clear(seed.project.id, Mapping.jsonMapping)
-      Extractor fromSeed seed grouped bulkSize foreach { docs ⇒
-        indexer ! elastic.api.IndexMany(seed.project.id, docs map Mapping.write)
+    def index(project: Project): Future[Unit] = {
+      println("[%s] Indexing documents" format project)
+      repository ? storage.api.GetSeed(project) mapTo manifest[Option[Seed]] flatMap {
+        _.fold[Future[Any]](Future failed badArg("Can't find seed of " + project)) { seed ⇒
+          indexer ! elastic.api.Clear(seed.project.id, Mapping.jsonMapping)
+          Extractor fromSeed seed grouped bulkSize foreach { docs ⇒
+            indexer ! elastic.api.IndexMany(seed.project.id, docs map Mapping.write)
+          }
+          indexer ? elastic.api.Optimize
+        }
       }
-      (indexer ? elastic.api.Optimize).void
-    }
+    } void
 
-    def isIndexed(seed: Seed): Future[Boolean] = {
+    def isIndexed(project: Project): Future[Boolean] = {
       indexer ? Query.count(query.TextQuery(
         tokens = Nil,
-        scope = query.Scope() + seed.project.name,
+        scope = query.Scope() + project.name,
         pagination = query.Pagination(1, Int.MaxValue)
       )).in(selector)
     } mapTo manifest[Int] map (0!=)
 
-    def selector = Selector(database.projects)
-
-    (Future.traverse(database.seeds) { s ⇒
+    (Future.traverse(selector.all) { s ⇒
       isIndexed(s) flatMap { indexed ⇒
         if (indexed) Future successful ()
-        else fromSeed(s)
+        else index(s)
       }
     }).void
   }
