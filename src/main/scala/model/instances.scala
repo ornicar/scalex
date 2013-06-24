@@ -1,11 +1,18 @@
 package org.scalex
 package model
 
-import scalaz.Show
+import scalaz.{ Show, Monoid }
 
 object instances extends instances
 
 trait instances {
+
+  implicit val blockMonoid = Monoid.instance[Block]((b1, b2) ⇒ b2, Block("", ""))
+
+  def instance[A](f: (A, ⇒ A) ⇒ A, z: A): Monoid[A] = new Monoid[A] {
+    def zero = z
+    def append(f1: A, f2: ⇒ A): A = f(f1, f2)
+  }
 
   implicit val roleShow = Show.shows[Role] {
     case Role.CaseClass    ⇒ "case class"
