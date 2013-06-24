@@ -72,7 +72,9 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
       ports = Seq(config getInt "port"))
     i.start
     try {
-      i.createIndex(indexName, settings = Map.empty)
+      i.createIndex(indexName, settings = Map(
+        "index.mapper.dynamic" -> "false"
+      ))
     }
     catch {
       case e: org.elasticsearch.indices.IndexAlreadyExistsException ⇒
