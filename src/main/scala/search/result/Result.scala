@@ -6,12 +6,14 @@ import play.api.libs.json._
 
 import document._
 import model.instances._
+import model.json._
 
 case class Result(doc: Doc, score: Score) {
 
   override def toString =
     """%s
-%s""".format(doc.name, doc) 
+%s
+%s""".format(doc.name, doc, doc.member.comment ?? (_.summary.txt))
 
   def toJson: JsObject = Json.obj(
     "docUrl" -> "TODO",
@@ -24,7 +26,7 @@ case class Result(doc: Doc, score: Score) {
     }),
     "valueParams" -> (doc match {
       case o: Def ⇒ o.valueParams.shows
-      case _ => ""
+      case _      ⇒ ""
     }),
     "resultType" -> doc.member.resultType,
     "declaration" -> doc.declaration,
@@ -39,6 +41,6 @@ case class Result(doc: Doc, score: Score) {
       "qualifiedName" -> doc.member.parent.entity.qualifiedName,
       "typeParams" -> doc.member.parent.typeParams.shows
     ),
-    "comment" -> "???"
+    "comment" -> doc.member.comment.map(Json.toJson(_))
   )
 }
