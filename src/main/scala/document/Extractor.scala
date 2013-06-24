@@ -27,6 +27,7 @@ private[scalex] object Extractor {
     def makeMember(parent: Parent)(o: model.Member) = Member(
       project = seed.project,
       parent = parent,
+      comment = o.comment,
       entity = o.entity,
       role = o.role,
       flags = o.flags,
