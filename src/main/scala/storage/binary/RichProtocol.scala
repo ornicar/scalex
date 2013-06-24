@@ -63,4 +63,54 @@ private[binary] trait RichProtocol {
       ts foreach (t ⇒ writer(out)(t))
     }
   }
+
+  def asProduct14[S, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14](
+    apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) ⇒ S)(
+      unapply: S ⇒ Product14[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14])(implicit bin1: Format[T1],
+        bin2: Format[T2],
+        bin3: Format[T3],
+        bin4: Format[T4],
+        bin5: Format[T5],
+        bin6: Format[T6],
+        bin7: Format[T7],
+        bin8: Format[T8],
+        bin9: Format[T9],
+        bin10: Format[T10],
+        bin11: Format[T11],
+        bin12: Format[T12],
+        bin13: Format[T13],
+        bin14: Format[T14]) = new Format[S] {
+    def reads(in: Input): S = apply(
+      read[T1](in),
+      read[T2](in),
+      read[T3](in),
+      read[T4](in),
+      read[T5](in),
+      read[T6](in),
+      read[T7](in),
+      read[T8](in),
+      read[T9](in),
+      read[T10](in),
+      read[T11](in),
+      read[T12](in),
+      read[T13](in),
+      read[T14](in))
+    def writes(out: Output, s: S) = {
+      val product = unapply(s)
+      write(out, product._1)
+      write(out, product._2)
+      write(out, product._3)
+      write(out, product._4)
+      write(out, product._5)
+      write(out, product._6)
+      write(out, product._7)
+      write(out, product._8)
+      write(out, product._9)
+      write(out, product._10)
+      write(out, product._11)
+      write(out, product._12)
+      write(out, product._13)
+      write(out, product._14)
+    }
+  }
 }

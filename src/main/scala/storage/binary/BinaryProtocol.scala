@@ -20,7 +20,11 @@ object BinaryProtocol extends DefaultProtocol with RichProtocol {
     def writer(a: Role)(implicit out: Output) { >>(Role toName a) }
   }
 
-  implicit val memberF: Format[Member] = asProduct6(Member)(Member.unapply(_).get)
+  implicit val blockF: Format[Block] = asProduct2(Block)(Block.unapply(_).get)
+
+  implicit val commentF: Format[Comment] = asProduct14(Comment)(Comment.unapply(_).get)
+
+  implicit val memberF: Format[Member] = asProduct7(Member)(Member.unapply(_).get)
 
   implicit val templateF = asProduct4(Template)(Template.unapply(_).get)
 
