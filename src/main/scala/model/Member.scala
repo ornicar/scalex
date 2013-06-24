@@ -1,8 +1,6 @@
 package org.scalex
 package model
 
-// import scala.tools.nsc.doc.base.comment.Body
-
 /**
  * An entity that is a member of a template. All entities, including templates, are member of another entity
  * except for parameters and annotations. Note that all members of a template are modelled, including those that are
@@ -14,13 +12,7 @@ case class Member(
   entity: Entity,
 
   /** The comment attached to this member, if any. */
-  // comment: Option[Comment],
-
-  /** The group this member is from */
-  // def group: String
-
-  /** The qualified name of the member in its currently active declaration template. */
-  // definitionName: String,
+  comment: Option[Comment],
 
   /** The templates in which this member has been declared. The first element of the list is the template that contains
     * the currently active declaration of this member, subsequent elements are declarations that have been overriden. If

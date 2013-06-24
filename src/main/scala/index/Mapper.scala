@@ -66,7 +66,7 @@ private[index] final class Mapper {
 
   def member(o: nsc.MemberEntity): Member = Member(
     entity = entity(o),
-    // comment = o.comment map comment,
+    comment = o.comment map comment,
     inDefinitionTemplates = o.inDefinitionTemplates map (_.qualifiedName),
     flags = (o.flags collect {
       case nscComment.Paragraph(nscComment.Text(flag)) ⇒ flag
@@ -91,7 +91,21 @@ private[index] final class Mapper {
 
   def typeEntity(o: nsc.TypeEntity) = o.name
 
-  def comment(o: nscComment.Comment) = Comment(body = o.body)
+  def comment(o: nscComment.Comment) = Comment(
+    body = body(o.body),
+    summary = o.body.summary.isDefined ? inline(o.short) | Block("", ""),
+    see = o.see map body,
+    result = o.result map body,
+    throws = o.throws.toMap mapValues body,
+    valueParams = o.valueParams.toMap mapValues body,
+    typeParams = o.typeParams.toMap mapValues body,
+    version = o.version map body,
+    since = o.since map body,
+    todo = o.todo map body,
+    deprecated = o.deprecated map body,
+    note = o.note map body,
+    example = o.example map body,
+    constructor = o.constructor map body) 
 
   def implicitConversion(o: nsc.ImplicitConversion) = ImplicitConversion(
     source = docTemplate(o.source),
@@ -126,6 +140,14 @@ private[index] final class Mapper {
         }) && !t.isShadowedOrAmbiguousImplicit
       case _ ⇒ false
     }
+
+  def body(b: nscComment.Body): Block = html(Html bodyToHtml b)
+
+  def inline(i: nscComment.Inline): Block = html(Html inlineToHtml i)
+
+  def block(b: nscComment.Block): Block = html(Html blockToHtml b)
+
+  def html(n: scala.xml.NodeSeq): Block = Block(n.toString, n.text)
 
   private def ignoredTemplates = Set(
     "scala.Any",
