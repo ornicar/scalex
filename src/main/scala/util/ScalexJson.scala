@@ -2,10 +2,23 @@ package org.scalex
 package util
 
 import play.api.libs.json._
+import scalaz.Monoid
 
 private[scalex] object ScalexJson extends ScalexJson
 
 private[scalex] trait ScalexJson {
+
+  implicit final class OFormatMonoid[E: Monoid](format: OFormat[E]) {
+
+    def default: OFormat[E] = OFormat(
+      Reads { v ⇒
+        format reads v match {
+          case s: JsSuccess[_] ⇒ s: JsResult[E]
+          case _               ⇒ JsSuccess(∅[E])
+        }
+      },
+      format)
+  }
 
   implicit final class ScalexJsObject(js: JsObject) {
 
