@@ -15,8 +15,8 @@ final class Search(env: Env) {
     new SearchActor(env.config)
   ), name = "search")
 
-  def apply(expression: String): Future[Try[Results]] = {
+  def apply(expression: String): Future[Try[result.Results]] = {
     println("Search for \"%s\"" format expression)
-    actor ? expression mapTo manifest[Try[Results]]
+    actor ? expression mapTo manifest[Try[result.Results]]
   }
 }

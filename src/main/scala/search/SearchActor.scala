@@ -34,14 +34,14 @@ private[search] final class SearchActor(config: Config) extends Actor {
     case expression: String ⇒ apply(expression) pipeTo sender
   }
 
-  private def apply(expression: String): Future[Try[Results]] =
+  private def apply(expression: String): Future[Try[result.Results]] =
     query.Raw(expression, 1, 10).analyze match {
       case Success(query) ⇒ apply(query) map { Success(_) }
       case Failure(err)   ⇒ Future successful Failure(err)
     }
 
-  private def apply(q: query.Query): Future[Results] = q match {
-    case q: query.TextQuery ⇒ textualEngine ? q mapTo manifest[Results]
+  private def apply(q: query.Query): Future[result.Results] = q match {
+    case q: query.TextQuery ⇒ textualEngine ? q mapTo manifest[result.Results]
     case _                  ⇒ ???
   }
 }

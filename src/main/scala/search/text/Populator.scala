@@ -33,6 +33,7 @@ private[text] object Populator extends scalaz.NonEmptyListFunctions {
 
     def isIndexed(project: Project): Future[Boolean] = {
       val q = query.TextQuery(
+        raw = "",
         tokens = Nil,
         scope = query.Scope() + project.name,
         pagination = query.Pagination(1, Int.MaxValue)

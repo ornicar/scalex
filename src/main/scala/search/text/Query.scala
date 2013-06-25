@@ -11,7 +11,7 @@ private[text] final class Query(q: TextQuery) {
 
   def search = new {
     def in(projects: List[Project]) = q match {
-      case TextQuery(tokens, scope, Pagination(page, perPage)) ⇒ elastic.api.Search(
+      case TextQuery(_, tokens, scope, Pagination(page, perPage)) ⇒ elastic.api.Search(
         query = makeQuery,
         typeNames = projects map (_.id),
         from = (page - 1) * perPage,

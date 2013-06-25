@@ -15,6 +15,7 @@ private[search] case class Raw(
     queryAndScope ← scopeQuery(string)
     (queryString, scope) = queryAndScope
   } yield TextQuery(
+    string,
     tokens = tokenize(queryString),
     scope = scope,
     pagination = Pagination(currentPage, maxPerPage))

@@ -7,6 +7,4 @@ package object search {
   type Fragment[A] = Map[A, Score]
 
   def fragmentMonoid[A] = scalaz.Monoid[Fragment[A]]
-
-  type Results = result.Results
 }

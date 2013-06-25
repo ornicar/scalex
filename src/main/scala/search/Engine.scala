@@ -7,5 +7,5 @@ import query.Scope
 
 trait Engine {
 
-  def search(tokens: List[Token], scope: Scope): Future[Results]
+  def search(tokens: List[Token], scope: Scope): Future[List[result.Result]]
 }

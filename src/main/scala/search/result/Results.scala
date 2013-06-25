@@ -4,8 +4,6 @@ package result
 
 import scala.concurrent.duration._
 
-import play.api.libs.json._
-
 import model.Project
 import query.Query
 
@@ -22,7 +20,4 @@ case class Results(
       case (result, i) ⇒ "%d. %s\n".format(i + 1, result)
     } mkString "\n"
   )
-
-  // def toJson: JsObject = Json.obj(
-  // )
 }

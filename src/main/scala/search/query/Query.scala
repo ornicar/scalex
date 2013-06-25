@@ -7,11 +7,13 @@ import scalaz.NonEmptyList
 private[search] case class Pagination(currentPage: Int, maxPerPage: Int)
 
 private[search] sealed trait Query {
+  def raw: String
   def scope: Scope
   def pagination: Pagination
 }
 
 private[search] case class TextQuery(
+    raw: String,
     tokens: List[String],
     scope: Scope,
     pagination: Pagination) extends Query {
@@ -20,6 +22,7 @@ private[search] case class TextQuery(
 }
 
 private[search] case class SigQuery(
+    raw: String,
     sig: String,
     scope: Scope,
     pagination: Pagination) extends Query {
