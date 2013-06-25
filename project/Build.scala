@@ -29,6 +29,7 @@ trait Dependencies {
     val version = "2.2-SNAPSHOT"
     val json = "play" % "play-json_2.10" % version
   }
+  val specs2 = "org.specs2" % "specs2_2.10" % "2.1-SNAPSHOT" % "test"
 }
 
 object ScalexBuild extends Build with Resolvers with Dependencies {
@@ -53,6 +54,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
   lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
     libraryDependencies ++= Seq(
       compiler, config, scalaz, scalazContrib, semver,
-      scopt, sbinary, scalastic, akka.actor, play.json)
+      scopt, sbinary, scalastic, akka.actor, play.json,
+      specs2)
   )
 }
