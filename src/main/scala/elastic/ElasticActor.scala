@@ -14,7 +14,9 @@ import scalastic.elasticsearch.Indexer
 import api._
 import util.Timer._
 
-private[scalex] final class ElasticActor(config: Config) extends Actor {
+private[scalex] final class ElasticActor(
+  config: Config,
+  indexSettings: Map[String, String]) extends Actor {
 
   private val indexName = config getString "index"
 
@@ -72,9 +74,7 @@ private[scalex] final class ElasticActor(config: Config) extends Actor {
       ports = Seq(config getInt "port"))
     i.start
     try {
-      i.createIndex(indexName, settings = Map(
-        "index.mapper.dynamic" -> "false"
-      ))
+      i.createIndex(indexName, settings = indexSettings)
     }
     catch {
       case e: org.elasticsearch.indices.IndexAlreadyExistsException ⇒
