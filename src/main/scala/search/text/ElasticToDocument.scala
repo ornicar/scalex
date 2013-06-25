@@ -7,87 +7,14 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 import document._
-import model.{ TypeParam, ValueParam, Project, Role, Entity, Block, Comment }
 import model.json._
+import model.{ TypeParam, ValueParam, Project, Role, Entity, Block, Comment }
 
-private[text] object Mapping extends org.scalex.util.ScalexJson {
+private[text] object ElasticToDocument extends org.scalex.util.ScalexJson {
 
-  object f {
-    val name = "na"
-    val entity = "en"
-    val parent = "pa"
-    val member = "me"
-    val comment = "co"
-    val role = "ro"
-    val typeParams = "tp"
-    val valueParams = "vp"
-    val variance = "va"
-    val lo = "lo"
-    val hi = "hi"
-    val flags = "fl"
-    val resultType = "rt"
-    val defaultValue = "dv"
-    val isImplicit = "ii"
+  private val f = Index.fields
 
-    val memberEntity = member + "." + entity
-  }
-
-  def jsonMapping = Json.obj(
-    "properties" -> Json.obj(
-      f.name -> boost("string", 10),
-      f.member -> Json.obj(
-        "properties" -> Json.obj(
-          f.entity -> boost("string", 2)
-        )
-      )
-    ),
-    "analyzer" -> "snowball"
-  )
-
-  def write(doc: Doc): (String, JsObject) = {
-
-    def writeValueParam(o: ValueParam): JsObject = Json.obj(
-      f.name -> o.name,
-      f.resultType -> o.resultType,
-      f.defaultValue -> o.defaultValue,
-      f.isImplicit -> o.isImplicit)
-
-    def writeTypeParam(o: TypeParam): JsObject = Json.obj(
-      f.name -> o.name,
-      f.typeParams -> JsArray(o.typeParams map writeTypeParam),
-      f.variance -> o.variance,
-      f.lo -> o.lo,
-      f.hi -> o.hi)
-
-    doc.qualifiedName -> Json.obj(
-      f.name -> doc.member.entity.name,
-      f.member -> Json.obj(
-        f.parent -> Json.obj(
-          f.entity -> doc.member.parent.entity.qualifiedName,
-          f.role -> doc.member.parent.role.name,
-          f.typeParams -> JsArray(doc.member.parent.typeParams map writeTypeParam)
-        ),
-        f.comment -> Json.toJson(doc.member.comment),
-        f.entity -> doc.member.entity.qualifiedName,
-        f.role -> doc.member.role.name,
-        f.flags -> JsArray(doc.member.flags map JsString),
-        f.resultType -> doc.member.resultType
-      ),
-      f.typeParams -> JsArray(doc match {
-        case o: Def      ⇒ o.typeParams map writeTypeParam
-        case o: Template ⇒ o.typeParams map writeTypeParam
-        case _: Val      ⇒ Nil
-      }),
-      f.valueParams -> JsArray(doc match {
-        case o: Def ⇒ o.valueParams map { vps ⇒
-          JsArray(vps map writeValueParam)
-        }
-        case _ ⇒ Nil
-      })
-    )
-  }
-
-  def read(projectName: ProjectName, id: String, json: JsValue): Option[Doc] = {
+  def apply(projectName: ProjectName, id: String, json: JsValue): Option[Doc] = {
 
     def readTypeParam(js: JsValue): Option[TypeParam] =
       js.asOpt[JsObject] flatMap { tp ⇒

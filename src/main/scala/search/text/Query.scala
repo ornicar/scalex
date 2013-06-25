@@ -9,8 +9,6 @@ import model.Project
 
 private[text] final class Query(q: TextQuery) {
 
-  import Mapping.f
-
   def search = new {
     def in(projects: List[Project]) = q match {
       case TextQuery(tokens, scope, Pagination(page, perPage)) ⇒ elastic.api.Search(
@@ -25,6 +23,8 @@ private[text] final class Query(q: TextQuery) {
     def in(projects: List[Project]) = 
       elastic.api.Count(makeQuery, projects map (_.id))
   }
+
+  private def f = Index.fields
 
   private def makeQuery = q.tokens.toNel.fold[BaseQueryBuilder](matchAllQuery) {
     _.foldLeft(boolQuery) {

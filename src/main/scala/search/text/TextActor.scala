@@ -53,7 +53,7 @@ private[search] final class TextActor(config: Config) extends Actor {
       area = area,
       millis = response.getTookInMillis.toInt,
       rs = response.getHits.hits.toList map { hit ⇒
-        Mapping.read(
+        ElasticToDocument(
           projectName = hit.getType,
           id = hit.id,
           json = Json parse hit.sourceAsString

@@ -3,13 +3,13 @@ package document
 
 import model.{ Project, Seed, DocTemplate }
 
-private[scalex] object Extractor {
+private[scalex] object ModelToDocument {
 
   def apply(d: model.Database): ScopedDocs = (d.seeds map { 
     case seed @ Seed(project, _) ⇒ project.id -> fromSeed(seed)
   }).toMap
 
-  def fromSeed(seed: Seed) = {
+  def fromSeed(seed: Seed): Docs = {
 
     def walk(parent: Parent)(tpl: DocTemplate): Docs =
       makeParent(tpl) |> { context ⇒

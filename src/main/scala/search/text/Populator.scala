@@ -8,7 +8,7 @@ import scala.concurrent.{ Future, Await }
 import akka.actor.ActorRef
 import akka.pattern.{ ask, pipe }
 
-import document.Extractor
+import document.ModelToDocument
 import makeTimeout.veryLarge
 import model.{ Database, Project, Seed }
 
@@ -22,9 +22,9 @@ private[text] object Populator extends scalaz.NonEmptyListFunctions {
       println("[%s] Indexing documents" format project)
       repository ? storage.api.GetSeed(project) mapTo manifest[Option[Seed]] flatMap {
         _.fold[Future[Any]](Future failed badArg("Can't find seed of " + project)) { seed ⇒
-          indexer ! elastic.api.Clear(seed.project.id, Mapping.jsonMapping)
-          Extractor fromSeed seed grouped bulkSize foreach { docs ⇒
-            indexer ! elastic.api.IndexMany(seed.project.id, docs map Mapping.write)
+          indexer ! elastic.api.Clear(seed.project.id, Index.mapping)
+          ModelToDocument fromSeed seed grouped bulkSize foreach { docs ⇒
+            indexer ! elastic.api.IndexMany(seed.project.id, docs map DocumentToElastic.apply)
           }
           indexer ? elastic.api.Optimize
         }
