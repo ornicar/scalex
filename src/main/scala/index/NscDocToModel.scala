@@ -150,12 +150,8 @@ private[index] final class NscDocToModel {
 
   def block(b: nscComment.Block): Block = html(Html blockToHtml b)
 
-  def html(n: scala.xml.NodeSeq): Block = {
-    val t = n.text
-    val h = n.toString
-    val ho = !(h == t || h == "<p>%s</p>".format(t)) option h
-    Block(t, ho)
-  }
+  def html(n: scala.xml.NodeSeq): Block = 
+    Block(txt = n.text, html = n.toString)
 
   private def ignoredTemplates = Set(
     "scala.Any",
