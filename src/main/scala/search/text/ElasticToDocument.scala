@@ -10,7 +10,7 @@ import document._
 import model.json._
 import model.{ TypeParam, ValueParam, Project, Role, Entity, Block, Comment }
 
-private[text] object ElasticToDocument extends org.scalex.util.ScalexJson {
+private[search] object ElasticToDocument extends org.scalex.util.ScalexJson {
 
   private val f = Index.fields
 

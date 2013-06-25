@@ -26,21 +26,3 @@ case class Results(
   // def toJson: JsObject = Json.obj(
   // )
 }
-
-object Results {
-
-  def apply(
-    query: Query,
-    area: List[Project],
-    millis: Int,
-    rs: List[Result],
-    nbRs: Int): Results = Results(
-    paginator = new Paginator(
-      results = rs,
-      nbResults = nbRs,
-      currentPage = query.pagination.currentPage,
-      maxPerPage = query.pagination.maxPerPage),
-    duration = millis.millis,
-    query = query,
-    area = area)
-}
