@@ -7,7 +7,8 @@ case class Comment(
     body: Block,
 
     /** A shorter version of the body. Usually, this is the first sentence of the body. */
-    summary: Block,
+    /** left empty if similar to body */
+    summary: Option[Block],
 
     /**
      * A list of other resources to see, including links to other entities or
@@ -67,6 +68,8 @@ case class Comment(
 
     /** A description for the primary constructor */
     constructor: Option[Block]) {
+
+  def summaryOrBody = summary | body
 
   override def toString =
     body.toString + "\n" +

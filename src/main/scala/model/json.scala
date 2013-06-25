@@ -14,8 +14,8 @@ private[scalex] object json {
   )(Block.apply, unlift(Block.unapply))
 
   implicit val commentFormat = (
-    (__ \ "body").format[Block] and
-    (__ \ "summary").format[Block] and
+    (__ \ "body").format[Block].default and
+    (__ \ "summary").format[Option[Block]].default and
     (__ \ "see").format[List[Block]].default and
     (__ \ "result").format[Option[Block]].default and
     (__ \ "throws").format[Map[String, Block]].default and

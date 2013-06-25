@@ -9,5 +9,5 @@ case class Result(doc: Doc, score: Score) {
   override def toString =
     """%s
 %s
-%s""".format(doc.name, doc, doc.member.comment ?? (_.summary.txt))
+%s""".format(doc.name, doc, doc.member.comment ?? (_.summaryOrBody.txt))
 }

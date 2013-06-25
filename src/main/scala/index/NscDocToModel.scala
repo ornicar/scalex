@@ -93,7 +93,10 @@ private[index] final class NscDocToModel {
 
   def comment(o: nscComment.Comment) = Comment(
     body = body(o.body),
-    summary = o.body.summary.isDefined ?? inline(o.short),
+    summary = o.body.summary.isDefined ?? {
+      val s = inline(o.short)
+      (s.txt != body(o.body).txt) option s
+    },
     see = o.see map body,
     result = o.result map body,
     throws = o.throws.toMap mapValues body,
