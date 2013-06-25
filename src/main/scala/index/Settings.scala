@@ -7,8 +7,8 @@ package index
  * @param printMsg A function that prints the string, without any extra boilerplate of error
  */
 private[index] final class Settings(
-    error: String ⇒ Unit,
-    pmsg: String ⇒ Unit = println(_)) extends scala.tools.nsc.doc.Settings(error, pmsg) {
+    error: String ⇒ Unit = println,
+    pmsg: String ⇒ Unit = println) extends scala.tools.nsc.doc.Settings(error, pmsg) {
 
   val inputDir = PathSetting(
     "-input-dir",

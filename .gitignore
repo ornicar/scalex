@@ -5,3 +5,4 @@ project/boot/
 databases
 application.conf
 sbt-launch.jar
+*.scalex

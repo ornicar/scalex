@@ -27,26 +27,27 @@ private[scalex] final class Repository(config: Config) extends Actor {
       (list find {
         case (_, header) ⇒ header contains project
       }).fold(Future successful none[Seed]) {
-        case (file, _) ⇒ Storage read file map (_ seedOf project)
+        case (file, _) ⇒ storage.binary.FileToBinary(file) map { bin ⇒
+          storage.binary.BinaryToModel(bin).toOption flatMap (_ seedOf project)
+        }
       }
     } pipeTo sender
   }
 
-  private lazy val projects: Future[List[Project]] = 
+  private lazy val projects: Future[List[Project]] =
     buildFileHeaders map { list ⇒
       (Header merge list.map(_._2)).projects
     } pipeTo sender
-
 
   private lazy val buildFileHeaders: Future[List[(File, Header)]] = {
     val files = configDbFiles(config)
     println {
       ("Found %d scalex database files" format files.size) :: {
-      Nil // files map { f ⇒ "- %s (%s)".format(f.getName, ~humanReadableFileSize(f)) }
+        Nil // files map { f ⇒ "- %s (%s)".format(f.getName, ~humanReadableFileSize(f)) }
       } mkString "\n"
     }
     Future.traverse(files) { file ⇒
-      (Storage header file) map (file -> _)
+      (storage FileToHeader file) map (file -> _)
     }
   }
 

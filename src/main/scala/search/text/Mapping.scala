@@ -125,7 +125,7 @@ private[text] object Mapping extends org.scalex.util.ScalexJson {
               typeParams = readTypeParams(parent)
             } yield Parent(entity, role, typeParams)
           }
-          comment = m.get[Comment]("comment")
+          comment = m.get[Comment](f.comment)
           entity = Entity(id)
           role ← m str f.role map Role.fromName
           flags = (m arr f.flags) ?? { ~_.asOpt[List[String]] }

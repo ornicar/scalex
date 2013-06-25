@@ -6,7 +6,7 @@ import scala.tools.nsc.doc.{ model ⇒ nsc }
 
 import model._
 
-private[index] final class Mapper {
+private[index] final class NscDocToModel {
 
   var seen = scala.collection.mutable.Set[nsc.DocTemplateEntity]()
 

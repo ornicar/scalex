@@ -9,7 +9,7 @@ import semverfi.{ Valid, Version }
 
 import model._
 
-object BinaryProtocol extends DefaultProtocol with RichProtocol {
+private[binary] object BinaryFormat extends DefaultProtocol with RichProtocol {
 
   import Sugar._
 
