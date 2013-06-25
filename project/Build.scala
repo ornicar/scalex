@@ -29,6 +29,9 @@ trait Dependencies {
     val version = "2.2-SNAPSHOT"
     val json = "play" % "play-json_2.10" % version
   }
+  object apache {
+    val io = "commons-io" % "commons-io" % "2.4"
+  }
   val specs2 = "org.specs2" % "specs2_2.10" % "2.1-SNAPSHOT" % "test"
 }
 
@@ -55,6 +58,6 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     libraryDependencies ++= Seq(
       compiler, config, scalaz, scalazContrib, semver,
       scopt, sbinary, scalastic, akka.actor, play.json,
-      specs2)
+      apache.io, specs2)
   )
 }

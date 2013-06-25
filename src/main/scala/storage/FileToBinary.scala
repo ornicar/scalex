@@ -24,17 +24,16 @@ private[scalex] object FileToBinary {
   private def inputStream[A](file: File)(f: InputStream ⇒ InputStream ⇒ A): Future[A] = Future {
     val fileIn = new FileInputStream(file)
     val gzip = new GZIPInputStream(fileIn)
-    val reader = new InputStreamReader(gzip)
     try {
       f(fileIn)(gzip)
     }
     finally {
-      reader.close()
       gzip.close()
       fileIn.close()
     }
   }
 
-  private def inputStreamToByteArray(is: InputStream): Array[Byte] =
-    Stream.continually(is.read).takeWhile(-1 !=).map(_.toByte).toArray
+  private def inputStreamToByteArray(input: InputStream): Array[Byte] = {
+    org.apache.commons.io.IOUtils toByteArray input
+  }
 }
