@@ -36,8 +36,11 @@ private[scalex] trait ScalexJson {
     private def droppable(v: JsValue): Boolean = v match {
       case JsNull       ⇒ true
       case JsString("") ⇒ true
-      case JsArray(v)   ⇒ v forall droppable
-      case _            ⇒ false
+      case JsObject(fields) ⇒ fields forall {
+        case (_, value) ⇒ droppable(value)
+      }
+      case JsArray(fields) ⇒ fields forall droppable
+      case _               ⇒ false
     }
   }
 
