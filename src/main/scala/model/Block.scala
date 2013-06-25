@@ -1,4 +1,7 @@
 package org.scalex
 package model
 
-case class Block(html: String, txt: String) 
+case class Block(
+  txt: String, 
+  // let empty if similar to txt
+  html: Option[String]) 

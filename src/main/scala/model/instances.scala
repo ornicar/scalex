@@ -7,7 +7,7 @@ object instances extends instances
 
 trait instances {
 
-  implicit val blockMonoid = Monoid.instance[Block]((b1, b2) ⇒ b2, Block("", ""))
+  implicit val blockMonoid = Monoid.instance[Block]((b1, b2) ⇒ b2, Block("", none))
 
   def instance[A](f: (A, ⇒ A) ⇒ A, z: A): Monoid[A] = new Monoid[A] {
     def zero = z

@@ -93,7 +93,7 @@ private[index] final class NscDocToModel {
 
   def comment(o: nscComment.Comment) = Comment(
     body = body(o.body),
-    summary = o.body.summary.isDefined ? inline(o.short) | Block("", ""),
+    summary = o.body.summary.isDefined ?? inline(o.short),
     see = o.see map body,
     result = o.result map body,
     throws = o.throws.toMap mapValues body,
@@ -147,7 +147,12 @@ private[index] final class NscDocToModel {
 
   def block(b: nscComment.Block): Block = html(Html blockToHtml b)
 
-  def html(n: scala.xml.NodeSeq): Block = Block(n.toString, n.text)
+  def html(n: scala.xml.NodeSeq): Block = {
+    val t = n.text
+    val h = n.toString
+    val ho = !(h == t || h == "<p>%s</p>".format(t)) option h
+    Block(t, ho)
+  }
 
   private def ignoredTemplates = Set(
     "scala.Any",

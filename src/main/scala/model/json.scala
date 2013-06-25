@@ -9,8 +9,8 @@ import org.scalex.util.ScalexJson._
 private[scalex] object json {
 
   implicit val blockFormat = (
-    (__ \ "html").format[String] and
-    (__ \ "txt").format[String]
+    (__ \ "txt").format[String] and
+    (__ \ "html").format[Option[String]] 
   )(Block.apply, unlift(Block.unapply))
 
   implicit val commentFormat = (
