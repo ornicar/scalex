@@ -16,7 +16,7 @@ object Block extends Function2[String, Option[String], Block] {
   }
 
   private val trimHtmlRegex =
-    """^$void<p>$void(.+)$void</p>$void$""".replace("$void", """[\n\s]*""").pp.r
+    """^$void<p>$void(.+)$void</p>$void$""".replace("$void", """[\n\s]*""").r
 
   def trimHtml(str: String): String = str.trim match {
     case trimHtmlRegex(content) ⇒ content
