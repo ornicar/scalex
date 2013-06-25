@@ -8,6 +8,39 @@ private[scalex] object ScalexJson extends ScalexJson
 
 private[scalex] trait ScalexJson {
 
+  implicit final class OFormatDropDefaults[E](format: OFormat[E]) {
+
+    def dropDefaults: OFormat[E] = OFormat(
+      format,
+      OWrites { (v: E) ⇒
+        (format writes v) |> { obj ⇒
+          DropDefaults(obj).asOpt[JsObject] | obj
+        }
+      })
+  }
+
+  object DropDefaults {
+
+    def apply(obj: JsObject): JsObject = apply(obj: JsValue).asOpt[JsObject] | obj
+
+    def apply(js: JsValue): JsValue = js match {
+      case JsObject(fields) ⇒ JsObject(fields map {
+        case (key, value) ⇒ key -> apply(value)
+      } filterNot {
+        case (_, value) ⇒ droppable(value)
+      })
+      case JsArray(fields) ⇒ JsArray(fields map apply filterNot droppable)
+      case _               ⇒ js
+    }
+
+    private def droppable(v: JsValue): Boolean = v match {
+      case JsNull       ⇒ true
+      case JsString("") ⇒ true
+      case JsArray(v)   ⇒ v forall droppable
+      case _            ⇒ false
+    }
+  }
+
   implicit final class OFormatMonoid[E: Monoid](format: OFormat[E]) {
 
     def default: OFormat[E] = OFormat(
@@ -21,6 +54,8 @@ private[scalex] trait ScalexJson {
   }
 
   implicit final class ScalexJsObject(js: JsObject) {
+
+    def dropDefaults: JsObject = DropDefaults(js)
 
     def str(key: String): Option[String] =
       (js \ key).asOpt[String]
