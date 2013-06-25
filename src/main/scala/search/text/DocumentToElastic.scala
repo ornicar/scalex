@@ -29,7 +29,7 @@ private[text] object DocumentToElastic extends org.scalex.util.ScalexJson {
       f.lo -> o.lo,
       f.hi -> o.hi)
 
-    doc.qualifiedName -> Json.obj(
+    doc.qualifiedName -> DropDefaults(Json.obj(
       f.name -> doc.member.entity.name,
       f.member -> Json.obj(
         f.parent -> Json.obj(
@@ -54,7 +54,7 @@ private[text] object DocumentToElastic extends org.scalex.util.ScalexJson {
         }
         case _ ⇒ Nil
       })
-    )
+    ))
   }
 
 }
