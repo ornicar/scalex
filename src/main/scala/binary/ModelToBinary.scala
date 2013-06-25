@@ -1,5 +1,4 @@
 package org.scalex
-package storage
 package binary
 
 import model.Database

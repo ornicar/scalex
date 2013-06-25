@@ -27,8 +27,8 @@ private[scalex] final class Repository(config: Config) extends Actor {
       (list find {
         case (_, header) ⇒ header contains project
       }).fold(Future successful none[Seed]) {
-        case (file, _) ⇒ storage.binary.FileToBinary(file) map { bin ⇒
-          storage.binary.BinaryToModel(bin).toOption flatMap (_ seedOf project)
+        case (file, _) ⇒ storage.FileToBinary(file) map { bin ⇒
+          binary.BinaryToModel(bin).toOption flatMap (_ seedOf project)
         }
       }
     } pipeTo sender

@@ -4,8 +4,8 @@ package index
 import scala.util.{ Try, Success, Failure }
 
 import model._
-import storage.binary.BinaryToFile
-import storage.binary.ModelToBinary
+import binary.ModelToBinary
+import storage.BinaryToFile
 
 private[scalex] object Indexer {
 
