@@ -15,7 +15,7 @@ private[text] final class Query(q: TextQuery) {
         query = makeQuery,
         typeNames = projects map (_.id),
         from = (page - 1) * perPage,
-        size = perPage).pp
+        size = perPage)
     }
   }
 
