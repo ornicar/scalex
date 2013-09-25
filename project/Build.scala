@@ -1,7 +1,6 @@
 import sbt._, Keys._
 
-import com.github.retronym.SbtOneJar
-import org.scalex.sbt_plugin.ScalexSbtPlugin
+// import org.scalex.sbt_plugin.ScalexSbtPlugin
 
 trait Resolvers {
   val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
@@ -13,17 +12,17 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val compiler = "org.scala-lang" % "scala-compiler" % "2.11.0-M3"
-  val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0.0"
-  val scalazContrib = "org.typelevel" % "scalaz-contrib-210_2.10" % "0.1.4"
-  val config = "com.typesafe" % "config" % "1.0.1"
-  val scopt = "com.github.scopt" % "scopt_2.10" % "3.0.0"
-  val sbinary = "org.scala-tools.sbinary" % "sbinary_2.11" % "0.4.1-THIB3"
-  val scalastic = "scalastic" % "scalastic_2.11" % "0.90.0-THIB2"
+  val compiler = "org.scala-lang" % "scala-compiler" % "2.11.0-M4"
+  val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0.3"
+  val scalazContrib = "org.typelevel" % "scalaz-contrib-210_2.10" % "0.1.5"
+  val config = "com.typesafe" % "config" % "1.0.2"
+  val scopt = "com.github.scopt" % "scopt_2.10" % "3.1.0"
+  val sbinary = "org.scala-tools.sbinary" % "sbinary_2.10" % "0.4.2"
+  val scalastic = "org.scalastic" % "scalastic_2.10" % "0.90.2"
   val semver = "me.lessis" % "semverfi_2.10" % "0.1.3"
   object akka {
-    val version = "2.2.0-RC1"
-    val actor = "com.typesafe.akka" % "akka-actor_2.11.0-M3" % version
+    val version = "2.2.0"
+    val actor = "com.typesafe.akka" %% "akka-actor" % version
   }
   object play {
     val version = "2.2-SNAPSHOT"
@@ -32,7 +31,7 @@ trait Dependencies {
   object apache {
     val io = "commons-io" % "commons-io" % "2.4"
   }
-  val specs2 = "org.specs2" % "specs2_2.10" % "2.1-SNAPSHOT" % "test"
+  val specs2 = "org.specs2" % "specs2_2.10" % "2.2.2" % "test"
 }
 
 object ScalexBuild extends Build with Resolvers with Dependencies {
@@ -42,7 +41,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     organization := "org.scalex",
     name := "scalex",
     version := "3.0-SNAPSHOT",
-    scalaVersion := "2.11.0-M3",
+    scalaVersion := "2.11.0-M4",
     libraryDependencies := Seq(config),
     // libraryDependencies in test := Seq(specs2),
     sources in doc in Compile := List(),
@@ -52,11 +51,13 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
       "iliaz",
       "scala.iliaz.com"
     ) as ("scala_iliaz_com", Path.userHome / ".ssh" / "id_rsa"))
-  ) ++ SbtOneJar.oneJarSettings ++ ScalexSbtPlugin.defaultSettings
+  ) // ++ ScalexSbtPlugin.defaultSettings
 
   lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
     libraryDependencies ++= Seq(
-      compiler, config, scalaz, scalazContrib, semver,
+      compiler, config, scalaz, 
+      scalazContrib, 
+      semver,
       scopt, sbinary, scalastic, akka.actor, play.json,
       apache.io, specs2)
   )
