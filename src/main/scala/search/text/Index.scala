@@ -33,6 +33,10 @@ private[text] object Index extends org.scalex.util.ScalexJson {
   }
 
   def mapping = Json.obj(
+    // store entire source document
+    "_source" -> Json.obj("enabled" -> true),
+    // disallow search on all fields
+    "_all" -> Json.obj("enabled" -> false),
     "properties" -> Json.obj(
       f.name -> boost("string", 10),
       f.member -> Json.obj(
@@ -41,7 +45,13 @@ private[text] object Index extends org.scalex.util.ScalexJson {
         )
       )
     ),
+    "index" -> "no",
     "analyzer" -> "snowball"
+  )
+
+  def settings = Map(
+    "index.mapper.dynamic" -> "true",
+    "index.query.default_field" -> Index.fields.name
   )
 
   private def f = fields

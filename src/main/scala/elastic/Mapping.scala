@@ -13,15 +13,15 @@ private[scalex] object Mapping {
     val formatter: DateTimeFormatter = DateTimeFormat forPattern format
   }
 
-  def field(typ: String, analyzed: Boolean = false, attrs: JsObject = Json.obj()) =
+  def field(typ: String, attrs: JsObject = Json.obj()) =
     Json.obj(
       "type" -> typ,
-      "index" -> analyzed.fold("analyzed", "not_analyzed")
+      "index" -> "analyzed"
     ) ++ attrs
 
-  def boost( typ: String, b: Int = 1, attrs: JsObject = Json.obj()) =
-    field(typ, true, Json.obj("boost" -> b) ++ attrs)
+  def boost(typ: String, b: Int = 1, attrs: JsObject = Json.obj()) =
+    field(typ, Json.obj("boost" -> b) ++ attrs)
 
-  def obj( properties: JsObject) =
+  def obj(properties: JsObject) =
     Json.obj("type" -> "object", "properties" -> properties)
 }

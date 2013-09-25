@@ -29,10 +29,7 @@ private[search] final class TextActor(config: Config) extends Actor {
     indexer = context.actorOf(Props(
       new elastic.ElasticActor(
         config = config getConfig "elastic",
-        indexSettings = Map(
-          "index.mapper.dynamic" -> "false",
-          "index.query.default_field" -> Index.fields.name
-        ))
+        indexSettings = Index.settings)
     ), name = "elastic")
     selector = Await.result(
       repository ? storage.api.GetProjects mapTo manifest[List[Project]] map Selector,
