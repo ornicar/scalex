@@ -1,7 +1,6 @@
 package org.scalex
 package search
 
-import scala.concurrent.Future
 import scala.util.{ Try, Success, Failure }
 
 import akka.actor.{ ActorRef, Props }
@@ -15,7 +14,7 @@ final class Search(env: Env) {
     new SearchActor(env.config)
   ), name = "search")
 
-  def apply(expression: String): Future[Try[result.Results]] = {
+  def apply(expression: String): Fu[Try[result.Results]] = {
     println("Search for \"%s\"" format expression)
     actor ? expression mapTo manifest[Try[result.Results]]
   }

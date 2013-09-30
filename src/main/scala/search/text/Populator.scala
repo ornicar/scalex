@@ -3,7 +3,7 @@ package search
 package text
 
 import scala.concurrent.duration._
-import scala.concurrent.{ Future, Await }
+import scala.concurrent.Future
 
 import akka.actor.ActorRef
 import akka.pattern.{ ask, pipe }
@@ -16,34 +16,35 @@ private[text] object Populator extends scalaz.NonEmptyListFunctions {
 
   private val bulkSize = 2000
 
-  def apply(repository: ActorRef, selector: Selector)(indexer: ActorRef): Future[Unit] = {
+  def apply(repository: ActorRef, selector: Selector)(es: ActorRef): Fu[Unit] = {
 
-    def index(project: Project): Future[Unit] = {
+    def index(project: Project): Fu[Unit] = {
       println("[%s] Indexing documents" format project)
       repository ? storage.api.GetSeed(project) mapTo manifest[Option[Seed]] flatMap {
-        _.fold[Future[Any]](Future failed badArg("Can't find seed of " + project)) { seed ⇒
-          indexer ! elastic.api.Clear(seed.project.id, Index.mapping)
+        _.fold(fufail[Any](badArg("Can't find seed of " + project))) { seed ⇒
+          es ! elastic.api.Clear(seed.project.id, Index.mapping)
           ModelToDocument fromSeed seed grouped bulkSize foreach { docs ⇒
-            indexer ! elastic.api.IndexMany(seed.project.id, docs map DocumentToElastic.apply)
+            es ! elastic.api.IndexMany(seed.project.id, docs map DocumentToElastic.apply)
           }
-          indexer ? elastic.api.Optimize
+          es ? elastic.api.Optimize
         }
       }
     } void
 
-    def isIndexed(project: Project): Future[Boolean] = {
-      val q = query.TextQuery(
+    def isIndexed(project: Project): Fu[Boolean] = {
+      val q = text.Query(
         raw = "",
         tokens = Nil,
         scope = query.Scope() + project.name,
         pagination = query.Pagination(1, Int.MaxValue)
       )
-      indexer ? Query.count(q).in(selector(q.scope))
+      // TODO es ? Query.count(q).in(selector(q.scope))
+      fufail("TODO")
     } mapTo manifest[Int] map (0!=)
 
     (Future.traverse(selector.all) { p ⇒
       isIndexed(p) flatMap { indexed ⇒
-        if (indexed) Future successful ()
+        if (indexed) fuccess()
         else index(p)
       }
     }).void

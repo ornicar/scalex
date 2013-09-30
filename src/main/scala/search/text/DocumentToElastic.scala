@@ -2,19 +2,19 @@ package org.scalex
 package search
 package text
 
-import elastic.Mapping._
+import com.sksamuel.elastic4s.source.Source
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 import document._
-import model.{ TypeParam, ValueParam, Project, Role, Entity, Block, Comment }
 import model.json._
+import model.{ TypeParam, ValueParam, Project, Role, Entity, Block, Comment }
 
 private[text] object DocumentToElastic extends org.scalex.util.ScalexJson {
 
   private val f = Index.fields
 
-  def apply(doc: Doc): (String, JsObject) = {
+  def apply(doc: Doc): (String, Source) = {
 
     def writeValueParam(o: ValueParam): JsObject = Json.obj(
       f.name -> o.name,
@@ -29,7 +29,7 @@ private[text] object DocumentToElastic extends org.scalex.util.ScalexJson {
       f.lo -> o.lo,
       f.hi -> o.hi)
 
-    doc.qualifiedName -> DropDefaults(Json.obj(
+    doc.qualifiedName -> new JsonSource(DropDefaults(Json.obj(
       f.name -> doc.member.entity.name,
       f.member -> Json.obj(
         f.parent -> Json.obj(
@@ -54,7 +54,7 @@ private[text] object DocumentToElastic extends org.scalex.util.ScalexJson {
         }
         case _ ⇒ Nil
       })
-    ))
+    )))
   }
 
 }

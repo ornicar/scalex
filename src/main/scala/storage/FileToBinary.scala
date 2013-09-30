@@ -9,7 +9,7 @@ import model.Database
 
 private[scalex] object FileToBinary {
 
-  def apply(file: File): Future[Array[Byte]] =
+  def apply(file: File): Fu[Array[Byte]] =
     inputStream(file) { raw ⇒
       gzip ⇒
         try {
@@ -21,7 +21,7 @@ private[scalex] object FileToBinary {
         }
     }
 
-  private def inputStream[A](file: File)(f: InputStream ⇒ InputStream ⇒ A): Future[A] = Future {
+  private def inputStream[A](file: File)(f: InputStream ⇒ InputStream ⇒ A): Fu[A] = Future {
     val fileIn = new FileInputStream(file)
     val gzip = new GZIPInputStream(fileIn)
     try {

@@ -1,7 +1,5 @@
 package org.scalex
 
-import scala.concurrent.Future
-
 import akka.actor.ActorSystem
 import com.typesafe.config.{ Config, ConfigFactory }
 
@@ -24,7 +22,7 @@ object Env {
 
   def defaultConfig = ConfigFactory.load.getConfig("scalex")
 
-  def using[A](config: ⇒ Config)(f: Env ⇒ Future[A]): Future[A] = {
+  def using[A](config: ⇒ Config)(f: Env ⇒ Fu[A]): Fu[A] = {
     println("Scalex env starting")
     val env = apply(config)
     f(env) andThen { case _ ⇒ env.shutdown }

@@ -2,42 +2,25 @@ package org.scalex
 package search
 package text
 
+import com.sksamuel.elastic4s
+import com.sksamuel.elastic4s.{ ElasticDsl => ES }
 import org.elasticsearch.index.query._, QueryBuilders._, FilterBuilders._
 
-import query.{ TextQuery, Pagination }
+import Index.{ fields ⇒ F }
 import model.Project
 
-private[text] final class Query(q: TextQuery) {
+private[search] case class Query(
+    raw: String,
+    tokens: List[String],
+    scope: query.Scope,
+    pagination: query.Pagination) extends query.Query {
 
-  def search = new {
-    def in(projects: List[Project]) = q match {
-      case TextQuery(_, tokens, scope, Pagination(page, perPage)) ⇒ elastic.api.Search(
-        query = makeQuery.pp,
-        typeNames = projects map (_.id),
-        from = (page - 1) * perPage,
-        size = perPage)
-    }
-  }
-
-  def count = new {
-    def in(projects: List[Project]) = 
-      elastic.api.Count(makeQuery, projects map (_.id))
-  }
-
-  private def f = Index.fields
-
-  private def makeQuery = q.tokens.toNel.fold[BaseQueryBuilder](matchAllQuery) {
-    _.foldLeft(boolQuery) {
-      case (query, token) ⇒ query must {
-        multiMatchQuery(token, f.memberEntity)
+  def definition: elastic4s.QueryDefinition =
+    tokens.toNel.fold[elastic4s.QueryDefinition](ES.all) {
+      _.foldLeft(new elastic4s.BoolQueryDefinition) {
+        case (q, token) ⇒ q must (ES.multiMatchQuery(token) fields F.memberEntity)
       }
     }
-  }
-}
 
-private[text] object Query {
-
-  def search(q: TextQuery) = new Query(q).search
-
-  def count(q: TextQuery) = new Query(q).count
+  override def toString = "\"%s\" in %s".format(tokens mkString " and ", scope)
 }

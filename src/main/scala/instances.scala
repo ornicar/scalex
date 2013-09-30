@@ -1,6 +1,5 @@
 package org.scalex
 
-import scala.concurrent.Future
 import scala.util.{ Try, Success, Failure }
 
 import scalaz._
@@ -15,11 +14,11 @@ private[scalex] trait instances {
       f1.map(fa) { k ⇒ f2.map(k: N[B])(f) }
   }
 
-  implicit final class ScalexFuture[A](fua: Future[A]) {
+  implicit final class ScalexFu[A](fua: Fu[A]) {
 
-    def void: Future[Unit] = fua map (_ ⇒ ())
+    def void: Fu[Unit] = fua map (_ ⇒ ())
 
-    def addEffects(fail: Exception ⇒ Unit)(succ: A ⇒ Unit): Future[A] =
+    def addEffects(fail: Exception ⇒ Unit)(succ: A ⇒ Unit): Fu[A] =
       fua ~ { _.effectFold(fail, succ) }
 
     def effectFold(fail: Exception ⇒ Unit, succ: A ⇒ Unit) {
@@ -30,7 +29,7 @@ private[scalex] trait instances {
       }
     }
 
-    def thenPp: Future[A] = fua ~ {
+    def thenPp: Fu[A] = fua ~ {
       _.effectFold(
         e ⇒ println("[failure] " + e),
         a ⇒ println("[success] " + a)

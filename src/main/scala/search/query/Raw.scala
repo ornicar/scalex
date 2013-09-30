@@ -14,7 +14,7 @@ private[search] case class Raw(
   def analyze: Try[Query] = for {
     queryAndScope ← scopeQuery(string)
     (queryString, scope) = queryAndScope
-  } yield TextQuery(
+  } yield text.Query(
     string,
     tokens = tokenize(queryString),
     scope = scope,

@@ -1,6 +1,7 @@
 package org.scalex
 package util
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 import akka.util.Timeout
@@ -12,6 +13,13 @@ private[scalex] trait utilities {
   type File = java.io.File
 
   implicit def execontext = scala.concurrent.ExecutionContext.Implicits.global
+
+  type Fu[+A] = Future[A]
+
+  def fuccess[A](a: A) = Future successful a
+  def fufail[A](a: Exception): Fu[A] = Future failed a
+  def fufail[A](a: String): Fu[A] = fufail(new Exception(a))
+  val funit = fuccess(())
 
   def badArg(msg: String) = new BadArgumentException(msg)
 

@@ -1,8 +1,6 @@
 package org.scalex
 package util
 
-import scala.concurrent.Future
-
 private[scalex] final class Timer {
 
   val start: Long = System.currentTimeMillis
@@ -14,7 +12,7 @@ private[scalex] final class Timer {
 
 private[scalex] object Timer {
 
-  def printAndMonitorFuture[A](msg: ⇒ String)(op: ⇒ Future[A]): Future[A] = {
+  def printAndMonitorFuture[A](msg: ⇒ String)(op: ⇒ Fu[A]): Fu[A] = {
     print(msg)
     monitorFuture(op) map {
       case (res, time) ⇒ {
@@ -24,7 +22,7 @@ private[scalex] object Timer {
     }
   }
 
-  def monitorFuture[A](op: ⇒ Future[A]): Future[(A, Long)] = {
+  def monitorFuture[A](op: ⇒ Fu[A]): Fu[(A, Long)] = {
     val timer = new Timer
     op map { _ -> timer.currentTime }
   }

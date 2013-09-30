@@ -2,7 +2,6 @@ package org.scalex
 package search
 package result
 
-import scala.concurrent.Future
 import scala.util.{ Try, Success, Failure }
 
 final class Paginator[A] (

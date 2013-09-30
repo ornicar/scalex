@@ -2,7 +2,8 @@ package org.scalex
 package search
 package text
 
-import elastic.Mapping._
+import com.sksamuel.elastic4s.{ ElasticDsl => ES }
+import com.sksamuel.elastic4s.FieldType._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
@@ -32,22 +33,29 @@ private[text] object Index extends org.scalex.util.ScalexJson {
     val memberEntity = member + "." + entity
   }
 
-  def mapping = Json.obj(
-    // store entire source document
-    "_source" -> Json.obj("enabled" -> true),
-    // disallow search on all fields
-    "_all" -> Json.obj("enabled" -> false),
-    "properties" -> Json.obj(
-      f.name -> boost("string", 10),
-      f.member -> Json.obj(
-        "properties" -> Json.obj(
-          f.entity -> boost("string", 2)
-        )
-      )
-    ),
-    "index" -> "no",
-    "analyzer" -> "snowball"
+  def mapping: List[ES.FieldDefinition] = List(
+    ES.field(f.name) typed StringType boost 1
+    // field(f.member) as (
+    //   f.entity boost 2
+    // )
   )
+
+  // def mapping = Json.obj(
+  //   // store entire source document
+  //   "_source" -> Json.obj("enabled" -> true),
+  //   // disallow search on all fields
+  //   "_all" -> Json.obj("enabled" -> false),
+  //   "properties" -> Json.obj(
+  //     f.name -> boost("string", 10),
+  //     f.member -> Json.obj(
+  //       "properties" -> Json.obj(
+  //         f.entity -> boost("string", 2)
+  //       )
+  //     )
+  //   ),
+  //   "index" -> "no",
+  //   "analyzer" -> "snowball"
+  // )
 
   def settings = Map(
     "index.mapper.dynamic" -> "true",

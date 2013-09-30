@@ -26,7 +26,7 @@ private[scalex] final class Repository(config: Config) extends Actor {
     case GetSeed(project) ⇒ buildFileHeaders flatMap { list ⇒
       (list find {
         case (_, header) ⇒ header contains project
-      }).fold(Future successful none[Seed]) {
+      }).fold(fuccess(none[Seed])) {
         case (file, _) ⇒ storage.FileToBinary(file) map { bin ⇒
           binary.BinaryToModel(bin).toOption flatMap (_ seedOf project)
         }
@@ -34,12 +34,12 @@ private[scalex] final class Repository(config: Config) extends Actor {
     } pipeTo sender
   }
 
-  private lazy val projects: Future[List[Project]] =
+  private lazy val projects: Fu[List[Project]] =
     buildFileHeaders map { list ⇒
       (Header merge list.map(_._2)).projects
     } pipeTo sender
 
-  private lazy val buildFileHeaders: Future[List[(File, Header)]] = {
+  private lazy val buildFileHeaders: Fu[List[(File, Header)]] = {
     val files = configDbFiles(config)
     println {
       ("Found %d scalex database files" format files.size) :: {

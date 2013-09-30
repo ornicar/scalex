@@ -23,11 +23,11 @@ object Main {
     }, 1 hour)
   }
 
-  private def process(args: Array[String]): Future[Unit] = (args.toList match {
+  private def process(args: Array[String]): Fu[Unit] = (args.toList match {
     case "index" :: name :: version :: rest ⇒ Future {
       index Indexer api.Index(name, version, rest)
     }
-    case _ ⇒ Parser.parse(args).fold(Future.failed[Any](badArg(args mkString " "))) {
+    case _ ⇒ Parser.parse(args).fold(fufail[Any](badArg(args mkString " "))) {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)
       case Config(None, Some(searchConfig)) ⇒
@@ -37,7 +37,7 @@ object Main {
             case Failure(e)       ⇒ println("Is the request valid? " + e)
           }
         }
-      case c ⇒ Future.failed(badArg(c.toString))
+      case c ⇒ fufail(badArg(c.toString))
     }
   }).void
 }
