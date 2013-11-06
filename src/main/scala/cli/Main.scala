@@ -3,8 +3,7 @@ package cli
 
 import scala.concurrent.duration._
 import scala.concurrent.{ Future, Await }
-import scala.tools.nsc
-import scala.util.{ Try, Success, Failure }
+import scala.util.{ Success, Failure }
 
 import com.typesafe.config.ConfigFactory
 

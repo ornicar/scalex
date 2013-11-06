@@ -2,7 +2,7 @@ package org.scalex
 package elastic
 
 import akka.actor.ActorRef
-import com.sksamuel.elastic4s.ElasticClient
+import com.sksamuel.elastic4s.{ ElasticClient, FieldDefinition }
 import com.sksamuel.elastic4s.source.Source
 import com.sksamuel.elastic4s.{ ElasticDsl ⇒ ES }
 import org.elasticsearch.action.ActionRequest
@@ -15,7 +15,7 @@ import play.api.libs.json._
 
 private[scalex] object api {
 
-  case class Clear(typeName: Type, mapping: List[ES.FieldDefinition])
+  case class Clear(typeName: Type, mapping: List[FieldDefinition])
 
   case class Optimize(typeName: Type)
 
