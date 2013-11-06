@@ -48,4 +48,4 @@ For example, when I index scalaz I run:
 
 ## HTTP
 
-A HTTP API is available, [see the doc](https://github.com/ornicar/scalex/blob/master/http-api-documentation.md)
+A HTTP API is available, [see the doc](https://github.com/ornicar/scalex/blob/master/doc/http-api.md)
