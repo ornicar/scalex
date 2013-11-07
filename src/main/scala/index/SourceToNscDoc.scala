@@ -30,7 +30,7 @@ private[scalex] object SourceToNscDoc {
     }
     catch {
       case ex @ nsc.FatalError(msg) ⇒
-        if (settings.debug.value) ex.printStackTrace()
+        if (true || settings.debug.value) ex.printStackTrace()
         reporter.error(null, "fatal error: " + msg)
         throw ex
     }

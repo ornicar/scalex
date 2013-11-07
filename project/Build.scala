@@ -1,6 +1,7 @@
 import sbt._, Keys._
 
 // import org.scalex.sbt_plugin.ScalexSbtPlugin
+import com.github.retronym.SbtOneJar
 
 trait Resolvers {
   val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
@@ -21,8 +22,8 @@ trait Dependencies {
   val semver = "me.lessis" % "semverfi_2.10" % "0.1.3"
   val elastic4s = "com.sksamuel.elastic4s" % "elastic4s_2.10" % "0.90.5.5"
   object akka {
-    val version = "2.2.0"
-    val actor = "com.typesafe.akka" % "akka-actor_2.10" % version
+    val version = "2.2.1"
+    val actor = "com.typesafe.akka" %% "akka-actor" % version
   }
   object play {
     val version = "2.2-SNAPSHOT"
@@ -51,7 +52,8 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
       "iliaz",
       "scala.iliaz.com"
     ) as ("scala_iliaz_com", Path.userHome / ".ssh" / "id_rsa"))
-  ) // ++ ScalexSbtPlugin.defaultSettings
+  ) ++ SbtOneJar.oneJarSettings
+  // ++ ScalexSbtPlugin.defaultSettings
 
   lazy val scalex = Project("scalex", file("."), settings = buildSettings).settings(
     libraryDependencies ++= Seq(
