@@ -33,7 +33,7 @@ object Main {
         Env.using(Env.defaultConfig) { env ⇒
           (new search.Search(env) apply searchConfig.expression) andThen {
             case Success(results) ⇒ results.fold(println)(println)
-            case Failure(e)       ⇒ println("Is the request valid? " + e)
+            case Failure(e)       ⇒ println(s"Is the request valid? $e")
           }
         }
       case c ⇒ fufail(badArg(c.toString))

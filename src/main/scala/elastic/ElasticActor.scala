@@ -32,7 +32,7 @@ private[scalex] final class ElasticActor(
     Option(client) foreach { _.close() }
   }
 
-  def receive = akka.event.LoggingReceive {
+  def receive = {
 
     case api.Clear(typeName, mapping) ⇒ Await.ready((Future {
       try {
@@ -55,7 +55,16 @@ private[scalex] final class ElasticActor(
       }): _*
     }
 
-    case search: ES.SearchDefinition ⇒ client execute search pipeTo sender
+    case search: ES.SearchDefinition ⇒ execute(client execute search, sender)
+
+    case count: ES.CountDefinition   ⇒ execute(client execute count, sender)
+  }
+
+  private def execute[A](action: Future[A], replyTo: ActorRef) {
+    action onComplete {
+      case Success(response)  ⇒ replyTo ! response
+      case Failure(exception) ⇒ throw exception
+    }
   }
 
   private def instanciateElasticClient = {

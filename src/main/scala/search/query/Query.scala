@@ -13,3 +13,8 @@ private[search] trait Query {
   def pagination: Pagination
   def definition: elastic4s.QueryDefinition
 }
+
+private[search] trait Count {
+  def scope: Scope
+  def definition: elastic4s.QueryDefinition
+}

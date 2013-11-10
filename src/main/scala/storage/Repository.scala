@@ -27,8 +27,18 @@ private[scalex] final class Repository(config: Config) extends Actor {
       (list find {
         case (_, header) ⇒ header contains project
       }).fold(fuccess(none[Seed])) {
-        case (file, _) ⇒ storage.FileToBinary(file) map { bin ⇒
-          binary.BinaryToModel(bin).toOption flatMap (_ seedOf project)
+        case (file, _) ⇒ storage.FileToBinary(file) flatMap { bin ⇒
+          binary.BinaryToModel(bin) match {
+            case Success(db) ⇒ db seedOf project match {
+              case Some(seed) ⇒ fuccess(seed.some)
+              case None ⇒ fufail(new InvalidDatabaseException(
+                s"$file claims to contain a seed for $project"
+              ))
+            }
+            case Failure(throwable) ⇒ fufail(new InvalidDatabaseException(
+              s"Can't read project $project from $file: ${throwable.toString}"
+            ))
+          }
         }
       }
     } pipeTo sender
@@ -37,12 +47,12 @@ private[scalex] final class Repository(config: Config) extends Actor {
   private lazy val projects: Fu[List[Project]] =
     buildFileHeaders map { list ⇒
       (Header merge list.map(_._2)).projects
-    } pipeTo sender
+    }
 
   private lazy val buildFileHeaders: Fu[List[(File, Header)]] = {
     val files = configDbFiles(config)
     println {
-      ("Found %d scalex database files" format files.size) :: {
+      s"Found ${files.size} scalex database files" :: {
         Nil // files map { f ⇒ "- %s (%s)".format(f.getName, ~humanReadableFileSize(f)) }
       } mkString "\n"
     }

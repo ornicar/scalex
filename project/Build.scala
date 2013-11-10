@@ -13,26 +13,26 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val compiler = "org.scala-lang" % "scala-compiler" % "2.11.0-M5"
-  val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0.4"
-  val scalazContrib = "org.typelevel" % "scalaz-contrib-210_2.10" % "0.1.5"
+  val compiler = "org.scala-lang" % "scala-compiler" % "2.10.3"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.4"
+  val scalazContrib = "org.typelevel" %% "scalaz-contrib-210" % "0.1.5"
   val config = "com.typesafe" % "config" % "1.0.2"
-  val scopt = "com.github.scopt" % "scopt_2.10" % "3.1.0"
+  val scopt = "com.github.scopt" %% "scopt" % "3.1.0"
   val sbinary = "org.scala-tools.sbinary" % "sbinary_2.10" % "0.4.2"
-  val semver = "me.lessis" % "semverfi_2.10" % "0.1.3"
-  val elastic4s = "com.sksamuel.elastic4s" % "elastic4s_2.10" % "0.90.5.5"
+  val semver = "me.lessis" %% "semverfi" % "0.1.3"
+  val elastic4s = "com.sksamuel.elastic4s" %% "elastic4s" % "0.90.5.5"
   object akka {
-    val version = "2.2.1"
+    val version = "2.2.3"
     val actor = "com.typesafe.akka" %% "akka-actor" % version
   }
   object play {
-    val version = "2.2-SNAPSHOT"
-    val json = "play" % "play-json_2.10" % version
+    val version = "2.2.1"
+    val json = "com.typesafe.play" %% "play-json" % version
   }
   object apache {
     val io = "commons-io" % "commons-io" % "2.4"
   }
-  val specs2 = "org.specs2" % "specs2_2.10" % "2.3.1" % "test"
+  val specs2 = "org.specs2" %% "specs2" % "2.3.1" % "test"
 }
 
 object ScalexBuild extends Build with Resolvers with Dependencies {
@@ -42,7 +42,7 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     organization := "org.scalex",
     name := "scalex",
     version := "3.0-SNAPSHOT",
-    scalaVersion := "2.11.0-M5",
+    scalaVersion := "2.10.3",
     libraryDependencies := Seq(config),
     // libraryDependencies in test := Seq(specs2),
     sources in doc in Compile := List(),

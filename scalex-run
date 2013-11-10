@@ -3,5 +3,5 @@
 args=$@
 cd `dirname $0`
 
-jar=target/scala-2.11.0-M5/scalex_2.11.0-M5-3.0-SNAPSHOT-one-jar.jar
+jar=target/scala-2.10/scalex_2.10-3.0-SNAPSHOT-one-jar.jar
 java -Dconfig.file=application.conf -jar $jar $args

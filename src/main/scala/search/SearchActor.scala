@@ -20,6 +20,7 @@ private[search] final class SearchActor(config: Config) extends Actor {
   override val supervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
       case _: ActorInitializationException ⇒ Escalate
+      case _: InvalidDatabaseException     ⇒ Escalate
       case _: Exception                    ⇒ Restart
     }
 
@@ -31,7 +32,7 @@ private[search] final class SearchActor(config: Config) extends Actor {
 
   def receive = {
 
-    case expression: String ⇒ apply(expression) pipeTo sender
+    case expression: String ⇒ apply(expression.pp) pipeTo sender
   }
 
   private def apply(expression: String): Fu[Try[result.Results]] =

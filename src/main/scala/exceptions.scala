@@ -17,3 +17,13 @@ final class OutdatedDatabaseException(name: String)
 final class BadArgumentException(msg: String)
   extends IllegalArgumentException(msg)
   with ScalexException
+
+final class InvalidQueryException(msg: String)
+  extends IllegalArgumentException(msg)
+  with ScalexException
+  
+class InvalidDatabaseException(msg: String) 
+  extends RuntimeException 
+  with ScalexException {
+    override def getMessage = s"[Invalid database] $msg"
+  }
