@@ -10,39 +10,90 @@ import akka.actor._
 import akka.actor.SupervisorStrategy._
 import akka.pattern.{ ask, pipe }
 import com.typesafe.config.Config
+import text.TextActor
 
-import makeTimeout.veryLarge
+private[search] final class SearchActor(config: Config)
+    extends FSM[SearchActor.State, SearchActor.Data] {
 
-private[search] final class SearchActor(config: Config) extends Actor {
+  import SearchActor._
 
   private var textualEngine: ActorRef = _
 
   override val supervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
       case _: ActorInitializationException ⇒ Escalate
-      case _: InvalidDatabaseException     ⇒ Escalate
+      case _: InvalidDatabaseException     ⇒ Stop
       case _: Exception                    ⇒ Restart
     }
 
   override def preStart {
     textualEngine = context.actorOf(Props(
-      new text.TextActor(config)
+      new TextActor(config)
     ), name = "text")
+    context watch textualEngine
   }
 
-  def receive = {
+  startWith(Booting, Pile(Vector.empty))
 
-    case expression: String ⇒ apply(expression.pp) pipeTo sender
-  }
+  when(Booting) {
 
-  private def apply(expression: String): Fu[Try[result.Results]] =
-    query.Raw(expression, 1, 10).analyze match {
-      case Success(query) ⇒ apply(query) map { Success(_) }
-      case Failure(err)   ⇒ fuccess(Failure(err))
+    case Event(q: String, pile: Pile) ⇒
+      stay using (pile + Job(q, sender))
+
+    case Event(TextActor.Ready, Pile(jobs)) ⇒ {
+      jobs foreach self.!
+      goto(Ready) using NoData
     }
 
-  private def apply(q: query.Query): Fu[result.Results] = q match {
-    case q: text.Query ⇒ textualEngine ? q mapTo manifest[result.Results]
-    case _             ⇒ ???
+    // something went wrong and the child actor terminated
+    // abort all jobs then die
+    case Event(Terminated(_), Pile(jobs)) ⇒ {
+      jobs foreach {
+        case Job(_, from) ⇒ from ! Status.Failure(new SearchFailureException)
+      }
+      self ! PoisonPill
+      stay
+    }
+  }
+
+  when(Ready) {
+
+    case Event(Job(q, from), _) ⇒ {
+      import makeTimeout.short
+      self ? q pipeTo from
+      stay
+    }
+
+    case Event(q: String, _) ⇒ {
+      self.tell(query.Raw(q, 1, 0), sender)
+      stay
+    }
+
+    case Event(q: query.Raw, _) ⇒ {
+      q.analyze match {
+        case Success(query) ⇒ self.tell(query, sender)
+        case Failure(err)   ⇒ sender ! Status.Failure(err)
+      }
+      stay
+    }
+
+    case Event(q: text.Query, _) ⇒ {
+      textualEngine.tell(q, sender)
+      stay
+    }
+  }
+}
+
+private[search] object SearchActor {
+
+  sealed trait State
+  case object Booting extends State
+  case object Ready extends State
+
+  sealed trait Data
+  case object NoData extends Data
+  case class Job(query: String, from: ActorRef)
+  case class Pile(jobs: Vector[Job]) extends Data {
+    def +(job: Job) = copy(jobs :+ job)
   }
 }

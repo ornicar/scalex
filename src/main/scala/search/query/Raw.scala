@@ -24,7 +24,7 @@ private[search] case class Raw(
     if ((t contains "-") || (t contains "+")) {
       val words = t split ' ' toList
       val parsed = words.foldLeft((List[String](), Scope())) {
-        case ((ws, scope), RawQuery.scoper(sign, pack)) ⇒ sign match {
+        case ((ws, scope), Raw.scoper(sign, pack)) ⇒ sign match {
           case "-" ⇒ (ws, scope - pack)
           case "+" ⇒ (ws, scope + pack)
           case _   ⇒ (ws, scope)
@@ -40,7 +40,7 @@ private[search] case class Raw(
     (t.toLowerCase split Array('.', ' ', '#')).toList map (_.trim) filterNot (_.isEmpty)
 }
 
-object RawQuery {
+object Raw {
 
   val splitter = """^([^\:]*)\:\s(.+)$""".r
   val scoper = """^(\-|\+)([a-z]+)$""".r

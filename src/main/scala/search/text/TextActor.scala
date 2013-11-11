@@ -51,10 +51,7 @@ private[search] final class TextActor(config: Config)
     }
 
     case Event(selector: Selector, pile: Pile) ⇒ {
-      Populator(repository, selector)(es, self) onComplete {
-        case Failure(err) ⇒ throw err
-        case Success(_)   ⇒ self ! Populated
-      }
+      Populator(repository, selector)(es, self) onComplete self.!
       goto(Populating) using PileWith(pile, selector)
     }
 
@@ -64,13 +61,16 @@ private[search] final class TextActor(config: Config)
 
   when(Populating) {
 
-    case Event(q: Count, PileWith(pile, selector)) ⇒ {
+    case Event(q: Count, PileWith(_, selector)) ⇒ {
       count(selector)(q)
       stay
     }
 
-    case Event(Populated, PileWith(Pile(jobs), selector)) ⇒ {
+    case Event(Failure(err), _) ⇒ throw err
+
+    case Event(Success(_), PileWith(Pile(jobs), selector)) ⇒ {
       jobs foreach self.!
+      context.parent ! Ready
       goto(Ready) using With(selector)
     }
 
