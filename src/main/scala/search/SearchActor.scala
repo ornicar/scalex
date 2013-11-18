@@ -10,6 +10,8 @@ import akka.actor._
 import akka.actor.SupervisorStrategy._
 import akka.pattern.{ ask, pipe }
 import com.typesafe.config.Config
+import scalaz.{ \/, -\/, \/- }
+
 import text.TextActor
 
 private[search] final class SearchActor(config: Config)
@@ -65,20 +67,16 @@ private[search] final class SearchActor(config: Config)
     }
 
     case Event(q: String, _) ⇒ {
-      self.tell(query.Raw(q, 1, 0), sender)
+      self forward query.Raw(q, 1, 0)
       stay
     }
 
     case Event(q: query.Raw, _) ⇒ {
-      q.analyze match {
-        case Success(query) ⇒ self.tell(query, sender)
-        case Failure(err)   ⇒ sender ! Status.Failure(err)
-      }
-      stay
-    }
-
-    case Event(q: text.Query, _) ⇒ {
-      textualEngine.tell(q, sender)
+      import makeTimeout.short
+      q.analyze.fold(
+        err ⇒ sender ! -\/(err),
+        query ⇒ textualEngine ? query map { \/-(_) } pipeTo sender
+      )
       stay
     }
   }

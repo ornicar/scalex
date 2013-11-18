@@ -5,6 +5,7 @@ import scala.util.{ Try, Success, Failure }
 
 import akka.actor.{ ActorRef, Props }
 import akka.pattern.ask
+import scalaz.\/
 
 final class Search(env: Env) {
 
@@ -14,8 +15,8 @@ final class Search(env: Env) {
     new SearchActor(env.config)
   ), name = "search")
 
-  def apply(expression: String): Fu[Try[result.Results]] = {
+  def apply(expression: String): Fu[String \/ result.Results] = {
     println("Search for \"%s\"" format expression)
-    actor ? expression mapTo manifest[Try[result.Results]]
+    actor ? expression mapTo manifest[String \/ result.Results] 
   }
 }

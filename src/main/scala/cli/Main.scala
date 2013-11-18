@@ -32,8 +32,11 @@ object Main {
       case Config(None, Some(searchConfig)) ⇒
         Env.using(Env.defaultConfig) { env ⇒
           (new search.Search(env) apply searchConfig.expression) andThen {
-            case Success(results) ⇒ results.fold(println)(println)
-            case Failure(e)       ⇒ println(s"Is the request valid? $e")
+            case Success(results) ⇒ results.fold(
+              err ⇒ println(s"Invalid query: $err"),
+              println
+            )
+            case Failure(err) ⇒ println(s"An error occured: $err")
           }
         }
       case c ⇒ fufail(badArg(c.toString))

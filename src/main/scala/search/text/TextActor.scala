@@ -92,7 +92,9 @@ private[search] final class TextActor(config: Config)
       import makeTimeout.short
       es ? {
         ES.search.in(indexName).types(types: _*) query q.definition
-      } mapTo manifest[SearchResponse] map result.ElasticToResult(q, area) pipeTo sender
+      } mapTo
+        manifest[SearchResponse] map
+        result.ElasticToResult(q, area) pipeTo sender
       stay
     }
 
