@@ -11,7 +11,7 @@ private[document] trait DocImpl {
 
   // Implementation
 
-  def id = member.project.id + ":" + qualifiedName
+  def id = member.projectId + ":" + qualifiedName
 
   def entity = member.entity
 

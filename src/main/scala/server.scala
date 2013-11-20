@@ -40,7 +40,7 @@ private[server] final class ScalexApp(searcher: search.Search) extends HApp {
     def act(talk: HTalk) {
 
       import play.api.libs.json._
-      import org.scalex.json.Writer.resultsWrites
+      import org.scalex.search.result.Writer.resultsWrites
 
       def write[A: Writes](status: HStatus.type ⇒ HStatus.Value)(response: A) = {
         val bytes = Json stringify Json.toJson(response) getBytes "UTF-8"

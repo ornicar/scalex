@@ -1,7 +1,11 @@
 package org.scalex
 package api
 
-case class Index(name: String, version: String, args: List[String]) {
+case class Index(
+  name: String, 
+  version: String, 
+  scaladocUrl: Option[String],
+  args: List[String]) {
 
   def add(arg: String) = copy(args = args :+ arg)
 }

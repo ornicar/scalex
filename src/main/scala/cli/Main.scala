@@ -23,8 +23,9 @@ object Main {
   }
 
   private def process(args: Array[String]): Fu[Unit] = (args.toList match {
+    // TODO real option to set optional scaladoc url
     case "index" :: name :: version :: rest ⇒ Future {
-      index Indexer api.Index(name, version, rest)
+      index Indexer api.Index(name, version, Some("http://www.scala-lang.org/api/2.10.3"), rest)
     }
     case "server" :: port :: Nil ⇒ port.parseInt.fold(
       err ⇒ fufail(badArg(s"Invalid server port: $port")),

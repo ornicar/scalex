@@ -5,7 +5,10 @@ import scala.util.{ Try, Success, Failure }
 
 import semverfi.{ Version, Valid, SemVersion, NormalVersion }
 
-case class Project(name: ProjectId, version: Valid) {
+case class Project(
+  name: ProjectId, 
+  version: Valid,
+  scaladocUrl: Option[String]) {
 
   def id: ProjectId = name + "_" + version.shows
 
@@ -28,18 +31,18 @@ case class Project(name: ProjectId, version: Valid) {
   lazy val tokenize: List[Token] = name :: version.shows :: Nil
 }
 
-object Project extends Function2[ProjectId, Valid, Project] {
+object Project extends Function3[ProjectId, Valid, Option[String], Project] {
 
   val nameVersionRegex = """^([^_]+)_(.+)$""".r
 
-  def apply(name: String, version: String): Try[Project] =
+  def apply(name: String, version: String, url: Option[String]): Try[Project] =
     Version(version) match {
       case semverfi.Invalid(raw) ⇒ Failure(new InvalidProjectVersionException(raw))
-      case v: Valid              ⇒ Success(Project(name, v))
+      case v: Valid              ⇒ Success(Project(name, v, url))
     }
 
   def apply(str: String): Try[Project] = str match {
-    case nameVersionRegex(name, version) ⇒ apply(name, version)
+    case nameVersionRegex(name, version) ⇒ apply(name, version, none)
     case _                    ⇒ Failure(new InvalidProjectNameException(str))
   }
 }

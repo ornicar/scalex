@@ -1,11 +1,11 @@
 package org.scalex
-package json
+package search
+package result
 
 import play.api.libs.json._
 
 import document._
 import model._
-import search.result.Results
 import org.scalex.util.ScalexJson
 
 object Writer extends ScalexJson {
@@ -27,6 +27,33 @@ object Writer extends ScalexJson {
     )
   } 
 
+  implicit val blockWrites: OWrites[Block] = OWrites { block =>
+    Json.obj(
+      "txt" -> block.txt,
+      "html" -> block.html
+    )
+  } 
+
+  implicit val commentWrites: OWrites[Comment] = OWrites { comment =>
+    import comment._
+    Json.obj(
+      "short" -> summary,
+      "body" -> body,
+      "see" -> see,
+      "result" -> result,
+      "throws" -> throws,
+      "valueParams" -> valueParams,
+      "typeParams" -> typeParams,
+      "version" -> version,
+      "since" -> since,
+      "todo" -> todo,
+      "deprecated" -> deprecated,
+      "note" -> note,
+      "example" -> example,
+      "constructor" -> constructor
+    )
+  } 
+
   implicit val docWrites: OWrites[Doc] = OWrites { (doc: Doc) =>
     import doc._
     Json.obj(
@@ -44,10 +71,11 @@ object Writer extends ScalexJson {
       }),
       "declaration" -> declaration,
       "signature" -> signature,
-      "project" -> member.project,
+      // TODO get global project
+      "project" -> member.projectId,
       "deprecation" -> "TODO",
       "parent" -> member.parent,
-      "comment" -> "TODO"
+      "comment" -> member.comment.map(Json.toJson(_))
     )
   } dropDefaults
 

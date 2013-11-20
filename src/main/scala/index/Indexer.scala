@@ -12,7 +12,7 @@ private[scalex] object Indexer {
   def apply(config: api.Index) {
     println("- source code -> nsc doc")
     val settings = new Settings()
-    Project(config.name, config.version) flatMap { project ⇒
+    Project(config.name, config.version, config.scaladocUrl) flatMap { project ⇒
       SourceToNscDoc(config.name, config.version, settings, config.args) map { nscDoc ⇒
         println("- nsc doc -> model")
         val root = new NscDocToModel() docTemplate nscDoc

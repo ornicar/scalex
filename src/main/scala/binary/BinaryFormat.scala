@@ -92,7 +92,7 @@ private[binary] object BinaryFormat extends DefaultProtocol with RichProtocol {
     def writer(v: Valid)(implicit out: Output) { >>(v.shows) }
   }
 
-  implicit val projectF = asProduct2(Project)(Project.unapply(_).get)
+  implicit val projectF = asProduct3(Project)(Project.unapply(_).get)
 
   implicit val seedF = asProduct2(Seed)(Seed.unapply(_).get)
 

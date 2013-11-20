@@ -25,7 +25,7 @@ private[scalex] object ModelToDocument {
       typeParams = parent.typeParams)
 
     def makeMember(parent: Parent)(o: model.Member) = Member(
-      project = seed.project,
+      projectId = seed.project.id,
       parent = parent,
       comment = o.comment,
       entity = o.entity,

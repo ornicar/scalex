@@ -53,7 +53,7 @@ private[search] object ElasticToDocument extends org.scalex.util.ScalexJson {
         role ← m str f.role map Role.fromName
         flags = (m arr f.flags) ?? { ~_.asOpt[List[String]] }
         resultType ← m str f.resultType
-      } yield Member(project, parent, comment, entity, role, flags, resultType)) map { member ⇒
+      } yield Member(project.id, parent, comment, entity, role, flags, resultType)) map { member ⇒
         member.role match {
           case Role.Def ⇒ Def(
             member,
