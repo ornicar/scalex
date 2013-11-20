@@ -3,7 +3,7 @@ package cli
 
 import scala.concurrent.duration._
 import scala.concurrent.{ Future, Await }
-import scala.util.{ Success, Failure }
+import scala.util.{ Try, Success, Failure }
 
 import com.typesafe.config.ConfigFactory
 
@@ -26,6 +26,13 @@ object Main {
     case "index" :: name :: version :: rest ⇒ Future {
       index Indexer api.Index(name, version, rest)
     }
+    case "server" :: port :: Nil ⇒ port.parseInt.fold(
+      err ⇒ fufail(badArg(s"Invalid server port: $port")),
+      port ⇒ Env.using(Env.defaultConfig) { env ⇒
+        new server.Server(new search.Search(env), port)
+        fuccess(println("Server stopped"))
+      }
+    )
     case _ ⇒ Parser.parse(args).fold(fufail[Any](badArg(args mkString " "))) {
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer indexConfig)
       // case Config(Some(indexConfig), _) ⇒ Success(index Indexer api.Index.test)

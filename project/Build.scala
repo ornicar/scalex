@@ -21,6 +21,7 @@ trait Dependencies {
   val sbinary = "org.scala-tools.sbinary" % "sbinary_2.10" % "0.4.2"
   val semver = "me.lessis" %% "semverfi" % "0.1.3"
   val elastic4s = "com.sksamuel.elastic4s" %% "elastic4s" % "0.90.5.5"
+  val tiscaf = "org.gnieh" %% "tiscaf" % "0.8"
   object akka {
     val version = "2.2.3"
     val actor = "com.typesafe.akka" %% "akka-actor" % version
@@ -59,6 +60,6 @@ object ScalexBuild extends Build with Resolvers with Dependencies {
     libraryDependencies ++= Seq(
       compiler, config, scalaz, scalazContrib, semver,
       scopt, sbinary, elastic4s, akka.actor, play.json,
-      apache.io, specs2)
+      apache.io, specs2, tiscaf)
   )
 }
