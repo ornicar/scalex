@@ -2,8 +2,6 @@ package org.scalex
 package search
 package result
 
-import scala.util.{ Try, Success, Failure }
-
 final class Paginator[A] (
 
     /**

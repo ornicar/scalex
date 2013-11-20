@@ -67,7 +67,7 @@ private[search] final class SearchActor(config: Config)
     }
 
     case Event(q: String, _) ⇒ {
-      self forward query.Raw(q, 1, 0)
+      self forward query.Raw(q)
       stay
     }
 

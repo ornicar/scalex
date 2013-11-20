@@ -43,4 +43,8 @@ object Raw {
 
   val splitter = """^([^\:]*)\:\s(.+)$""".r
   val scoper = """^(\-|\+)([a-z]+)$""".r
+  val maxPerPage = 10
+
+  def apply(s: String): Raw = Raw(s, 1, maxPerPage)
+  def apply(s: String, p: Int): Raw = Raw(s, p, maxPerPage)
 }
