@@ -1,9 +1,9 @@
 package org.scalex
 package server
 
-import scala.util.{ Try, Success, Failure }
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.util.{ Try, Success, Failure }
 
 import tiscaf._
 
@@ -39,10 +39,13 @@ private[server] final class ScalexApp(searcher: search.Search) extends HApp {
 
     def act(talk: HTalk) {
 
-      def write(status: HStatus.type ⇒ HStatus.Value)(str: String) = {
-        val bytes = str getBytes "UTF-8"
+      import play.api.libs.json._
+      import org.scalex.json.Writer.resultsWrites
+
+      def write[A: Writes](status: HStatus.type ⇒ HStatus.Value)(response: A) = {
+        val bytes = Json stringify Json.toJson(response) getBytes "UTF-8"
         talk
-          .setContentType("text/plain; charset=UTF-8")
+          .setContentType("application/json; charset=UTF-8")
           .setCharacterEncoding("UTF-8")
           .setContentLength(bytes.size)
           .setStatus(status(HStatus))
@@ -52,9 +55,9 @@ private[server] final class ScalexApp(searcher: search.Search) extends HApp {
       talk.req param "q" match {
         case None ⇒ write(_.BadRequest)("Empty query")
         case Some(q) ⇒ Try(Await.result(searcher(q), timeout)) match {
-          case Success(res) => res.fold(
+          case Success(res) ⇒ res.fold(
             err ⇒ write(_.BadRequest)(err),
-            res ⇒ write(_.OK)(res.toString)
+            res ⇒ write(_.OK)(res)
           )
           case Failure(err) ⇒ write(_.InternalServerError) {
             s"""Failure while searching for "$q": $err""".pp

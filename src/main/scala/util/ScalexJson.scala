@@ -8,15 +8,21 @@ private[scalex] object ScalexJson extends ScalexJson
 
 private[scalex] trait ScalexJson {
 
+  implicit final class OWritesDropDefaults[E](writes: OWrites[E]) {
+
+    def dropDefaults: OWrites[E] = OWrites { (v: E) ⇒
+      (writes writes v) |> { obj ⇒
+        DropDefaults(obj).asOpt[JsObject] | obj
+      }
+    }
+  }
+
   implicit final class OFormatDropDefaults[E](format: OFormat[E]) {
 
     def dropDefaults: OFormat[E] = OFormat(
       format,
-      OWrites { (v: E) ⇒
-        (format writes v) |> { obj ⇒
-          DropDefaults(obj).asOpt[JsObject] | obj
-        }
-      })
+      OWrites(format.writes).dropDefaults
+    )
   }
 
   object DropDefaults {

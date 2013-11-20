@@ -18,3 +18,8 @@ case class TypeParam(
     /** The upper bound for this type parameter, if it has been defined. */
     hi: Option[TypeEntity]) {
 }
+
+trait TypeParameterized {
+
+  def typeParams: List[TypeParam]
+}

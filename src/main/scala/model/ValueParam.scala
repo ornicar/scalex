@@ -22,3 +22,8 @@ case class ValueParam(
       case None     ⇒ ""
     })
 }
+
+trait ValueParameterized {
+
+  def valueParams: List[List[ValueParam]]
+}

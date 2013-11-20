@@ -7,7 +7,8 @@ sealed trait Doc extends DocImpl
 
 case class Template(
     member: Member,
-    typeParams: List[model.TypeParam]) extends Doc {
+    typeParams: List[model.TypeParam]
+  ) extends Doc with model.TypeParameterized {
 
   def signature = member.parent.qualifiedSignature 
 
@@ -21,7 +22,8 @@ case class Template(
 case class Def(
     member: Member,
     typeParams: List[model.TypeParam],
-    valueParams: List[List[model.ValueParam]]) extends Doc {
+    valueParams: List[List[model.ValueParam]]
+  ) extends Doc with model.TypeParameterized with model.ValueParameterized {
 
   def signature = (member.parent.typeParams ++ typeParams).shows + " " + (List(
     member.parent.signature,
