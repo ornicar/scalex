@@ -11,7 +11,7 @@ private[document] trait DocImpl {
 
   // Implementation
 
-  def id = member.projectId + ":" + qualifiedName
+  def id = member.project.id + ":" + qualifiedName
 
   def entity = member.entity
 
@@ -24,4 +24,6 @@ private[document] trait DocImpl {
   def qualifiedName = member.entity.qualifiedName
 
   def namePile = member.entity.namePile
+
+  def scaladocUrl: Option[String]
 }

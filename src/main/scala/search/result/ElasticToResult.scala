@@ -14,11 +14,13 @@ private[search] object ElasticToResult {
   def apply(q: query.Query, area: List[Project])(response: SearchResponse) = Results(
     paginator = new Paginator(
       results = response.getHits.hits.toList map { hit ⇒
-        text.ElasticToDocument(
-          projectName = hit.getType,
-          id = hit.id,
-          json = Json parse hit.sourceAsString
-        ) map { result.Result(_, math round hit.score) }
+        area find (_.id == hit.getType) flatMap { project =>
+          text.ElasticToDocument(
+            project = project,
+            id = hit.id,
+            json = Json parse hit.sourceAsString
+          ) map { result.Result(_, math round hit.score) }
+        }
       } flatten,
       nbResults = response.getHits.totalHits.toInt,
       currentPage = q.pagination.currentPage,

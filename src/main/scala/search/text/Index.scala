@@ -18,6 +18,8 @@ private[text] object Index extends org.scalex.util.ScalexJson {
     val entity = "en"
     val parent = "pa"
     val member = "me"
+    val projectName = "pn"
+    val projectVersion = "pv"
     val comment = "co"
     val role = "ro"
     val typeParams = "tp"

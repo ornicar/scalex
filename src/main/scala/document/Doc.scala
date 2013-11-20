@@ -7,23 +7,25 @@ sealed trait Doc extends DocImpl
 
 case class Template(
     member: Member,
-    typeParams: List[model.TypeParam]
-  ) extends Doc with model.TypeParameterized {
+    typeParams: List[model.TypeParam]) extends Doc with model.TypeParameterized {
 
-  def signature = member.parent.qualifiedSignature 
+  def signature = member.parent.qualifiedSignature
 
   def declaration = "%s %s.%s%s".format(
     member.role.shows,
     member.parent.entity.shortQualifiedName,
     member.entity.name,
     typeParams.shows)
+
+  def scaladocUrl = member.project.scaladocUrl map { base ⇒
+    s"$base/#${qualifiedName.replace(".", "/")}.html"
+  }
 }
 
 case class Def(
     member: Member,
     typeParams: List[model.TypeParam],
-    valueParams: List[List[model.ValueParam]]
-  ) extends Doc with model.TypeParameterized with model.ValueParameterized {
+    valueParams: List[List[model.ValueParam]]) extends Doc with model.TypeParameterized with model.ValueParameterized {
 
   def signature = (member.parent.typeParams ++ typeParams).shows + " " + (List(
     member.parent.signature,
@@ -38,6 +40,10 @@ case class Def(
     typeParams.shows,
     valueParams.shows,
     member.resultType)
+
+  def scaladocUrl = member.project.scaladocUrl map { base ⇒
+    s"$base/#${qualifiedName.replace(".", "/")}.html"
+  }
 }
 
 case class Val(
@@ -53,4 +59,8 @@ case class Val(
     member.role.shows,
     member.entity.name,
     member.resultType)
+
+  def scaladocUrl = member.project.scaladocUrl map { base ⇒
+    s"$base/#${qualifiedName.replace(".", "/")}.html"
+  }
 }

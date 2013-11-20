@@ -13,7 +13,7 @@ private[search] object ElasticToDocument extends org.scalex.util.ScalexJson {
 
   private val f = Index.fields
 
-  def apply(projectName: ProjectName, id: String, json: JsValue): Option[Doc] = {
+  def apply(project: Project, id: String, json: JsValue): Option[Doc] = {
 
     def readTypeParam(js: JsValue): Option[TypeParam] = for {
       tp ← js.asOpt[JsObject]
@@ -40,7 +40,6 @@ private[search] object ElasticToDocument extends org.scalex.util.ScalexJson {
     json.asOpt[JsObject] flatMap { doc ⇒
       (for {
         m ← doc obj f.member
-        project ← Project(projectName).toOption
         parent ← m obj f.parent flatMap { parent ⇒
           for {
             entity ← parent str f.entity map Entity
@@ -53,7 +52,7 @@ private[search] object ElasticToDocument extends org.scalex.util.ScalexJson {
         role ← m str f.role map Role.fromName
         flags = (m arr f.flags) ?? { ~_.asOpt[List[String]] }
         resultType ← m str f.resultType
-      } yield Member(project.id, parent, comment, entity, role, flags, resultType)) map { member ⇒
+      } yield Member(project, parent, comment, entity, role, flags, resultType)) map { member ⇒
         member.role match {
           case Role.Def ⇒ Def(
             member,

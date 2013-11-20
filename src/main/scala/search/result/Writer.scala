@@ -14,7 +14,8 @@ object Writer extends ScalexJson {
     import project._
     Json.obj(
       "name" -> name,
-      "version" -> version.shows
+      "version" -> version.shows,
+      "docUrl" -> scaladocUrl
     )
   }
 
@@ -57,7 +58,7 @@ object Writer extends ScalexJson {
   implicit val docWrites: OWrites[Doc] = OWrites { (doc: Doc) =>
     import doc._
     Json.obj(
-      "docUrl" -> "TODO",
+      "docUrl" -> scaladocUrl,
       "name" -> name,
       "qualifiedName" -> qualifiedName,
       "typeParams" -> (doc match {
@@ -72,7 +73,7 @@ object Writer extends ScalexJson {
       "declaration" -> declaration,
       "signature" -> signature,
       // TODO get global project
-      "project" -> member.projectId,
+      "project" -> member.project,
       "deprecation" -> "TODO",
       "parent" -> member.parent,
       "comment" -> member.comment.map(Json.toJson(_))

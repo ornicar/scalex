@@ -8,7 +8,7 @@ import play.api.libs.json._
 
 import document._
 import model.json._
-import model.{ TypeParam, ValueParam, Project, Role, Entity, Block, Comment }
+import model.{ TypeParam, ValueParam, Role, Entity, Block, Comment }
 
 private[text] object DocumentToElastic extends org.scalex.util.ScalexJson {
 
@@ -32,6 +32,8 @@ private[text] object DocumentToElastic extends org.scalex.util.ScalexJson {
     doc.qualifiedName -> new JsonSource(DropDefaults(Json.obj(
       f.name -> doc.member.entity.name,
       f.member -> Json.obj(
+        f.projectName -> doc.member.project.name,
+        f.projectVersion -> doc.member.project.version.shows,
         f.parent -> Json.obj(
           f.entity -> doc.member.parent.entity.qualifiedName,
           f.role -> doc.member.parent.role.name,

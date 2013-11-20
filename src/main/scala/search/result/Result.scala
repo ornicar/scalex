@@ -8,6 +8,7 @@ case class Result(doc: Doc, score: Score) {
 
   override def toString = {
     List(doc.name, doc) :::
-      (doc.member.comment ?? (_.summaryOrBody.txt)).toList
+      (doc.member.comment ?? (_.summaryOrBody.txt)).toList :::
+      doc.scaladocUrl.toList
   } mkString "\n"
 }
