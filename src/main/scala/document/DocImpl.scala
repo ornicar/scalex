@@ -24,6 +24,4 @@ private[document] trait DocImpl {
   def qualifiedName = member.entity.qualifiedName
 
   def namePile = member.entity.namePile
-
-  def scaladocUrl: Option[String]
 }

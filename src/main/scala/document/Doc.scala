@@ -16,10 +16,6 @@ case class Template(
     member.parent.entity.shortQualifiedName,
     member.entity.name,
     typeParams.shows)
-
-  def scaladocUrl = member.project.scaladocUrl map { base ⇒
-    s"$base/#${qualifiedName.replace(".", "/")}.html"
-  }
 }
 
 case class Def(
@@ -40,10 +36,6 @@ case class Def(
     typeParams.shows,
     valueParams.shows,
     member.resultType)
-
-  def scaladocUrl = member.project.scaladocUrl map { base ⇒
-    s"$base/#${qualifiedName.replace(".", "/")}.html"
-  }
 }
 
 case class Val(
@@ -59,8 +51,4 @@ case class Val(
     member.role.shows,
     member.entity.name,
     member.resultType)
-
-  def scaladocUrl = member.project.scaladocUrl map { base ⇒
-    s"$base/#${qualifiedName.replace(".", "/")}.html"
-  }
 }

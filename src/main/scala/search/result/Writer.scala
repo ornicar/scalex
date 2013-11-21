@@ -58,7 +58,7 @@ object Writer extends ScalexJson {
   implicit val docWrites: OWrites[Doc] = OWrites { (doc: Doc) =>
     import doc._
     Json.obj(
-      "docUrl" -> scaladocUrl,
+      "docUrl" -> ScaladocUrl(doc),
       "name" -> name,
       "qualifiedName" -> qualifiedName,
       "typeParams" -> (doc match {
