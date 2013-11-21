@@ -12,10 +12,6 @@ case class Header(projects: List[Project]) {
 
 object Header {
 
-  def apply(str: String): Header = Header {
-    str.split(';').toList.map(Project.apply).map(_.toOption).flatten 
-  }
-
   def merge(headers: List[Header]): Header = 
     headers.toNel.fold(Header(Nil)) { _ foldLeft1 { _ merge _ } }
 }

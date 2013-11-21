@@ -15,6 +15,7 @@ import org.elasticsearch.action.count.CountResponse
 import org.elasticsearch.action.search.SearchResponse
 import play.api.libs.json._
 
+import storage.Repository
 import model.{ Database, Project }
 
 private[search] final class TextActor(config: Config)
@@ -26,16 +27,15 @@ private[search] final class TextActor(config: Config)
   private var repository: ActorRef = _
   private val indexName = config getString "elastic.index"
 
+  override val supervisorStrategy = OneForOneStrategy() {
+    case _: InvalidDatabaseException ⇒ Escalate
+    case _: Exception                ⇒ Restart
+  }
+
   override def preStart {
     repository = context.actorOf(Props(
-      new storage.Repository(config getConfig "repository")
+      new Repository(config getConfig "repository")
     ), name = "repository")
-    es = context.actorOf(Props(
-      new elastic.ElasticActor(
-        config = config getConfig "elastic",
-        indexName = indexName,
-        indexSettings = Index.settings)
-    ), name = "elastic")
   }
 
   startWith(Booting, Pile(Vector.empty))
@@ -44,15 +44,20 @@ private[search] final class TextActor(config: Config)
   when(Booting) {
 
     case Event(MakeSelector, _) ⇒ {
-      import makeTimeout.short
-      repository ? storage.api.GetProjects mapTo
-        manifest[List[Project]] map Selector pipeTo self
+      repository ! Repository.GetProjects 
       stay
     }
 
-    case Event(selector: Selector, pile: Pile) ⇒ {
+    case Event(projects: Repository.Projects, pile: Pile) ⇒ {
+      val selector = Selector(projects.projects)
+      val es = context.actorOf(Props(
+        new elastic.ElasticActor(
+          config = config getConfig "elastic",
+          indexName = indexName,
+          indexSettings = Index.settings)
+      ), name = "elastic")
       Populator(repository, selector)(es, self) onComplete self.!
-      goto(Populating) using PileWith(pile, selector)
+      goto(Populating) using PileWith(pile, selector, es)
     }
 
     case Event(query: Query, pile: Pile) ⇒
@@ -61,17 +66,17 @@ private[search] final class TextActor(config: Config)
 
   when(Populating) {
 
-    case Event(q: Count, PileWith(_, selector)) ⇒ {
-      count(selector)(q)(sender)
+    case Event(q: Count, PileWith(_, selector, es)) ⇒ {
+      count(selector, es)(q)(sender)
       stay
     }
 
     case Event(Failure(err), _) ⇒ throw err
 
-    case Event(Success(_), PileWith(Pile(jobs), selector)) ⇒ {
+    case Event(Success(_), PileWith(Pile(jobs), selector, es)) ⇒ {
       jobs foreach self.!
       context.parent ! Ready
-      goto(Ready) using With(selector)
+      goto(Ready) using With(selector, es)
     }
 
     case Event(query: Query, pileWith: PileWith) ⇒
@@ -86,7 +91,7 @@ private[search] final class TextActor(config: Config)
       stay
     }
 
-    case Event(q: Query, With(selector)) ⇒ {
+    case Event(q: Query, With(selector, es)) ⇒ {
       val area = selector(q.scope)
       val types = area map (_.id)
       import makeTimeout.short
@@ -98,13 +103,13 @@ private[search] final class TextActor(config: Config)
       stay
     }
 
-    case Event(q: Count, With(selector)) ⇒ {
-      count(selector)(q)(sender)
+    case Event(q: Count, With(selector, es)) ⇒ {
+      count(selector, es)(q)(sender)
       stay
     }
   }
 
-  private def count(selector: Selector)(q: Count)(replyTo: ActorRef) {
+  private def count(selector: Selector, es: ActorRef)(q: Count)(replyTo: ActorRef) {
     val types = selector(q.scope) map (_.id)
     val request = ES.count.from(indexName).types(types) query q.definition
     es.tell(request, replyTo)
@@ -128,8 +133,8 @@ private[search] object TextActor {
   case class Pile(jobs: Vector[Job]) extends Data {
     def +(job: Job) = copy(jobs :+ job)
   }
-  case class With(selector: Selector) extends Data
-  case class PileWith(pile: Pile, selector: Selector) extends Data {
+  case class With(selector: Selector, es: ActorRef) extends Data
+  case class PileWith(pile: Pile, selector: Selector, es: ActorRef) extends Data {
     def +(job: Job) = copy(pile = pile + job)
   }
 }

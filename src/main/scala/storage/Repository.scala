@@ -15,12 +15,19 @@ import model.{ Header, Seed, Project, Database }
 import util.IO._
 import util.Timer._
 
-private[scalex] final class Repository(config: Config) extends Actor {
+private[scalex] final class Repository(config: Config) extends Actor with ActorLogging {
+
+  import Repository._
 
   def receive = {
 
     // fast
-    case GetProjects ⇒ projects pipeTo sender
+    case GetProjects ⇒ projects onComplete {
+      case Success(x) ⇒ sender ! Projects(x)
+      case Failure(e) ⇒ self ! new InvalidDatabaseException(e.toString)
+    }
+
+    case e: Exception ⇒ throw e
 
     // slow
     case GetSeed(project) ⇒ buildFileHeaders flatMap { list ⇒
@@ -70,4 +77,13 @@ private[scalex] final class Repository(config: Config) extends Actor {
     } filter (_.exists) sortBy (-_.length)
 
   private def isDbFile(file: File) = file.getName endsWith ".scalex"
+}
+
+private[scalex] object Repository {
+
+    case object GetProjects
+
+    case class Projects(projects: List[model.Project])
+
+    case class GetSeed(project: model.Project)
 }

@@ -5,7 +5,7 @@ import scala.util.{ Try, Success, Failure }
 
 import model._
 import binary.ModelToBinary
-import storage.BinaryToFile
+import storage.{ BinaryToFile, HeaderFormat }
 
 private[scalex] object Indexer {
 
@@ -26,7 +26,7 @@ private[scalex] object Indexer {
             config.name + "_" + config.version + ".scalex"
           else settings.outputFile.value
         )
-        BinaryToFile(outputFile, bytes, database.header.toString)
+        BinaryToFile(outputFile, bytes, HeaderFormat write database.header)
         println("- Success!")
         println("- Database saved to " + outputFile.getAbsolutePath)
       }

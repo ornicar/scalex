@@ -50,6 +50,7 @@ private[search] final class SearchActor(config: Config)
     // something went wrong and the child actor terminated
     // abort all jobs then die
     case Event(Terminated(_), Pile(jobs)) ⇒ {
+      println(s"Cancelling ${jobs.size} job(s)...")
       jobs foreach {
         case Job(_, from) ⇒ from ! Status.Failure(new SearchFailureException)
       }

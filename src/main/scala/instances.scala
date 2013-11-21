@@ -1,5 +1,6 @@
 package org.scalex
 
+import scala.concurrent.Future
 import scala.util.{ Try, Success, Failure }
 
 import scalaz._
@@ -34,6 +35,14 @@ private[scalex] trait instances {
         e ⇒ println("[failure] " + e),
         a ⇒ println("[success] " + a)
       )
+    }
+  }
+
+  implicit final class ScalexFuTry[A](fua: Fu[Try[A]]) {
+
+    def flatten: Fu[A] = fua flatMap {
+      case Success(a) ⇒ fuccess(a)
+      case Failure(e) ⇒ Future failed e
     }
   }
 

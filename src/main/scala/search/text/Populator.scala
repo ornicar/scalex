@@ -10,6 +10,7 @@ import akka.pattern.{ ask, pipe }
 
 import document.ModelToDocument
 import model.{ Database, Project, Seed }
+import storage.Repository
 
 private[text] object Populator extends scalaz.NonEmptyListFunctions {
 
@@ -20,7 +21,7 @@ private[text] object Populator extends scalaz.NonEmptyListFunctions {
     def index(project: Project): Fu[Unit] = {
       println(s"[$project] Indexing documents")
       import makeTimeout.veryLarge
-      repository ? storage.api.GetSeed(project) mapTo manifest[Option[Seed]] flatMap {
+      repository ? Repository.GetSeed(project) mapTo manifest[Option[Seed]] flatMap {
         _.fold(fufail[Any](badArg("Can't find seed of " + project))) { seed ⇒
           println(s"[$seed] ${seed.describe}")
           es ! elastic.api.Clear(seed.project.id, Index.mapping)
