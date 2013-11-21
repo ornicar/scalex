@@ -35,7 +35,7 @@ private[text] object Populator extends scalaz.NonEmptyListFunctions {
     } void
 
     def isIndexed(project: Project): Fu[Boolean] = {
-      import makeTimeout.large
+      import makeTimeout.short
       textActor ? Count(tokens = Nil, scope = query.Scope() + project.name)
     } mapTo manifest[Int] map (0!=)
 

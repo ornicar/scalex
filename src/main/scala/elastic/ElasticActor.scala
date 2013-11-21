@@ -19,12 +19,15 @@ import util.Timer._
 private[scalex] final class ElasticActor(
     config: Config,
     indexName: String,
-    indexSettings: Map[String, String]) extends Actor {
+    indexSettings: Map[String, String]) extends Actor with ActorLogging {
+
+  import ElasticActor._
 
   var client: ElasticClient = _
 
   override def preStart {
     client = instanciateElasticClient
+    self ! EnsureIndex
   }
 
   override def postStop {
@@ -34,7 +37,11 @@ private[scalex] final class ElasticActor(
 
   def receive = {
 
-    case api.Clear(typeName, mapping) ⇒ Await.ready((Future {
+    case EnsureIndex ⇒ client execute {
+      ES.create index indexName // mappings (typeName as mapping)
+    }
+
+    case api.Clear(typeName, mapping) ⇒ Future {
       try {
         client execute { ES.delete from s"$indexName/typeName" where ES.matchall }
       }
@@ -42,10 +49,7 @@ private[scalex] final class ElasticActor(
         case e: org.elasticsearch.indices.TypeMissingException ⇒
       }
       // TODO set type mappings
-      // client execute {
-      //   ES.create index indexName mappings (typeName as mapping)
-      // }
-    }) recover { case e ⇒ println("[elastic] clear: " + e) }, 3 second)
+    }
 
     case api.Optimize ⇒ client execute { ES optimize indexName } pipeTo sender
 
@@ -57,7 +61,14 @@ private[scalex] final class ElasticActor(
 
     case search: ES.SearchDefinition ⇒ execute(client execute search, sender)
 
-    case count: ES.CountDefinition   ⇒ execute(client execute count, sender)
+    case count: ES.CountDefinition ⇒ {
+      val replyTo = sender
+      client execute count onComplete {
+        case Success(response) ⇒ replyTo ! response.getCount.toInt
+        case Failure(_: org.elasticsearch.indices.TypeMissingException) ⇒ sender ! 0
+        case Failure(exception) ⇒ throw exception
+      }
+    }
   }
 
   private def execute[A](action: Future[A], replyTo: ActorRef) {
@@ -80,4 +91,9 @@ private[scalex] final class ElasticActor(
       println("[search] Elastic client running")
     }
   }
+}
+
+private[elastic] object ElasticActor {
+
+  case object EnsureIndex
 }

@@ -18,7 +18,7 @@ import play.api.libs.json._
 import model.{ Database, Project }
 
 private[search] final class TextActor(config: Config)
-    extends FSM[TextActor.State, TextActor.Data] {
+    extends LoggingFSM[TextActor.State, TextActor.Data] {
 
   import TextActor._
 
@@ -62,7 +62,7 @@ private[search] final class TextActor(config: Config)
   when(Populating) {
 
     case Event(q: Count, PileWith(_, selector)) ⇒ {
-      count(selector)(q)
+      count(selector)(q)(sender)
       stay
     }
 
@@ -99,17 +99,15 @@ private[search] final class TextActor(config: Config)
     }
 
     case Event(q: Count, With(selector)) ⇒ {
-      count(selector)(q)
+      count(selector)(q)(sender)
       stay
     }
   }
 
-  private def count(selector: Selector)(q: Count) {
+  private def count(selector: Selector)(q: Count)(replyTo: ActorRef) {
     val types = selector(q.scope) map (_.id)
-    import makeTimeout.short
-    (es ? {
-      ES.count.from(indexName).types(types) query q.definition
-    }) mapTo manifest[CountResponse] map (_.getCount.toInt) pipeTo sender
+    val request = ES.count.from(indexName).types(types) query q.definition
+    es.tell(request, replyTo)
   }
 
   private val indexPrefix = indexName + "/"

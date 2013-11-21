@@ -15,7 +15,7 @@ import scalaz.{ \/, -\/, \/- }
 import text.TextActor
 
 private[search] final class SearchActor(config: Config)
-    extends FSM[SearchActor.State, SearchActor.Data] {
+    extends LoggingFSM[SearchActor.State, SearchActor.Data] {
 
   import SearchActor._
 
