@@ -11,7 +11,10 @@ case class Env(
     // akka actor system, or "context"
     system: ActorSystem) {
 
-  def shutdown { system.shutdown }
+  def shutdown { 
+    println("Scalex env shutdown")
+    system.shutdown 
+  }
 }
 
 object Env {

@@ -2,8 +2,8 @@ package org.scalex
 
 sealed trait ScalexException
 
-final class InvalidProjectNameException(name: String)
-  extends Exception("Invalid project name: " + name)
+final class InvalidHeaderException(str: String)
+  extends Exception("Invalid project header: " + str)
   with ScalexException
 
 final class InvalidProjectVersionException(version: String)

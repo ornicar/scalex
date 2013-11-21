@@ -14,12 +14,12 @@ private[scalex] object HeaderFormat {
   def read(str: String): Try[Header] =
     str.split(projectSep).toList.foldLeft(Success(Nil): Try[List[Project]]) {
       case (Success(projects), nameVersionUrlRegex(name, version, url)) ⇒
-        Project(name, version, url.some.filter(_.nonEmpty).pp) map (p ⇒ projects :+ p)
-      case (_: Success[_], str) ⇒ Failure(new InvalidProjectNameException(str))
+        Project(name, version, url.some.filter(_.nonEmpty)) map (p ⇒ projects :+ p)
+      case (_: Success[_], str) ⇒ Failure(new InvalidHeaderException(str))
       case (e: Failure[_], _)   ⇒ e
     } map Header.apply
 
   def write(header: Header): String = header.projects map { p ⇒
-    s"${p.name}|{$p.version}|{$p.scaladocUrl}"
+    s"${p.name}|${p.version}|${~p.scaladocUrl}"
   } mkString projectSep
 }

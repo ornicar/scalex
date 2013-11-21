@@ -22,9 +22,12 @@ private[scalex] final class Repository(config: Config) extends Actor with ActorL
   def receive = {
 
     // fast
-    case GetProjects ⇒ projects onComplete {
-      case Success(x) ⇒ sender ! Projects(x)
-      case Failure(e) ⇒ self ! new InvalidDatabaseException(e.toString)
+    case GetProjects ⇒ {
+      val replyTo = sender
+      projects onComplete {
+        case Success(x) ⇒ replyTo ! Projects(x)
+        case Failure(e) ⇒ self ! new InvalidDatabaseException(e.toString)
+      }
     }
 
     case e: Exception ⇒ throw e
@@ -81,9 +84,9 @@ private[scalex] final class Repository(config: Config) extends Actor with ActorL
 
 private[scalex] object Repository {
 
-    case object GetProjects
+  case object GetProjects
 
-    case class Projects(projects: List[model.Project])
+  case class Projects(projects: List[model.Project])
 
-    case class GetSeed(project: model.Project)
+  case class GetSeed(project: model.Project)
 }

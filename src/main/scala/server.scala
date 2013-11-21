@@ -60,7 +60,7 @@ private[server] final class ScalexApp(searcher: search.Search) extends HApp {
             res ⇒ write(_.OK)(res)
           )
           case Failure(err) ⇒ write(_.InternalServerError) {
-            s"""Failure while searching for "$q": $err""".pp
+            s"""Failure while searching for "$q": $err"""
           }
         }
       }

@@ -3,8 +3,6 @@ package model
 
 case class Header(projects: List[Project]) {
 
-  override def toString = projects mkString ";"
-
   def contains(project: Project) = projects contains project
 
   def merge(other: Header) = Header((projects ++ other.projects).distinct)
