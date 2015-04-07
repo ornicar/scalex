@@ -2,7 +2,7 @@
 
 - [See it in action](http://scalex.org)
 
-- Read the [HTTP API documentation](https://github.com/ornicar/scalex/blob/master/http-api-documentation.md)
+- Read the [HTTP API documentation](https://github.com/ornicar/scalex/blob/master/doc/http-api.md)
 
 ## Usage
 
